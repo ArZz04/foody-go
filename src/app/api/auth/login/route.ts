@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken"
+
 
 export async function POST(req: Request) {
   try {
@@ -41,28 +42,28 @@ export async function POST(req: Request) {
     }
 
     // 3) Generar token JWT
-    const secret = process.env.JWT_SECRET;
+    const secret: jwt.Secret = process.env.JWT_SECRET as string
     if (!secret) {
       throw new Error("JWT_SECRET no configurado en .env");
+    }
+
+    const options: SignOptions = {
+      expiresIn: (process.env.JWT_EXPIRES_IN || "9h") as SignOptions["expiresIn"],
     }
 
     const token = jwt.sign(
       {
         id: user.id,
-        name: user.first_name + " " + user.last_name,
+        name: `${user.first_name} ${user.last_name}`,
         role: user.role,
       },
       secret,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN || "9h", // default 9h
-      },
-    );
+      options
+    )
 
     // 4) Decidir redirección según rol
-    let redirectTo = "/tiendas";
-    if (user.role === "MANAGER" || user.role === "OWNER") {
-      redirectTo = "/dashboard";
-    }
+    const redirectTo =
+      user.role === "CUSTOMER" ? "/tiendas" : "/dashboard";
 
     // 5) Devolver token y ruta de redirección
     return NextResponse.json({
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
         name: `${user.first_name} ${user.last_name}`,
         role: user.role,
       },
-      redirectTo: user.role === "CUSTOMER" ? "/tiendas" : "/dashboard",
+      redirectTo,
     });
   } catch (error) {
     console.error(error);
