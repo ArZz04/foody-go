@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  console.log(user);
 
   return (
     <nav className="border-b border-white/10 bg-black/40 text-white backdrop-blur supports-[backdrop-filter]:bg-black/30">
