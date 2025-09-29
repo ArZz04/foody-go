@@ -79,7 +79,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Error en el servidor" },
+      { 
+        error: "Error en el servidor",
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 },
     );
   }
