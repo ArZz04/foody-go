@@ -15,9 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <Navbar/>
-        {children}
+      <body className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-fixed bg-center">
+        <div className="min-h-screen flex flex-col">
+          <Navbar />
+          {children}
+        </div>
       </body>
     </html>
   );
