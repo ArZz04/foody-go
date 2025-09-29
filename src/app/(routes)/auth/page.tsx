@@ -2,13 +2,25 @@
 
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import LoginForm from "@/app/components/auth/loginForm";
 import RegisterForm from "@/app/components/auth/RegisterForm";
 
-export default function AuthPage() {
+function AuthContent() {
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") || "login";
 
+  return (
+    <div className="w-full max-w-md mx-auto">
+      {mode === "register" ? <RegisterForm /> : <LoginForm />}
+      <div className="text-center mt-8">
+        <p className="text-white/60 text-sm">© 2025 Foody Go</p>
+      </div>
+    </div>
+  );
+}
+
+export default function AuthPage() {
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center">
       <div className="min-h-screen bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -28,14 +40,9 @@ export default function AuthPage() {
           </div>
 
           {/* Right Panel */}
-          <div className="w-full max-w-md mx-auto">
-            {mode === "register" ? <RegisterForm /> : <LoginForm />}
-
-            {/* Footer */}
-            <div className="text-center mt-8">
-              <p className="text-white/60 text-sm">© 2025 Foody Go</p>
-            </div>
-          </div>
+          <Suspense fallback={<div className="text-white">Cargando...</div>}>
+            <AuthContent />
+          </Suspense>
         </div>
       </div>
     </div>
