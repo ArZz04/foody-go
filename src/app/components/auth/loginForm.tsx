@@ -1,67 +1,84 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Link from "next/link"
+import type React from "react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function LoginForm() {
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [password, setPassword] = useState("")
-  const [acceptTerms, setAcceptTerms] = useState(false)
-  const [userType, setUserType] = useState("Usuario")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const router = useRouter();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Handle login logic here
-    console.log("Login attempt:", { phoneNumber, password, userType, acceptTerms })
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        login(
+          { id: data.user.id, name: data.user.name, role: data.user.role },
+          data.token,
+        );
+        // Redirigir según rol
+        router.push(data.redirectTo);
+      } else {
+        setErrorMessage(data.error || "Error en el inicio de sesión");
+      }
+    } catch (err) {
+      console.error("Error en la petición:", err);
+      setErrorMessage("Error de conexión con el servidor");
+    }
+  };
 
   return (
     <div className="bg-black rounded-2xl p-8 shadow-2xl">
-      <h1 className="text-white text-2xl font-semibold mb-8 text-center">Inicio de sesión</h1>
-
+      <h1 className="text-white text-2xl font-semibold mb-8 text-center">
+        Inicio de sesión
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Phone Number Field */}
+        {/* Mensaje de error */}
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+        )}
+
+        {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-white text-sm">
-            Número de teléfono
+          <Label htmlFor="email" className="text-white text-sm">
+            Correo electrónico
           </Label>
-          <div className="flex gap-2">
-            <Select defaultValue="+52">
-              <SelectTrigger className="w-32 bg-gray-800 border-gray-700 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="+52" className="text-white">
-                  +52 México
-                </SelectItem>
-                <SelectItem value="+1" className="text-white">
-                  +1 USA
-                </SelectItem>
-                <SelectItem value="+34" className="text-white">
-                  +34 España
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="3312726618"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
-              required
-            />
-          </div>
+          <Input
+            id="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            required
+          />
         </div>
 
-        {/* Password Field */}
+        {/* Password */}
         <div className="space-y-2">
           <Label htmlFor="password" className="text-white text-sm">
             Contraseña
@@ -81,7 +98,6 @@ export default function LoginForm() {
         <Button
           type="submit"
           className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg"
-          disabled={!acceptTerms}
         >
           Iniciar sesión
         </Button>
@@ -90,12 +106,15 @@ export default function LoginForm() {
         <div className="text-center">
           <span className="text-gray-400 text-sm">
             ¿No tienes cuenta?{" "}
-            <Link href="/auth?mode=register" className="text-emerald-400 hover:text-emerald-300">
+            <Link
+              href="/auth?mode=register"
+              className="text-emerald-400 hover:text-emerald-300"
+            >
               Regístrate
             </Link>
           </span>
         </div>
       </form>
     </div>
-  )
+  );
 }

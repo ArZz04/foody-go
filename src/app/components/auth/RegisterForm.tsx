@@ -1,82 +1,139 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Link from "next/link"
+import type React from "react";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
-  const [name, setName] = useState("")
-  const [phoneNumber, setPhoneNumber] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [acceptTerms, setAcceptTerms] = useState(false)
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("");
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); // 👈 estado para errores
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Register attempt:", { name, phoneNumber, password, confirmPassword, acceptTerms })
-  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          phone: phoneNumber,
+          email,
+          password,
+          role: role || undefined,
+        }),
+      });
+
+      if (res.ok) {
+        router.push("/"); // 👈 redirige al home si fue exitoso
+      } else {
+        const data = await res.json();
+        setErrorMessage(data.error || "Error en el registro");
+      }
+    } catch (err) {
+      console.error("Error en la petición:", err);
+      setErrorMessage("Error de conexión con el servidor");
+    }
+  };
 
   return (
     <div className="bg-black rounded-2xl p-8 shadow-2xl">
-      <h1 className="text-white text-2xl font-semibold mb-8 text-center">Registro</h1>
+      <h1 className="text-white text-2xl font-semibold mb-8 text-center">
+        Registro
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* 👇 mensaje de error */}
+        {errorMessage && (
+          <p className="text-red-500 text-sm text-center">{errorMessage}</p>
+        )}
+
+        {/* First Name */}
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-white text-sm">
-            Nombre completo
+          <Label htmlFor="firstName" className="text-white text-sm">
+            Nombre
           </Label>
           <Input
-            id="name"
+            id="firstName"
             type="text"
-            placeholder="Tu nombre completo"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            placeholder="Tu nombre"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
             required
           />
         </div>
 
-        {/* Phone Number Field */}
+        {/* Last Name */}
+        <div className="space-y-2">
+          <Label htmlFor="lastName" className="text-white text-sm">
+            Apellido
+          </Label>
+          <Input
+            id="lastName"
+            type="text"
+            placeholder="Tu apellido"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        {/* Email */}
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-white text-sm">
+            Correo electrónico
+          </Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            required
+          />
+        </div>
+
+        {/* Phone */}
         <div className="space-y-2">
           <Label htmlFor="phone" className="text-white text-sm">
             Número de teléfono
           </Label>
-          <div className="flex gap-2">
-            <Select defaultValue="+52">
-              <SelectTrigger className="w-32 bg-gray-800 border-gray-700 text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-gray-800 border-gray-700">
-                <SelectItem value="+52" className="text-white">
-                  +52 México
-                </SelectItem>
-                <SelectItem value="+1" className="text-white">
-                  +1 USA
-                </SelectItem>
-                <SelectItem value="+34" className="text-white">
-                  +34 España
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="3312726618"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="flex-1 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
-              required
-            />
-          </div>
+          <Input
+            id="phone"
+            type="tel"
+            placeholder="3312726618"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            required
+          />
         </div>
 
-        {/* Password Field */}
+        {/* Password */}
         <div className="space-y-2">
           <Label htmlFor="password" className="text-white text-sm">
             Contraseña
@@ -92,6 +149,7 @@ export default function RegisterForm() {
           />
         </div>
 
+        {/* Confirm Password */}
         <div className="space-y-2">
           <Label htmlFor="confirmPassword" className="text-white text-sm">
             Confirmar contraseña
@@ -107,9 +165,13 @@ export default function RegisterForm() {
           />
         </div>
 
-        {/* Terms Checkbox */}
+        {/* Terms */}
         <div className="flex items-center space-x-2">
-          <Checkbox id="terms" checked={acceptTerms} onCheckedChange={(checked) => setAcceptTerms(checked === true)} />
+          <Checkbox
+            id="terms"
+            checked={acceptTerms}
+            onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+          />
           <Label htmlFor="terms" className="text-gray-300 text-sm">
             Acepto Términos de uso y política de privacidad
           </Label>
@@ -126,12 +188,15 @@ export default function RegisterForm() {
         <div className="text-center">
           <span className="text-gray-400 text-sm">
             ¿Ya tienes cuenta?{" "}
-            <Link href="/auth?mode=login" className="text-emerald-400 hover:text-emerald-300">
+            <Link
+              href="/auth?mode=login"
+              className="text-emerald-400 hover:text-emerald-300"
+            >
               Inicia sesión
             </Link>
           </span>
         </div>
       </form>
     </div>
-  )
+  );
 }

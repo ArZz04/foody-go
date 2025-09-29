@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { useSearchParams } from "next/navigation"
-import LoginForm from "@/app/components/auth/loginForm"
-import RegisterForm from "@/app/components/auth/RegisterForm"
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import LoginForm from "@/app/components/auth/loginForm";
+import RegisterForm from "@/app/components/auth/RegisterForm";
 
 export default function AuthPage() {
-  const searchParams = useSearchParams()
-  const mode = searchParams.get("mode") || "login"
+  const searchParams = useSearchParams();
+  const mode = searchParams.get("mode") || "login";
 
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center">
@@ -31,7 +31,7 @@ export default function AuthPage() {
           <div className="w-full max-w-md mx-auto">
             {mode === "register" ? <RegisterForm /> : <LoginForm />}
 
-          {/* Footer */}
+            {/* Footer */}
             <div className="text-center mt-8">
               <p className="text-white/60 text-sm">© 2025 Foody Go</p>
             </div>
@@ -39,5 +39,5 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

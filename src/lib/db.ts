@@ -1,5 +1,5 @@
-import mysql from "mysql2/promise"
-import fs from "fs"
+import mysql from "mysql2/promise";
+import fs from "fs";
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST || "localhost",
@@ -11,8 +11,8 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-  ca: fs.readFileSync(process.env.DB_CA as string),
-}
-})
+    ca: fs.readFileSync(process.env.DB_CA as string),
+  },
+});
 
-export default pool
+export default pool;

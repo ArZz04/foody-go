@@ -1,8 +1,8 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { MoveRight } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MoveRight } from "lucide-react";
 
 export default function Home() {
   return (
@@ -15,11 +15,12 @@ export default function Home() {
               🚀 Entrega en 30 minutos o menos
             </Badge>
             <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 text-balance drop-shadow-lg">
-              Tu comida favorita, <span className="text-primary-foreground">al instante</span>
+              Tu comida favorita,{" "}
+              <span className="text-primary-foreground">al instante</span>
             </h1>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto text-pretty">
-              Descubre miles de restaurantes locales. Ordena con un click y disfruta de la mejor comida en la comodidad
-              de tu hogar.
+              Descubre miles de restaurantes locales. Ordena con un click y
+              disfruta de la mejor comida en la comodidad de tu hogar.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8 py-6 shadow-lg">
@@ -47,19 +48,27 @@ export default function Home() {
         <section className="container mx-auto px-4 py-16">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">500+</div>
+              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
+                500+
+              </div>
               <div className="text-white/70">Restaurantes</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">25min</div>
+              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
+                25min
+              </div>
               <div className="text-white/70">Tiempo promedio</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">50k+</div>
+              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
+                50k+
+              </div>
               <div className="text-white/70">Clientes felices</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">4.8★</div>
+              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
+                4.8★
+              </div>
               <div className="text-white/70">Calificación</div>
             </div>
           </div>
@@ -68,7 +77,9 @@ export default function Home() {
         {/* Features Section */}
         <section className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">¿Por qué elegir food-go?</h2>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              ¿Por qué elegir food-go?
+            </h2>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
               La experiencia de delivery más rápida y confiable de la ciudad
             </p>
@@ -80,8 +91,12 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">⚡</span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Súper rápido</h3>
-                <p className="text-white/80">Entrega garantizada en 30 minutos o tu pedido es gratis</p>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Súper rápido
+                </h3>
+                <p className="text-white/80">
+                  Entrega garantizada en 30 minutos o tu pedido es gratis
+                </p>
               </CardContent>
             </Card>
 
@@ -90,9 +105,12 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">🍕</span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Variedad infinita</h3>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Variedad infinita
+                </h3>
                 <p className="text-white/80">
-                  Desde pizza hasta sushi, encuentra exactamente lo que se te antoja
+                  Desde pizza hasta sushi, encuentra exactamente lo que se te
+                  antoja
                 </p>
               </CardContent>
             </Card>
@@ -102,8 +120,12 @@ export default function Home() {
                 <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <span className="text-2xl">💳</span>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Pago seguro</h3>
-                <p className="text-white/80">Múltiples métodos de pago con la máxima seguridad</p>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  Pago seguro
+                </h3>
+                <p className="text-white/80">
+                  Múltiples métodos de pago con la máxima seguridad
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -113,10 +135,12 @@ export default function Home() {
         <section className="container mx-auto px-4 py-20 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-5xl font-bold text-white mb-6 text-balance drop-shadow-lg">
-              ¿Listo para tu próxima <span className="text-primary-foreground">comida perfecta?</span>
+              ¿Listo para tu próxima{" "}
+              <span className="text-primary-foreground">comida perfecta?</span>
             </h2>
             <p className="text-xl text-white/80 mb-8">
-              Únete a miles de usuarios que ya disfrutan de la mejor experiencia de delivery
+              Únete a miles de usuarios que ya disfrutan de la mejor experiencia
+              de delivery
             </p>
             <Button size="lg" className="text-lg px-12 py-6 shadow-lg">
               Comenzar ahora
@@ -125,5 +149,5 @@ export default function Home() {
         </section>
       </main>
     </div>
-  )
+  );
 }
