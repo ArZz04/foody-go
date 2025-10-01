@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -31,6 +32,7 @@ type StoreExplorerProps = {
   categories: Category[];
   defaultCategory?: string;
   lockedCategory?: boolean;
+  afterFilters?: ReactNode;
 };
 
 export function StoreExplorer({
@@ -38,6 +40,7 @@ export function StoreExplorer({
   categories,
   defaultCategory = "",
   lockedCategory = false,
+  afterFilters,
 }: StoreExplorerProps) {
   const initialCategory = defaultCategory;
   const searchParams = useSearchParams();
@@ -306,7 +309,7 @@ export function StoreExplorer({
 
   return (
     <section className="space-y-6">
-      <div className="space-y-3">
+      <div className="space-y-6">
         <div className="rounded-3xl border border-emerald-100 bg-white/95 p-6 shadow-lg backdrop-blur-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
             <div className="flex-1">
@@ -432,6 +435,7 @@ export function StoreExplorer({
           ) : null}
         </div>
         </div>
+        {afterFilters ? <div className="space-y-10">{afterFilters}</div> : null}
         <div className="flex items-center justify-between rounded-full border border-emerald-100 bg-white/90 px-5 py-3 text-sm text-muted-foreground shadow">
           <p>
             {filteredStores.length} {filteredStores.length === 1 ? "tienda" : "tiendas"} encontradas
