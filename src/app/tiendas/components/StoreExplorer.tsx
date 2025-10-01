@@ -306,7 +306,7 @@ export function StoreExplorer({
 
   return (
     <section className="space-y-6">
-      <div className="sticky top-24 z-20 space-y-3">
+      <div className="space-y-3">
         <div className="rounded-3xl border border-emerald-100 bg-white/95 p-6 shadow-lg backdrop-blur-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
             <div className="flex-1">
