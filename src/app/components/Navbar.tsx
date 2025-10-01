@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
+import { ShoppingCart } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -47,6 +49,16 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="hidden rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 sm:inline-flex"
+                >
+                  <Link href="/carrito" className="flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>Carrito</span>
+                  </Link>
+                </Button>
                 <span className="text-white/80">Hola, {user.name}</span>
                 <Button
                   variant="ghost"
@@ -73,6 +85,17 @@ export default function Navbar() {
                 </Button>
               </>
             )}
+            {user ? (
+              <Button
+                asChild
+                variant="ghost"
+                className="inline-flex rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 sm:hidden"
+              >
+                <Link href="/carrito" aria-label="Ir al carrito">
+                  <ShoppingCart className="h-5 w-5" />
+                </Link>
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>
