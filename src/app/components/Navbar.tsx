@@ -17,16 +17,13 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center">
-                <Image
+              <Image
                   src="/logo.png"
                   alt="Logo"
                   width={24}
                   height={24}
                   className="h-6 w-6"
                 />
-              </div>
-              <span className="font-bold text-xl text-white">Logo</span>
             </Link>
           </div>
 
