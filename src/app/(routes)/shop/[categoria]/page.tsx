@@ -4,17 +4,13 @@ import { notFound } from "next/navigation";
 import { StoreExplorer } from "../components/StoreExplorer";
 import { categories, stores } from "../data";
 
-type CategoryPageProps = {
-  params: {
-    categoria: string;
-  };
-};
-
 export function generateStaticParams() {
   return categories.map((category) => ({ categoria: category.slug }));
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
+export default function CategoryPage({
+  params,
+}: { params: { categoria: string } }) {
   const category = categories.find((item) => item.slug === params.categoria);
 
   if (!category) {
