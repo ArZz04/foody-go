@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { IMAGE_BLUR_DATA_URL } from "@/app/tiendas/data";
+import { IMAGE_BLUR_DATA_URL } from "@/app/(routes)/shop/data";
 
 const cartItems = [
   {

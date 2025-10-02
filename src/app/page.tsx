@@ -32,7 +32,7 @@ export default function Home() {
                 size="lg"
                 className="group relative overflow-hidden text-lg px-8 py-6 border-white/60 bg-white/10 text-white backdrop-blur transition duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(255,255,255,0.35)]"
               >
-                <Link href="/tiendas" className="flex items-center gap-2">
+                <Link href="/shop" className="flex items-center gap-2">
                   <span className="relative z-10 flex items-center gap-2 font-medium transition-transform duration-300 group-hover:translate-x-1 group-hover:text-foreground">
                     Ver tiendas
                     <MoveRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />

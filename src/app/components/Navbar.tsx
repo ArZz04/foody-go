@@ -26,22 +26,10 @@ export default function Navbar() {
           {/* Navigation Links - Desktop */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
-              href="/features"
+              href="/"
               className="text-white/80 hover:text-white transition-colors"
             >
-              Características
-            </Link>
-            <Link
-              href="/pricing"
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Precios
-            </Link>
-            <Link
-              href="/about"
-              className="text-white/80 hover:text-white transition-colors"
-            >
-              Acerca de
+              Inicio
             </Link>
           </div>
 
