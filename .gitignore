@@ -17,9 +17,6 @@
 /.next/
 /out/
 
-# ruta desactivada
-/unavailable/
-
 # production
 /build
 
