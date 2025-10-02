@@ -6,7 +6,6 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { IMAGE_BLUR_DATA_URL } from "@/app/(routes)/shop/data";
 
 const cartItems = [
   {
@@ -95,7 +94,6 @@ export default function CarritoPage() {
                     className="object-cover"
                     sizes="(min-width: 1024px) 160px, (min-width: 640px) 200px, 100vw"
                     placeholder="blur"
-                    blurDataURL={IMAGE_BLUR_DATA_URL}
                   />
                 </div>
                 <div className="flex flex-1 flex-col gap-3">
