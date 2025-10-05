@@ -46,26 +46,41 @@ export default function CarritoPage() {
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold">Necesitas iniciar sesión</h1>
             <p className="text-sm text-emerald-800/80">
-              Guarda tus pedidos favoritos y sigue tu carrito desde cualquier dispositivo.
+              Guarda tus pedidos favoritos y sigue tu carrito desde cualquier
+              dispositivo.
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild className="bg-emerald-600 text-white hover:bg-emerald-700">
+            <Button
+              asChild
+              className="bg-emerald-600 text-white hover:bg-emerald-700"
+            >
               <Link href="/auth?mode=login">Iniciar sesión</Link>
             </Button>
-            <Button asChild variant="outline" className="border-emerald-300 text-emerald-700">
+            <Button
+              asChild
+              variant="outline"
+              className="border-emerald-300 text-emerald-700"
+            >
               <Link href="/auth?mode=register">Crear cuenta</Link>
             </Button>
           </div>
           <p className="text-xs text-emerald-800/60">
-            ¿Buscas algo rico? Explora las <Link href="/tiendas" className="underline">tiendas disponibles</Link>.
+            ¿Buscas algo rico? Explora las{" "}
+            <Link href="/tiendas" className="underline">
+              tiendas disponibles
+            </Link>
+            .
           </p>
         </div>
       </div>
     );
   }
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0,
+  );
   const total = subtotal + deliveryFee + serviceFee;
 
   return (
@@ -75,8 +90,8 @@ export default function CarritoPage() {
           <header className="flex flex-col gap-2">
             <h1 className="text-3xl font-semibold">Tu carrito</h1>
             <p className="text-sm text-emerald-900/80">
-              Revisa tu pedido antes de confirmar. Puedes ajustar cantidades o dejar instrucciones
-              especiales para cada tienda.
+              Revisa tu pedido antes de confirmar. Puedes ajustar cantidades o
+              dejar instrucciones especiales para cada tienda.
             </p>
           </header>
 
@@ -99,9 +114,15 @@ export default function CarritoPage() {
                 <div className="flex flex-1 flex-col gap-3">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h2 className="text-lg font-semibold text-emerald-950">{item.name}</h2>
-                      <p className="text-sm text-emerald-900/70">{item.store}</p>
-                      <p className="text-xs text-emerald-900/60">{item.notes}</p>
+                      <h2 className="text-lg font-semibold text-emerald-950">
+                        {item.name}
+                      </h2>
+                      <p className="text-sm text-emerald-900/70">
+                        {item.store}
+                      </p>
+                      <p className="text-xs text-emerald-900/60">
+                        {item.notes}
+                      </p>
                     </div>
                     <div className="text-right text-sm font-semibold text-emerald-900">
                       MX${(item.price * item.quantity).toFixed(2)}
@@ -109,11 +130,21 @@ export default function CarritoPage() {
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs">
                     <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 px-3 py-1">
-                      <button className="text-emerald-600" aria-label="Disminuir">−</button>
+                      <button
+                        className="text-emerald-600"
+                        aria-label="Disminuir"
+                      >
+                        −
+                      </button>
                       <span className="min-w-[2ch] text-center text-sm font-semibold text-emerald-900">
                         {item.quantity}
                       </span>
-                      <button className="text-emerald-600" aria-label="Aumentar">+</button>
+                      <button
+                        className="text-emerald-600"
+                        aria-label="Aumentar"
+                      >
+                        +
+                      </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {item.tags.map((tag) => (
@@ -136,10 +167,12 @@ export default function CarritoPage() {
           </div>
 
           <div className="rounded-3xl border border-dashed border-emerald-200 bg-emerald-50/80 p-6">
-            <h2 className="text-lg font-semibold text-emerald-900">Instrucciones para el repartidor</h2>
+            <h2 className="text-lg font-semibold text-emerald-900">
+              Instrucciones para el repartidor
+            </h2>
             <p className="mt-2 text-sm text-emerald-900/70">
-              Agrega cualquier indicación adicional (por ejemplo: “dejar en recepción” o “tocar el
-              timbre 2”).
+              Agrega cualquier indicación adicional (por ejemplo: “dejar en
+              recepción” o “tocar el timbre 2”).
             </p>
             <textarea
               placeholder="Escribe tus instrucciones..."
@@ -151,7 +184,9 @@ export default function CarritoPage() {
 
         <aside className="space-y-6">
           <div className="rounded-3xl border border-emerald-100 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-emerald-900">Resumen de pago</h2>
+            <h2 className="text-lg font-semibold text-emerald-900">
+              Resumen de pago
+            </h2>
             <dl className="mt-4 space-y-3 text-sm text-emerald-900/80">
               <div className="flex items-center justify-between">
                 <dt>Subtotal</dt>
@@ -176,7 +211,9 @@ export default function CarritoPage() {
           </div>
 
           <div className="rounded-3xl border border-emerald-100 bg-white/90 p-6 text-sm text-emerald-900/80">
-            <h3 className="text-sm font-semibold text-emerald-900">Beneficios de Foody Go</h3>
+            <h3 className="text-sm font-semibold text-emerald-900">
+              Beneficios de Foody Go
+            </h3>
             <ul className="mt-3 space-y-2">
               <li>• Soporte 24/7 para cualquier pedido</li>
               <li>• Seguimiento en tiempo real</li>

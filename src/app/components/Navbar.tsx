@@ -18,12 +18,12 @@ export default function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image
-                  src="/logo.png"
-                  alt="Logo"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6"
-                />
+                src="/logo.png"
+                alt="Logo"
+                width={24}
+                height={24}
+                className="h-6 w-6"
+              />
             </Link>
           </div>
 

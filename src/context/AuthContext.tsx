@@ -1,7 +1,6 @@
 "use client";
-import { createContext, useContext, useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"
-
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { jwtDecode } from "jwt-decode";
 
 interface User {
   id: number;
@@ -13,7 +12,7 @@ interface DecodedToken {
   exp: number;
   iat: number;
   id: number;
-  role: string;
+  name: string;
 }
 
 interface AuthContextType {
@@ -32,27 +31,59 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userData = localStorage.getItem("user");
 
     if (token && userData) {
-      try {
-        const decoded = jwtDecode<DecodedToken>(token);
+      (async () => {
+        try {
+          const res = await fetch("/api/auth/verify", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
 
-        // Validar expiración
-        if (decoded.exp * 1000 < Date.now()) {
-          console.warn("⚠️ Token expirado, cerrando sesión");
+          if (res.ok) {
+            setUser(JSON.parse(userData));
+          } else {
+            logout();
+          }
+        } catch (err) {
+          console.error("Error al verificar token:", err);
           logout();
-        } else {
-          setUser(JSON.parse(userData));
         }
-      } catch (err) {
-        console.error("Error al decodificar token:", err);
-        logout();
-      }
+      })();
     }
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = async (userData: User, token: string) => {
     localStorage.setItem("token", token);
     localStorage.setItem("user", JSON.stringify(userData));
     setUser(userData);
+
+    // Obtener roles desde el backend
+    try {
+      const rolesRes = await fetch("/api/auth/role", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (rolesRes.ok) {
+        const { roles } = await rolesRes.json();
+        const userRole = roles[0]?.name || "user";
+
+        // Actualizamos el usuario en memoria (estado React)
+        setUser((prev) => (prev ? { ...prev, role: userRole } : null));
+
+        // Guardamos también el rol actualizado en localStorage
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          parsedUser.role = userRole;
+          localStorage.setItem("user", JSON.stringify(parsedUser));
+        }
+
+        // También puedes guardar el rol en una clave separada si prefieres
+        localStorage.setItem("role", userRole);
+      }
+    } catch (err) {
+      console.error("Error al cargar roles:", err);
+    }
   };
 
   const logout = () => {
@@ -61,11 +92,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = useMemo(() => ({ user, login, logout }), [user]);
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

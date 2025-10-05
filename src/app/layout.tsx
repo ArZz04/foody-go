@@ -6,7 +6,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Foody Go",
-  description: "Plataforma de entrega de alimentos a domicilio rápida y confiable",
+  description:
+    "Plataforma de entrega de alimentos a domicilio rápida y confiable",
 };
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
