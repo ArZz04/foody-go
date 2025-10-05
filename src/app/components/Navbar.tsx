@@ -13,16 +13,15 @@ export default function Navbar() {
   return (
     <nav className="border-b border-white/10 bg-black/40 text-white backdrop-blur supports-[backdrop-filter]:bg-black/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Image
                 src="/logo.png"
                 alt="Logo"
-                width={24}
-                height={24}
-                className="h-6 w-6"
+                width={64}
+                height={64}
               />
             </Link>
           </div>
