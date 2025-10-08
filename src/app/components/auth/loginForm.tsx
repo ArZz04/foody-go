@@ -36,7 +36,7 @@ export default function LoginForm() {
 
       if (res.ok) {
         login(
-          { id: data.user.id, name: data.user.name, role: data.user.role },
+          { id: data.user.id, name: data.user.name, roles: data.user.role },
           data.token,
         );
         // Redirigir según rol
