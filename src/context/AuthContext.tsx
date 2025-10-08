@@ -65,21 +65,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (rolesRes.ok) {
         const { roles } = await rolesRes.json();
-        const userRole = roles[0]?.name || "user";
+
+        // Extrae los nombres de todos los roles (si existen)
+        const userRoles = Array.isArray(roles)
+          ? roles.map((r: any) => r.name)
+          : ["user"];
 
         // Actualizamos el usuario en memoria (estado React)
-        setUser((prev) => (prev ? { ...prev, role: userRole } : null));
+        setUser((prev) => (prev ? { ...prev, roles: userRoles } : null));
 
-        // Guardamos también el rol actualizado en localStorage
+        // Guardamos también los roles actualizados en localStorage
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          parsedUser.role = userRole;
+          parsedUser.roles = userRoles;
           localStorage.setItem("user", JSON.stringify(parsedUser));
         }
 
-        // También puedes guardar el rol en una clave separada si prefieres
-        localStorage.setItem("role", userRole);
+        // O si prefieres guardar todos los roles por separado
+        localStorage.setItem("roles", JSON.stringify(userRoles));
       }
     } catch (err) {
       console.error("Error al cargar roles:", err);
