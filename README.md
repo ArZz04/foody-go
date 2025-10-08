@@ -8,9 +8,9 @@
 
 | Nombre | Matrícula | Rol | GitHub |
 |--------|------------|-----|--------|
-| **Juan Arvizu** | 230111367 | Desarrollador principal / Arquitectura del sistema | [@ArZzDev](https://github.com/ArZzDev) |
-| **Yaritza Chavez** | 230110692 | Análisis de requerimientos / Diseño UX | [@yarichvz](https://github.com/yarichvz) |
-| **Andrea del Carmen Rojas** | — | Diseño UX | [@andrearojas](https://github.com/andrearojas) |
+| **Juan Arvizu** | 230111367 | Desarrollador principal / Arquitectura del sistema | [@ArZz04](https://github.com/ArZz04) |
+| **Yaritza Chavez** | 230110692 | Análisis de requerimientos / Diseño UX | [@Chavez-Yaritza-02](https://github.com/Chavez-Yaritza-02) |
+| **Andrea del Carmen Rojas** | — | Diseño UX | [@Fakerdyy](https://github.com/Fakerdyy) |
 
 ---
 
