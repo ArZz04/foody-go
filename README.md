@@ -6,11 +6,11 @@
 
 ## 🧑‍💻 Autores
 
-| Nombre | Matrícula | Rol |
-|--------|------------|-----|
-| **Juan Arvizu** | 230111367 | Desarrollador principal / Arquitectura del sistema |
-| **Yaritza Chavez** | 230110692 | Análisis de requerimientos / Diseño UX |
-| **Andrea del Carmen Rojas** | - | Diseño UX |
+| Nombre | Matrícula | Rol | GitHub |
+|--------|------------|-----|--------|
+| **Juan Arvizu** | 230111367 | Desarrollador principal / Arquitectura del sistema | [@ArZzDev](https://github.com/ArZzDev) |
+| **Yaritza Chavez** | 230110692 | Análisis de requerimientos / Diseño UX | [@yarichvz](https://github.com/yarichvz) |
+| **Andrea del Carmen Rojas** | — | Diseño UX | [@andrearojas](https://github.com/andrearojas) |
 
 ---
 
@@ -21,7 +21,7 @@
 - **Tailwind CSS** — Estilos rápidos y personalizables.  
 - **MySQL / MongoDB** — Bases de datos relacionales y documentales (según el módulo).  
 - **API REST / Express.js** — Comunicación entre frontend y backend.  
-- **ZeroTier / Raspberry Pi** *(para entornos reales)* — Conectividad en zonas rurales.
+- **ZeroTier** *(para entornos reales)* — Conectividad en zonas rurales.
 
 ---
 
