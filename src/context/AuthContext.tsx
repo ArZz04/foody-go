@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 interface User {
   id: number;
   name: string;
-  roles: string;
+  roles: string[];
 }
 
 interface DecodedToken {
