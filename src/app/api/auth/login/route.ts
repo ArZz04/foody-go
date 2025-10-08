@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import bcrypt from "bcrypt";
-import jwt, { SignOptions } from "jsonwebtoken"
-
+import jwt, { SignOptions } from "jsonwebtoken";
 
 export async function POST(req: Request) {
   try {
@@ -42,28 +41,31 @@ export async function POST(req: Request) {
     }
 
     // 3) Generar token JWT
-    const secret: jwt.Secret = process.env.JWT_SECRET as string
+    const secret: jwt.Secret = process.env.JWT_SECRET as string;
     if (!secret) {
       throw new Error("JWT_SECRET no configurado en .env");
     }
 
     const options: SignOptions = {
-      expiresIn: (process.env.JWT_EXPIRES_IN || "9h") as SignOptions["expiresIn"],
-    }
+      expiresIn: (process.env.JWT_EXPIRES_IN ||
+        "9h") as SignOptions["expiresIn"],
+    };
 
     const token = jwt.sign(
       {
         id: user.id,
         name: `${user.first_name} ${user.last_name}`,
-        role: user.role,
       },
       secret,
-      options
-    )
+      options,
+    );
 
-    // 4) Decidir redirección según rol
-    const redirectTo =
-      user.role === "CUSTOMER" ? "/tiendas" : "/dashboard";
+    // 4) Verificamos si el usuario tiene algun rol especial
+    const hasSpecialRole = Boolean(user.verify);
+
+    // 4) Decidir redirección según si tiene rol especial
+
+    const redirectTo = hasSpecialRole ? "/pickdash" : "/";
 
     // 5) Devolver token y ruta de redirección
     return NextResponse.json({
@@ -72,16 +74,16 @@ export async function POST(req: Request) {
       user: {
         id: user.id,
         name: `${user.first_name} ${user.last_name}`,
-        role: user.role,
       },
+      hasSpecialRole,
       redirectTo,
     });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { 
+      {
         error: "Error en el servidor",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 },
     );

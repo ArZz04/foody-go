@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import { ShoppingCart } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,25 +9,23 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const pathname = usePathname();
-  const isDeliveryWorkspace = pathname?.startsWith("/delivery");
-  const shouldShowCart = Boolean(user) && !isDeliveryWorkspace;
-  const showSwitchToCustomer = Boolean(user) && isDeliveryWorkspace;
 
   return (
     <nav className="border-b border-white/10 bg-black/40 text-white backdrop-blur supports-[backdrop-filter]:bg-black/30">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={24}
-                height={24}
-                className="h-6 w-6"
-              />
+              <div className="relative w-12 h-12 sm:w-16 sm:h-16">
+                <Image
+                  src="/logo.png"
+                  alt="Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </div>
 
@@ -46,29 +43,16 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                {showSwitchToCustomer ? (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="hidden rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 sm:inline-flex"
-                  >
-                    <Link href="/customer" className="px-4">
-                      Usar como usuario
-                    </Link>
-                  </Button>
-                ) : null}
-                {shouldShowCart ? (
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="hidden rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 sm:inline-flex"
-                  >
-                    <Link href="/carrito" className="flex items-center gap-2">
-                      <ShoppingCart className="h-4 w-4" />
-                      <span>Carrito</span>
-                    </Link>
-                  </Button>
-                ) : null}
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="hidden rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 sm:inline-flex"
+                >
+                  <Link href="/carrito" className="flex items-center gap-2">
+                    <ShoppingCart className="h-4 w-4" />
+                    <span>Carrito</span>
+                  </Link>
+                </Button>
                 <span className="text-white/80">Hola, {user.name}</span>
                 <Button
                   variant="ghost"
@@ -95,16 +79,7 @@ export default function Navbar() {
                 </Button>
               </>
             )}
-            {showSwitchToCustomer ? (
-              <Button
-                asChild
-                variant="ghost"
-                className="inline-flex rounded-full border border-white/30 bg-white/10 text-white hover:bg-white/20 px-4 sm:hidden"
-              >
-                <Link href="/customer">Usar como usuario</Link>
-              </Button>
-            ) : null}
-            {shouldShowCart ? (
+            {user ? (
               <Button
                 asChild
                 variant="ghost"
