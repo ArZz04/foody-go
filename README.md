@@ -137,20 +137,95 @@ Abre [http://localhost:3000](http://localhost:3000) para visualizar la aplicaci�
 
 ```
 📦 foody-go
-├── app/
-│   ├── api/
-│   ├── components/
-│   ├── (routes)/
-│   ├── layout.tsx
-│   └── page.tsx
-├── public/
-│   └── assets/
-├── lib/
-│   ├── db.ts
-│   └── utils/
-├── models/
-├── styles/
-└── README.md
+├foody-go/
+├── README.md                  # Documentación principal del proyecto
+├── biome.json                 # Configuración de Biome (linting y formateo)
+├── components.json            # Registro de componentes UI (shadcn/ui)
+├── next-env.d.ts              # Tipado automático de Next.js
+├── next.config.ts             # Configuración de Next.js
+├── package-lock.json          # Control de versiones de dependencias
+├── package.json               # Dependencias y scripts del proyecto
+├── postcss.config.mjs         # Configuración de PostCSS / TailwindCSS
+├── public/                    # Archivos estáticos del proyecto
+│   ├── coffe.png
+│   ├── file.svg
+│   ├── fondo-bosque.jpg
+│   ├── globe.svg
+│   ├── logo.png
+│   ├── next.svg
+│   ├── repartidor.jpg
+│   ├── vercel.svg
+│   └── window.svg
+├── src/
+│   ├── app/                   # Rutas y estructura principal de la aplicación
+│   │   ├── (routes)/          # Agrupación de rutas por rol o módulo
+│   │   │   ├── admin/
+│   │   │   │   ├── components/
+│   │   │   │   └── page.tsx
+│   │   │   ├── auth/
+│   │   │   │   └── page.tsx
+│   │   │   ├── business/
+│   │   │   │   ├── components/
+│   │   │   │   ├── manager/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── customer/
+│   │   │   │   └── page.tsx
+│   │   │   ├── delivery/
+│   │   │   │   ├── components/
+│   │   │   │   └── page.tsx
+│   │   │   ├── pickdash/
+│   │   │   │   └── page.tsx
+│   │   │   └── shop/
+│   │   │       ├── components/
+│   │   │       │   ├── BusinessCard.tsx
+│   │   │       │   └── FilterBar.tsx
+│   │   │       └── page.tsx
+│   │   ├── api/               # Endpoints internos (Next.js API Routes)
+│   │   │   ├── auth/
+│   │   │   │   ├── (id)/
+│   │   │   │   │   ├── role/route.ts
+│   │   │   │   │   └── verify/route.ts
+│   │   │   │   ├── login/route.ts
+│   │   │   │   └── register/route.ts
+│   │   │   ├── mysql.txt
+│   │   │   └── prueba/negocios/route.ts
+│   │   ├── carrito/page.tsx
+│   │   ├── components/
+│   │   │   ├── Navbar.tsx
+│   │   │   └── auth/
+│   │   │       ├── RegisterForm.tsx
+│   │   │       └── loginForm.tsx
+│   │   ├── globals.css        # Estilos globales
+│   │   ├── layout.tsx         # Layout raíz de la aplicación
+│   │   └── page.tsx           # Página principal (landing)
+│   ├── components/            # Componentes globales
+│   │   └── ui/                # Sistema UI basado en shadcn/ui
+│   │       ├── badge.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── checkbox.tsx
+│   │       ├── dialog.tsx
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       ├── select.tsx
+│   │       └── tabs.tsx
+│   ├── context/               # Contextos globales (Auth, Orders, etc.)
+│   │   ├── AuthContext.tsx
+│   │   └── OrdersContext.tsx
+│   ├── favicon.ico
+│   └── lib/                   # Configuración y utilidades globales
+│       ├── db.ts
+│       └── utils.ts
+├── tsconfig.json              # Configuración de TypeScript
+└── unavailable/               # Directorio temporal o en desarrollo
+    ├── [categoria]/page.txt
+    └── shop/
+        ├── components/
+        │   ├── StoreExplorer.txt
+        │   └── StoreGrid.txt
+        ├── data.txt
+        └── page.txt
 ```
 
 ---
