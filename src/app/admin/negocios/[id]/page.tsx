@@ -11,8 +11,9 @@ interface PageProps {
   };
 }
 
-export default function BusinessDetailPage({ params }: PageProps) {
-  const businessId = Number(params.id);
+export default async function BusinessDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // 👈 Esperas la promesa
+  const businessId = Number(id);
   const business = getBusinessById(businessId);
 
   if (!business) {
