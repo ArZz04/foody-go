@@ -36,3 +36,11 @@ export interface CourierRecord {
 export interface CourierAssignmentsTableProps {
   assignments: CourierAssignment[];
 }
+
+export interface CourierHeaderProps {
+  courierId: number;
+  name: string;
+  zone: string;
+  shift: string;
+  status: CourierStatus;
+}

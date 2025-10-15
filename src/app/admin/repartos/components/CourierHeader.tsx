@@ -2,15 +2,9 @@
 
 import Link from "next/link";
 
-import type { CourierStatus } from "../../data/couriers";
+import { CourierHeaderProps } from "@/types/Couriers";
 
-interface CourierHeaderProps {
-  courierId: number;
-  name: string;
-  zone: string;
-  shift: string;
-  status: CourierStatus;
-}
+
 
 export function CourierHeader({
   courierId,

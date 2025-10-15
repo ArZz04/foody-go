@@ -1,6 +1,6 @@
 "use client";
 
-import type { CourierRecord } from "../../data/couriers";
+import { CourierRecord } from "@/types/Couriers"
 import { CourierStatusBadge } from "./CourierStatusBadge";
 
 interface CourierInfoCardProps {
