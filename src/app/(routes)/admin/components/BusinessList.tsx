@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { businesses } from "@/app/admin/data/businesses";
+import { businesses } from "@/app/(routes)/admin/data/businesses";
 
 import { BusinessRecord, BusinessStatus } from "@/types/Business";
 

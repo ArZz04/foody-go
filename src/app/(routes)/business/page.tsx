@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-import { businesses } from "@/app/admin/data/businesses";
+import { businesses } from "@/app/(routes)/admin/data/businesses";
 
 type ProductStatus = "Activo" | "Agotado" | "Borrador";
 type PromotionType = "Ninguna" | "Oferta" | "Happy Hour" | "Combo" | string;
