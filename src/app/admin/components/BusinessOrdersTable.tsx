@@ -2,11 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import type { BusinessOrder } from "../data/businesses";
-
-interface BusinessOrdersTableProps {
-  orders: BusinessOrder[];
-}
+import { BusinessOrdersTableProps, BusinessOrder } from "@/types/Business";
 
 type MonthOption = {
   key: string;

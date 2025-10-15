@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CourierAssignmentsTable } from "../../components/CourierAssignmentsTable";
-import { getCourierById, type CourierAssignment } from "../../data/couriers";
+import { getCourierById } from "../../data/couriers";
+import { CourierAssignment } from "@/types/Couriers";
 
 import { CourierHeader } from "../components/CourierHeader";
 import { CourierInfoCard } from "../components/CourierInfoCard";

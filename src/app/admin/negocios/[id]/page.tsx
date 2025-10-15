@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getBusinessById, type BusinessOrder } from "../../data/businesses";
+import { getBusinessById } from "../../data/businesses";
 import { BusinessOrdersTable } from "../../components/BusinessOrdersTable";
+import { BusinessOrder, BusinessStatus } from "@/types/Business";
 
 interface PageProps {
   params: {

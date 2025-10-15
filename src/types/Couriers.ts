@@ -33,3 +33,6 @@ export interface CourierRecord {
   asignaciones: CourierAssignment[];
 }
 
+export interface CourierAssignmentsTableProps {
+  assignments: CourierAssignment[];
+}

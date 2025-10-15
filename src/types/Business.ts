@@ -30,3 +30,7 @@ export interface BusinessRecord {
   horario: BusinessSchedule;
   pedidos: BusinessOrder[];
 }
+
+export interface BusinessOrdersTableProps {
+  orders: BusinessOrder[];
+}
