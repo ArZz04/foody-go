@@ -27,7 +27,7 @@ export default function EditUsersList() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/users", {
+        const response = await fetch("/api/users/admns", {
           cache: "no-store",
           signal: controller.signal,
         });

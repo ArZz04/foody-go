@@ -1,33 +1,48 @@
+"use client";
+
 import Link from "next/link";
 
 import EditUsersList from "./components/EditUsersList";
-
-const USERS = [
-  { id: 1, name: "Yaritza Chávez", role: "Administrador", email: "yaritza@empresa.com", image: "/avatars/1.png" },
-  { id: 2, name: "Ramiro Chávez", role: "Vendedor", email: "ramiro@empresa.com", image: "/avatars/2.png" },
-  { id: 3, name: "Daniela Pérez", role: "Repartidor", email: "daniela@empresa.com", image: "/avatars/3.png" },
-  { id: 4, name: "Carlos Torres", role: "Administrador", email: "carlos@empresa.com", image: "/avatars/4.png" },
-  { id: 5, name: "Andrea López", role: "Vendedor", email: "andrea@empresa.com", image: "/avatars/5.png" },
-  { id: 6, name: "Luis Martínez", role: "Repartidor", email: "luis@empresa.com", image: "/avatars/6.png" },
-  { id: 7, name: "María Núñez", role: "Vendedor", email: "maria@empresa.com", image: "/avatars/7.png" },
-  { id: 8, name: "David Gómez", role: "Administrador", email: "david@empresa.com", image: "/avatars/8.png" },
-];
-
-const BAR_DATA = [2, 5, 7, 6, 8, 9, 11, 13, 10, 12, 9, 8];
-const RECENT_BUSINESSES = [
-  { id: 1, nombre: "Cafetería Central", ciudad: "Guadalajara", giro: "Cafetería", status: "Verificado" },
-  { id: 2, nombre: "Tacos El Güero", ciudad: "Zapopan", giro: "Taquería", status: "Activo" },
-  { id: 3, nombre: "Panadería Delicias", ciudad: "Tlaquepaque", giro: "Panadería", status: "Verificado" },
-  { id: 4, nombre: "Helados Frosti", ciudad: "Tonalá", giro: "Heladería", status: "Verificado" },
-];
-const ACTIVITY = [
-  { title: "Nuevo pedido #1234 por $250.00", time: "Hace 10 minutos" },
-  { title: "Usuario Ramiro Chávez se registró", time: "Hace 30 minutos" },
-  { title: "Negocio 'Tacos El Güero' verificado", time: "Hace 1 hora" },
-  { title: "Pedido #1233 entregado por Daniela Pérez", time: "Hace 2 horas" },
-];
+import { useEffect, useState } from "react";
 
 export default function AdminDashboardPage() {
+  const [admins, setAdmins] = useState([]);
+
+  // 🔹 Petición al endpoint /api/users/admins
+  useEffect(() => {
+    async function fetchAdmins() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return console.warn("Token no encontrado");
+
+        const response = await fetch("/api/users/admins", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error(`Error ${response.status}`);
+        const data = await response.json();
+        console.log("Usuarios administradores:", data.users);
+        setAdmins(data.users || []);
+      } catch (error) {
+        console.error("Error fetching admins:", error);
+      }
+    }
+    fetchAdmins();
+  }, []);
+
+  const BAR_DATA = [2, 5, 7, 6, 8, 9, 11, 13, 10, 12, 9, 8];
+  const RECENT_BUSINESSES = [
+    { id: 1, nombre: "Cafetería Central", ciudad: "Guadalajara", giro: "Cafetería", status: "Verificado" },
+    { id: 2, nombre: "Tacos El Güero", ciudad: "Zapopan", giro: "Taquería", status: "Activo" },
+    { id: 3, nombre: "Panadería Delicias", ciudad: "Tlaquepaque", giro: "Panadería", status: "Verificado" },
+    { id: 4, nombre: "Helados Frosti", ciudad: "Tonalá", giro: "Heladería", status: "Verificado" },
+  ];
+  const ACTIVITY = [
+    { title: "Nuevo pedido #1234 por $250.00", time: "Hace 10 minutos" },
+    { title: "Usuario Ramiro Chávez se registró", time: "Hace 30 minutos" },
+    { title: "Negocio 'Tacos El Güero' verificado", time: "Hace 1 hora" },
+    { title: "Pedido #1233 entregado por Daniela Pérez", time: "Hace 2 horas" },
+  ];
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 md:py-10">
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-500 via-red-500 to-red-600 p-6 text-white shadow-[0px_32px_80px_-32px_rgba(244,63,94,0.7)] ring-1 ring-white/20 sm:p-9">
@@ -100,20 +115,35 @@ export default function AdminDashboardPage() {
         <div className="space-y-4 md:space-y-6">
           <Card title="Equipo activo">
             <ul className="space-y-3 text-sm">
-              {USERS.slice(0, 4).map((user) => (
-                <li
-                  key={user.id}
-                  className="flex items-center justify-between rounded-[18px] border border-white/70 bg-white/95 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
-                >
-                  <div>
-                    <p className="font-medium">{user.name}</p>
-                    <p className="text-xs opacity-70">{user.role}</p>
-                  </div>
-                  <button className="rounded-lg bg-gradient-to-r from-rose-500/15 to-red-500/20 px-3 py-1 text-xs font-semibold text-red-600 transition hover:from-rose-500/30 hover:to-red-500/30 dark:text-red-200">
-                    Contactar
-                  </button>
-                </li>
-              ))}
+              {admins.slice(0, 4).map((user: any) => {
+                const initials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
+                return (
+                  <li
+                    key={user.id}
+                    className="flex items-center justify-between rounded-[18px] border border-white/70 bg-white/95 p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* 🧑 Avatar con iniciales */}
+                      <div className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-rose-400 to-red-500 text-xs font-semibold text-white shadow-md">
+                        {initials}
+                      </div>
+
+                      {/* 🧾 Info del usuario */}
+                      <div>
+                        <p className="font-medium">{user.first_name} {user.last_name}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {user.email || user.phone}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 📩 Botón */}
+                    <button className="rounded-lg bg-gradient-to-r from-rose-500/15 to-red-500/20 px-3 py-1 text-xs font-semibold text-red-600 transition hover:from-rose-500/30 hover:to-red-500/30 dark:text-red-200">
+                      Contactar
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           </Card>
 
