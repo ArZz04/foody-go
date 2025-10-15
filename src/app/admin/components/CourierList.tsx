@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import {
-  type CourierRecord,
-  type CourierStatus,
   couriers,
 } from "../data/couriers";
+
+import { CourierRecord, CourierStatus } from "@/types/Couriers";
 
 type EstadoFiltro = "Todos" | CourierStatus;
 
