@@ -29,23 +29,27 @@ const ACTIVITY = [
 
 export default function AdminDashboardPage() {
   return (
-    <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 md:py-10">
-      <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-500 via-red-500 to-red-600 p-6 text-white shadow-[0px_32px_80px_-32px_rgba(244,63,94,0.7)] ring-1 ring-white/20 sm:p-9">
-        <div className="absolute -right-16 -top-20 size-48 rounded-full bg-white/25 blur-3xl" />
-        <div className="absolute -bottom-16 left-[-48px] size-60 rounded-full bg-red-300/35 blur-3xl" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_65%)]" />
-        <div className="relative z-10 space-y-3">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white/80">
+    <div className="mx-auto w-full max-w-7xl space-y-8 px-4 pb-12 pt-4 sm:px-6 md:space-y-10 md:py-10">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-rose-500 via-red-500 to-red-600 p-5 text-white shadow-[0px_32px_80px_-32px_rgba(244,63,94,0.7)] ring-1 ring-white/20 sm:rounded-[32px] sm:p-9">
+        <div className="absolute -right-16 -top-16 size-44 rounded-full bg-white/25 blur-3xl sm:-right-20 sm:-top-20 sm:size-48" />
+        <div className="absolute -bottom-14 left-[-48px] size-56 rounded-full bg-red-300/35 blur-3xl sm:-bottom-16 sm:size-60" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.24),transparent_65%)]" />
+        <div className="relative z-10 space-y-4 text-center sm:text-left">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/80 sm:text-xs">
             Panel Admin
           </span>
-          <h2 className="text-3xl font-bold md:text-4xl">¡Hola, Admin!</h2>
-          <p className="max-w-2xl text-white/85">
+          <h2 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
+            ¡Hola, Admin!
+          </h2>
+          <p className="mx-auto max-w-2xl text-sm text-white/85 sm:mx-0 sm:text-base">
             Este es tu panel de control. Revisa el rendimiento, acciones rápidas y actividad reciente.
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <DashButton>+ Crear negocio</DashButton>
-            <DashButton variant="secondary">Invitar usuario</DashButton>
-            <DashButton variant="ghost" href="/admin/usuarios">
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:justify-start">
+            <DashButton className="w-full sm:w-auto">+ Crear negocio</DashButton>
+            <DashButton className="w-full sm:w-auto" variant="secondary">
+              Invitar usuario
+            </DashButton>
+            <DashButton className="w-full sm:w-auto" variant="ghost" href="/admin/usuarios">
               Ver usuarios
             </DashButton>
           </div>
@@ -53,7 +57,7 @@ export default function AdminDashboardPage() {
       </div>
 
       <section aria-label="Indicadores clave">
-        <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <KPI label="Ingresos (30d)" value="$128,450" delta="+12.4%" />
           <KPI label="Pedidos hoy" value="572" delta="+4.1%" />
           <KPI label="Negocios activos" value="24" delta="+2" />
@@ -61,21 +65,21 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      <section aria-label="Resúmenes" className="grid gap-6 md:grid-cols-[1.6fr_1fr]">
+      <section aria-label="Resúmenes" className="grid gap-5 md:grid-cols-[1.6fr_1fr] md:gap-6">
         <Card title="Rendimiento diario">
-          <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
+          <div className="grid gap-5 lg:grid-cols-[1fr,300px]">
             <div className="space-y-4">
               <div className="rounded-[22px] border border-white/70 bg-white/95 p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
                 <p className="text-sm font-medium text-red-600">Tráfico en vivo</p>
-                <p className="mt-1 text-3xl font-bold">+32%</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="mt-1 text-2xl font-bold sm:text-3xl">+32%</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-[13px]">
                   vs promedio de la última semana
                 </p>
               </div>
               <div className="rounded-[22px] border border-white/70 bg-white/95 p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
                 <p className="text-sm font-medium text-emerald-600">Tiempo promedio de entrega</p>
-                <p className="mt-1 text-3xl font-bold">28 min</p>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                <p className="mt-1 text-2xl font-bold sm:text-3xl">28 min</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 sm:text-[13px]">
                   Meta: 30 min
                 </p>
               </div>
@@ -118,41 +122,43 @@ export default function AdminDashboardPage() {
           </Card>
 
           <Card title="Negocios recientes">
-            <div className="overflow-hidden rounded-[22px] border border-white/70 bg-white/95 shadow-md dark:border-white/10 dark:bg-white/5">
-              <table className="min-w-full divide-y divide-white/70 text-sm dark:divide-white/10">
-                <thead className="bg-gradient-to-r from-rose-50/90 to-red-50/50 text-left text-[11px] font-semibold uppercase tracking-[0.3em] text-red-500 dark:from-white/5 dark:to-white/5 dark:text-red-200">
-                  <tr>
-                    <th className="px-4 py-2">Negocio</th>
-                    <th className="px-4 py-2">Ciudad</th>
-                    <th className="px-4 py-2">Giro</th>
-                    <th className="px-4 py-2">Estado</th>
-                    <th className="px-4 py-2" />
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/70 bg-white/95 text-zinc-700 dark:divide-white/10 dark:bg-white/5 dark:text-zinc-200">
-                  {RECENT_BUSINESSES.map((business) => (
-                    <tr key={business.id}>
-                      <td className="px-4 py-2 font-medium">{business.nombre}</td>
-                      <td className="px-4 py-2 text-sm">{business.ciudad}</td>
-                      <td className="px-4 py-2 text-sm">{business.giro}</td>
-                      <td className="px-4 py-2">
-                        <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-600">
-                          {business.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-right">
-                        <button className="text-red-600 hover:underline">Ver</button>
-                      </td>
+            <div className="w-full overflow-hidden rounded-[22px] border border-white/70 bg-white/95 shadow-md dark:border-white/10 dark:bg-white/5">
+              <div className="w-full overflow-x-auto">
+                <table className="min-w-full divide-y divide-white/70 text-sm dark:divide-white/10">
+                  <thead className="bg-gradient-to-r from-rose-50/90 to-red-50/50 text-left text-[11px] font-semibold uppercase tracking-[0.3em] text-red-500 dark:from-white/5 dark:to-white/5 dark:text-red-200">
+                    <tr>
+                      <th className="px-4 py-2">Negocio</th>
+                      <th className="px-4 py-2">Ciudad</th>
+                      <th className="px-4 py-2">Giro</th>
+                      <th className="px-4 py-2">Estado</th>
+                      <th className="px-4 py-2" />
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-white/70 bg-white/95 text-zinc-700 dark:divide-white/10 dark:bg-white/5 dark:text-zinc-200">
+                    {RECENT_BUSINESSES.map((business) => (
+                      <tr key={business.id}>
+                        <td className="px-4 py-2 font-medium">{business.nombre}</td>
+                        <td className="px-4 py-2 text-sm">{business.ciudad}</td>
+                        <td className="px-4 py-2 text-sm">{business.giro}</td>
+                        <td className="px-4 py-2">
+                          <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-600">
+                            {business.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-2 text-right">
+                          <button className="text-red-600 hover:underline">Ver</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </Card>
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-[2fr,1fr]">
+      <section className="grid gap-5 md:grid-cols-[2fr,1fr] md:gap-6">
         <Card title="Actividad reciente">
           <ul className="space-y-3 text-sm">
             {ACTIVITY.map((item, index) => (
@@ -209,13 +215,15 @@ function DashButton({
   children,
   href,
   variant = "primary",
+  className,
 }: {
   children: React.ReactNode;
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
+  className?: string;
 }) {
   const base =
-    "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-1";
+    "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-1";
   const styles =
     variant === "primary"
       ? "bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-lg shadow-red-500/25 hover:shadow-xl"
@@ -224,16 +232,22 @@ function DashButton({
         : "bg-white/10 text-white backdrop-blur ring-1 ring-white/30 hover:-translate-y-0.5 hover:bg-white/20";
   const Comp = href ? Link : "button";
   // @ts-ignore
-  return <Comp href={href} className={`${base} ${styles}`}>{children}</Comp>;
+  return (
+    <Comp href={href} className={`${base} ${styles} ${className ?? ""}`}>
+      {children}
+    </Comp>
+  );
 }
 
 function KPI({ label, value, delta }: { label: string; value: string; delta?: string }) {
   return (
-    <div className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-rose-100/80 via-red-200/70 to-red-300/40 p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]">
-      <div className="relative h-full rounded-[20px] bg-white/95 p-4 shadow-lg ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10">
+    <div className="relative w-full overflow-hidden rounded-[22px] bg-gradient-to-br from-rose-100/80 via-red-200/70 to-red-300/40 p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]">
+      <div className="relative h-full rounded-[20px] bg-white/95 p-4 shadow-lg ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10 sm:p-5">
         <div className="pointer-events-none absolute -top-10 right-0 h-16 w-16 rounded-full bg-rose-200/60 blur-3xl" />
-        <p className="text-xs uppercase tracking-[0.3em] text-red-400">{label}</p>
-        <div className="mt-2 text-3xl font-semibold text-zinc-800 dark:text-white md:text-[2.25rem]">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-red-400 sm:text-xs">
+          {label}
+        </p>
+        <div className="mt-2 text-2xl font-semibold text-zinc-800 dark:text-white sm:text-3xl md:text-[2.25rem]">
           {value}
         </div>
         {delta ? (
@@ -249,13 +263,15 @@ function KPI({ label, value, delta }: { label: string; value: string; delta?: st
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="relative overflow-hidden rounded-[26px] bg-white/95 p-6 shadow-xl ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10">
-      <div className="pointer-events-none absolute inset-x-6 top-0 h-24 rounded-full bg-gradient-to-br from-red-100/40 via-transparent to-transparent blur-3xl" />
+    <div className="relative w-full max-w-full overflow-hidden rounded-[24px] bg-white/95 p-4 shadow-xl ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10 sm:rounded-[26px] sm:p-6">
+      <div className="pointer-events-none absolute inset-x-6 top-0 h-20 rounded-full bg-gradient-to-br from-red-100/50 via-transparent to-transparent blur-3xl sm:h-24" />
       <div className="relative z-10">
-        <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-100">{title}</h3>
-        <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-rose-400/70 to-red-400/70" />
+        <h3 className="text-base font-semibold text-zinc-700 dark:text-zinc-100 sm:text-lg">
+          {title}
+        </h3>
+        <div className="mt-2 h-1 w-10 rounded-full bg-gradient-to-r from-rose-400/70 to-red-400/70 sm:w-12" />
       </div>
-      <div className="relative z-10 mt-5">{children}</div>
+      <div className="relative z-10 mt-4 sm:mt-5">{children}</div>
     </div>
   );
 }

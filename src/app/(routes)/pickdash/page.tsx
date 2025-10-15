@@ -20,6 +20,7 @@ type RoleCard = {
   image: StaticImageData;
   accent?: string;
   chip: string;
+  chipLabel?: string;
 };
 
 const CARDS: RoleCard[] = [
@@ -30,6 +31,7 @@ const CARDS: RoleCard[] = [
     href: "/delivery",
     image: deliveryImg,
     chip: "text-white",
+    chipLabel: "Repartidores",
   },
   {
     role: "VENDEDOR",
@@ -39,6 +41,7 @@ const CARDS: RoleCard[] = [
     image: vendorImg,
     accent: "from-lime-500/70 via-emerald-700/75 to-emerald-900/85",
     chip: "text-lime-100",
+    chipLabel: "Dueño de negocio",
   },
   {
     role: "ADMINISTRADOR",
@@ -48,6 +51,7 @@ const CARDS: RoleCard[] = [
     image: administradorImg,
     accent: "from-sky-500/70 via-slate-700/75 to-slate-900/90",
     chip: "text-sky-100",
+    chipLabel: "Administrador del negocio",
   },
   {
     role: "ADMIN",
@@ -57,6 +61,7 @@ const CARDS: RoleCard[] = [
     image: adminImg,
     accent: "from-rose-500/70 via-amber-700/80 to-amber-900/90",
     chip: "text-rose-100",
+    chipLabel: "Administradores de la web",
   },
 ];
 
@@ -125,7 +130,15 @@ export default function RoleMenu() {
   );
 }
 
-function Card({ title, description, href, image, accent, chip }: RoleCard) {
+function Card({
+  title,
+  description,
+  href,
+  image,
+  accent,
+  chip,
+  chipLabel = "Acceso rápido",
+}: RoleCard) {
   return (
     <Link
       href={href}
@@ -147,7 +160,7 @@ function Card({ title, description, href, image, accent, chip }: RoleCard) {
           <span
             className={`inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] ${chip}`}
           >
-            Acceso rápido
+            {chipLabel}
           </span>
           <div className="space-y-1">
             <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>

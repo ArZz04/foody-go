@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Navbar from "@/app/components/Navbar";
+import { NavbarWrapper } from "@/app/components/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { OrdersProvider } from "@/context/OrdersContext";
 import "./globals.css";
@@ -21,12 +21,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-fixed bg-center bg-black/60 bg-blend-multiply`}
+        className={`${inter.className} min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center md:bg-fixed bg-black/60 bg-blend-multiply`}
       >
         <AuthProvider>
           <OrdersProvider>
             <div className="min-h-screen flex flex-col">
-              <Navbar />
+              <NavbarWrapper />
               {children}
             </div>
           </OrdersProvider>

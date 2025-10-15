@@ -85,10 +85,10 @@ export default function EditUsersList() {
   };
 
   return (
-    <section className="space-y-6 rounded-2xl bg-white/90 p-6 shadow-md ring-1 ring-red-200/60 dark:bg-white/10 dark:ring-white/10">
-      <header>
-        <h2 className="text-xl font-semibold text-red-700">Lista de usuarios</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-300">
+    <section className="space-y-8 rounded-[28px] border border-white/40 bg-white/65 p-6 shadow-[0_40px_120px_-60px_rgba(244,63,94,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10 dark:shadow-none sm:p-8">
+      <header className="space-y-3">
+        <h2 className="text-2xl font-semibold text-red-600">Lista de usuarios</h2>
+        <p className="max-w-2xl text-sm text-zinc-500 dark:text-zinc-300">
           Consulta y ajusta los roles de los usuarios registrados en la plataforma.
         </p>
       </header>
@@ -104,9 +104,9 @@ export default function EditUsersList() {
         <SummaryCard label="Repartidores" value={stats.repartidores} accent="sky" />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
-        <table className="min-w-full divide-y divide-red-100/80 text-sm">
-          <thead className="bg-red-50/70 text-left text-xs font-semibold uppercase tracking-[0.2em] text-red-500">
+      <div className="overflow-hidden rounded-[26px] border border-white/40 bg-white/70 shadow-lg ring-1 ring-white/60 backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+        <table className="min-w-full divide-y divide-white/60 text-sm dark:divide-white/10">
+          <thead className="bg-gradient-to-r from-rose-50/80 via-white/80 to-amber-50/80 text-left text-[11px] font-semibold uppercase tracking-[0.3em] text-red-500 dark:from-white/10 dark:via-white/5 dark:to-white/10">
             <tr>
               <th className="px-4 py-3">Usuario</th>
               <th className="px-4 py-3">Contacto</th>
@@ -116,7 +116,7 @@ export default function EditUsersList() {
               <th className="px-4 py-3 text-center">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-red-100/60 bg-white text-zinc-700 dark:bg-white/5 dark:text-zinc-200">
+          <tbody className="divide-y divide-white/50 bg-white/80 text-zinc-700 backdrop-blur dark:divide-white/10 dark:bg-white/5 dark:text-zinc-200">
             {loading ? (
               <LoadingRow />
             ) : error ? (
@@ -127,25 +127,25 @@ export default function EditUsersList() {
               </tr>
             ) : usuarios.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-400">
+                <td colSpan={6} className="px-4 py-12 text-center text-sm text-zinc-400">
                   No hay usuarios aún.
                 </td>
               </tr>
             ) : (
               usuarios.map((usuario) => (
                 <tr key={usuario.id} className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
-                  <td className="px-4 py-3 font-medium">{usuario.nombre}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4 font-medium">{usuario.nombre}</td>
+                  <td className="px-4 py-4">
                     <div className="flex flex-col gap-0.5">
                       <span>{usuario.correo}</span>
                       <span className="text-xs text-zinc-400">{usuario.telefono || "—"}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <select
                       value={usuario.rol}
                       onChange={(event) => handleRoleChange(usuario.id, event.target.value)}
-                      className="rounded-lg border border-red-200/60 bg-white px-2 py-1 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
+                      className="rounded-xl border border-white/60 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
                     >
                       {(ROLE_OPTIONS.includes(usuario.rol)
                         ? ROLE_OPTIONS
@@ -160,7 +160,7 @@ export default function EditUsersList() {
                   <td className="px-4 py-3">
                     <StatusBadge status={usuario.estatus} />
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-4">
                     <span className="text-xs text-zinc-400">
                       {usuario.creadoEn
                         ? new Date(usuario.creadoEn).toLocaleDateString("es-MX", {
@@ -171,11 +171,11 @@ export default function EditUsersList() {
                         : "—"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-4 text-center">
                     <button
                       type="button"
                       onClick={() => handleStatusToggle(usuario.id)}
-                      className="inline-flex items-center justify-center rounded-lg border border-red-200/60 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/60 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10"
                     >
                       Cambiar estatus
                     </button>
