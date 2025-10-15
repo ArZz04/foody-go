@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import {CourierAssignment, CourierAssignmentsTableProps, CourierAssignmentStatus }  from "@/types/Couriers";
+import { CourierAssignmentsTableProps, CourierAssignmentStatus }  from "@/types/Couriers";
 
 type MonthOption = {
   key: string;
