@@ -1,8 +1,8 @@
+
 "use client";
 
 import Link from "next/link";
 
-import EditUsersList from "./components/EditUsersList";
 import { useEffect, useState } from "react";
 
 export default function AdminDashboardPage() {
@@ -267,13 +267,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
       </section>
-
-      <section id="usuarios" className="pt-6 md:pt-8">
-        <h2 className="mb-3 text-lg font-semibold md:text-xl">
-          Gestión de usuarios
-        </h2>
-        <EditUsersList />
-      </section>
+      
     </div>
   );
 }

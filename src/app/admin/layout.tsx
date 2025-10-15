@@ -5,7 +5,7 @@ import { SidebarLink } from "./components/SidebarLink";
 
 const NAV_LINKS = [
   { href: "/admin", label: "Resumen", icon: "📊" },
-  { href: "/admin/usuarios", label: "Usuarios", icon: "👥" },
+  { href: "/admin/users", label: "Usuarios", icon: "👥" },
   { href: "/admin/negocios", label: "Negocios", icon: "🏪" },
   { href: "/admin/repartos", label: "Repartos", icon: "🛵" },
   { href: "/admin/ajustes", label: "Ajustes", icon: "⚙️" },

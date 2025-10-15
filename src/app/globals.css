@@ -144,4 +144,15 @@
     );
     animation: shimmer 1.8s infinite;
   }
+
+    /* Oculta scrollbar pero permite desplazamiento */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE y Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari y Opera */
+  }
+
 }
