@@ -125,7 +125,7 @@ export default function RegisterForm() {
           <Input
             id="phone"
             type="tel"
-            placeholder="3312726618"
+            placeholder="Tu número de contacto"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
