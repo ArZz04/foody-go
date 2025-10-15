@@ -25,8 +25,7 @@ export function CourierList() {
         courier.telefono
           .replace(/\s+/g, "")
           .includes(query.replace(/\s+/g, "")) ||
-        courier.vehiculo.toLowerCase().includes(query) ||
-        courier.zona?.toLowerCase().includes?.(query);
+        courier.vehiculo.toLowerCase().includes(query);
 
       const matchesStatus =
         estadoFiltro === "Todos" || courier.estado === estadoFiltro;
