@@ -14,8 +14,9 @@ interface PageProps {
   };
 }
 
-export default function CourierDetailPage({ params }: PageProps) {
-  const courierId = Number(params.id);
+export default async function CourierDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; // 👈 Esperas la promesa
+  const courierId = Number(id);
   const courier = getCourierById(courierId);
 
   if (!courier) {
