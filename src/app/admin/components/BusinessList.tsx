@@ -34,9 +34,13 @@ export function BusinessList() {
 
   const summary = useMemo(() => {
     const total = businesses.length;
-    const verificados = businesses.filter((b) => b.estado === "Verificado").length;
+    const verificados = businesses.filter(
+      (b) => b.estado === "Verificado",
+    ).length;
     const activos = businesses.filter((b) => b.estado === "Activo").length;
-    const suspendidos = businesses.filter((b) => b.estado === "Suspendido").length;
+    const suspendidos = businesses.filter(
+      (b) => b.estado === "Suspendido",
+    ).length;
     return { total, verificados, activos, suspendidos };
   }, []);
 
@@ -44,9 +48,12 @@ export function BusinessList() {
     <section className="w-full rounded-3xl bg-white/95 px-6 py-8 shadow-lg ring-1 ring-red-200/60 backdrop-blur-sm dark:bg-white/10 dark:ring-white/10 lg:px-10 lg:py-10">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-red-700">Negocios registrados</h2>
+          <h2 className="text-2xl font-semibold text-red-700">
+            Negocios registrados
+          </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-300">
-            Gestiona comercios aliados, revisa documentación y estado de verificación.
+            Gestiona comercios aliados, revisa documentación y estado de
+            verificación.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -59,7 +66,9 @@ export function BusinessList() {
           />
           <select
             value={estadoFiltro}
-            onChange={(event) => setEstadoFiltro(event.target.value as EstadoFiltro)}
+            onChange={(event) =>
+              setEstadoFiltro(event.target.value as EstadoFiltro)
+            }
             className="rounded-xl border border-red-200/60 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
           >
             <option value="Todos">Todos los estados</option>
@@ -72,9 +81,17 @@ export function BusinessList() {
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Negocios totales" value={summary.total} />
-        <SummaryCard label="Verificados" value={summary.verificados} accent="emerald" />
+        <SummaryCard
+          label="Verificados"
+          value={summary.verificados}
+          accent="emerald"
+        />
         <SummaryCard label="Activos" value={summary.activos} accent="sky" />
-        <SummaryCard label="Suspendidos" value={summary.suspendidos} accent="rose" />
+        <SummaryCard
+          label="Suspendidos"
+          value={summary.suspendidos}
+          accent="rose"
+        />
       </section>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -93,7 +110,10 @@ export function BusinessList() {
           <tbody className="divide-y divide-red-100/60 bg-white text-zinc-700 dark:bg-white/5 dark:text-zinc-200">
             {filteredBusinesses.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-sm text-zinc-400">
+                <td
+                  colSpan={7}
+                  className="px-6 py-8 text-center text-sm text-zinc-400"
+                >
                   No se encontraron negocios con los filtros actuales.
                 </td>
               </tr>
@@ -107,7 +127,8 @@ export function BusinessList() {
       </div>
 
       <p className="mt-4 text-xs text-zinc-400">
-        Esta vista utiliza datos simulados. Conecta tu API cuando tengas la tabla de negocios lista.
+        Esta vista utiliza datos simulados. Conecta tu API cuando tengas la
+        tabla de negocios lista.
       </p>
     </section>
   );
@@ -146,7 +167,9 @@ function BusinessRow({ business }: { business: BusinessRecord }) {
           </Link>
           <select
             value={status}
-            onChange={(event) => setStatus(event.target.value as BusinessStatus)}
+            onChange={(event) =>
+              setStatus(event.target.value as BusinessStatus)
+            }
             className="rounded-lg border border-red-200/60 bg-white px-3 py-1 text-xs font-semibold text-zinc-600 transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5 dark:text-zinc-200"
           >
             <option value="Verificado">Verificado</option>
@@ -198,7 +221,9 @@ function StatusBadge({ status }: { status: BusinessStatus }) {
         : "bg-rose-100 text-rose-600";
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${theme}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${theme}`}
+    >
       <span className="size-2 rounded-full bg-current" />
       {status}
     </span>

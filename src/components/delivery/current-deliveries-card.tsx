@@ -32,9 +32,7 @@ const amountFormatter = new Intl.NumberFormat("es-MX", {
   maximumFractionDigits: 2,
 });
 
-export function CurrentDeliveriesCard({
-  orders,
-}: CurrentDeliveriesCardProps) {
+export function CurrentDeliveriesCard({ orders }: CurrentDeliveriesCardProps) {
   return (
     <Card className="overflow-hidden rounded-[26px] border border-white/20 bg-white/10 text-[#1f2d27] shadow-xl backdrop-blur-lg">
       <CardHeader className="border-b border-white/10 bg-gradient-to-r from-emerald-400/30 via-emerald-600/20 to-emerald-900/30 pb-6 text-white">

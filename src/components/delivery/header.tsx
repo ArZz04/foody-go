@@ -39,7 +39,8 @@ export function DeliveryHeader({
             Hola, {driverName}
           </h1>
           <p className="mt-2 max-w-xl text-sm text-emerald-50/80">
-            Revisa tus entregas asignadas, confirma ubicaciones y mantén tu estado de servicio al día durante el turno.
+            Revisa tus entregas asignadas, confirma ubicaciones y mantén tu
+            estado de servicio al día durante el turno.
           </p>
         </div>
 

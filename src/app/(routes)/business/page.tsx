@@ -4,9 +4,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-import {
-  businesses,
-} from "@/app/admin/data/businesses";
+import { businesses } from "@/app/admin/data/businesses";
 
 type ProductStatus = "Activo" | "Agotado" | "Borrador";
 type PromotionType = "Ninguna" | "Oferta" | "Happy Hour" | "Combo" | string;
@@ -196,7 +194,8 @@ export default function BusinessPage() {
   const businessOwnerId = businesses[0]?.id ?? 1;
 
   const business = useMemo(
-    () => businesses.find((item) => item.id === businessOwnerId) ?? businesses[0],
+    () =>
+      businesses.find((item) => item.id === businessOwnerId) ?? businesses[0],
     [businessOwnerId],
   );
 
@@ -207,34 +206,47 @@ export default function BusinessPage() {
     setProducts(data.map((item) => ({ ...item })));
   }, [business.id]);
 
-  const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } = useMemo(() => {
-    const total = products.length;
-    const active = products.filter((product) => product.estado === "Activo").length;
-    const lowStock = products.filter((product) => product.stock <= 10).length;
-    const promos = products.filter((product) => product.promocion !== "Ninguna").length;
-    return { totalProducts: total, activeProducts: active, lowStockProducts: lowStock, productsOnPromo: promos };
-  }, [products]);
+  const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } =
+    useMemo(() => {
+      const total = products.length;
+      const active = products.filter(
+        (product) => product.estado === "Activo",
+      ).length;
+      const lowStock = products.filter((product) => product.stock <= 10).length;
+      const promos = products.filter(
+        (product) => product.promocion !== "Ninguna",
+      ).length;
+      return {
+        totalProducts: total,
+        activeProducts: active,
+        lowStockProducts: lowStock,
+        productsOnPromo: promos,
+      };
+    }, [products]);
 
   const categorySummary = useMemo(
     () =>
-      products.reduce<Record<string, { count: number; destacados: number }>>((acc, product) => {
-        if (!acc[product.categoria]) {
-          acc[product.categoria] = { count: 0, destacados: 0 };
-        }
-        acc[product.categoria].count += 1;
-        if (product.destacado) {
-          acc[product.categoria].destacados += 1;
-        }
-        return acc;
-      }, {}),
+      products.reduce<Record<string, { count: number; destacados: number }>>(
+        (acc, product) => {
+          if (!acc[product.categoria]) {
+            acc[product.categoria] = { count: 0, destacados: 0 };
+          }
+          acc[product.categoria].count += 1;
+          if (product.destacado) {
+            acc[product.categoria].destacados += 1;
+          }
+          return acc;
+        },
+        {},
+      ),
     [products],
   );
 
   const promoProducts = useMemo(
-    () => products.filter((product) => product.promocion !== "Ninguna").slice(0, 4),
+    () =>
+      products.filter((product) => product.promocion !== "Ninguna").slice(0, 4),
     [products],
   );
-
 
   function handleEditPrice(productId: string) {
     const product = products.find((item) => item.id === productId);
@@ -242,7 +254,10 @@ export default function BusinessPage() {
       return;
     }
 
-    const raw = window.prompt("Ingresa el nuevo precio (MXN):", product.precio.toString());
+    const raw = window.prompt(
+      "Ingresa el nuevo precio (MXN):",
+      product.precio.toString(),
+    );
     if (raw === null) {
       return;
     }
@@ -259,7 +274,9 @@ export default function BusinessPage() {
     }
 
     setProducts((prev) =>
-      prev.map((item) => (item.id === productId ? { ...item, precio: nextPrice } : item)),
+      prev.map((item) =>
+        item.id === productId ? { ...item, precio: nextPrice } : item,
+      ),
     );
   }
 
@@ -278,7 +295,10 @@ export default function BusinessPage() {
       return;
     }
 
-    const raw = window.prompt("Ingresa el nuevo stock disponible:", product.stock.toString());
+    const raw = window.prompt(
+      "Ingresa el nuevo stock disponible:",
+      product.stock.toString(),
+    );
     if (raw === null) {
       return;
     }
@@ -295,7 +315,9 @@ export default function BusinessPage() {
     }
 
     setProducts((prev) =>
-      prev.map((item) => (item.id === productId ? { ...item, stock: nextStock } : item)),
+      prev.map((item) =>
+        item.id === productId ? { ...item, stock: nextStock } : item,
+      ),
     );
   }
 
@@ -345,7 +367,9 @@ export default function BusinessPage() {
 
     let targetProducts: Product[] = [];
     if (scope === "todos") {
-      targetProducts = products.filter((product) => product.estado === "Activo");
+      targetProducts = products.filter(
+        (product) => product.estado === "Activo",
+      );
     } else {
       const terms = scope
         .split(",")
@@ -395,7 +419,8 @@ export default function BusinessPage() {
     if (labelInput === null) {
       return;
     }
-    const promotionLabel = labelInput.trim().length > 0 ? labelInput.trim() : "Oferta";
+    const promotionLabel =
+      labelInput.trim().length > 0 ? labelInput.trim() : "Oferta";
 
     const targetIds = new Set(targetProducts.map((product) => product.id));
     const factor = 1 - percentage / 100;
@@ -405,23 +430,35 @@ export default function BusinessPage() {
         targetIds.has(item.id)
           ? {
               ...item,
-              precio: Math.max(0, Number.parseFloat((item.precio * factor).toFixed(2))),
+              precio: Math.max(
+                0,
+                Number.parseFloat((item.precio * factor).toFixed(2)),
+              ),
               promocion: promotionLabel,
             }
           : item,
       ),
     );
 
-    window.alert(`Rebaja del ${percentage}% aplicada a ${targetIds.size} producto(s).`);
+    window.alert(
+      `Rebaja del ${percentage}% aplicada a ${targetIds.size} producto(s).`,
+    );
   }
 
-  const businessCover = BUSINESS_COVER_IMAGES[business.id] ?? BUSINESS_COVER_IMAGES[1];
+  const businessCover =
+    BUSINESS_COVER_IMAGES[business.id] ?? BUSINESS_COVER_IMAGES[1];
 
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-4 py-10 sm:px-6 lg:px-8">
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-6 text-white shadow-xl sm:p-10">
-        <div aria-hidden className="absolute -left-28 top-10 size-64 rounded-full bg-white/15 blur-3xl" />
-        <div aria-hidden className="absolute -right-24 -top-24 size-64 rounded-full bg-white/20 blur-3xl" />
+        <div
+          aria-hidden
+          className="absolute -left-28 top-10 size-64 rounded-full bg-white/15 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute -right-24 -top-24 size-64 rounded-full bg-white/20 blur-3xl"
+        />
         <div className="relative grid gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
@@ -432,14 +469,26 @@ export default function BusinessPage() {
                 {business.nombre}
               </h1>
               <p className="max-w-2xl text-sm text-white/90 md:text-base lg:text-lg">
-                {business.categoria} en {business.ciudad}. Gestiona el catálogo, precios y promociones
-                de este negocio desde un único panel operativo.
+                {business.categoria} en {business.ciudad}. Gestiona el catálogo,
+                precios y promociones de este negocio desde un único panel
+                operativo.
               </p>
             </div>
             <dl className="grid gap-4 text-sm md:grid-cols-3">
-              <StatItem label="Productos activos" value={`${activeProducts}/${totalProducts}`} />
-              <StatItem label="Promociones activas" value={productsOnPromo.toString()} helper="Descuentos, combos y happy hour" />
-              <StatItem label="Criticidad de inventario" value={lowStockProducts.toString()} helper="Revisa niveles menores a 10 unidades" />
+              <StatItem
+                label="Productos activos"
+                value={`${activeProducts}/${totalProducts}`}
+              />
+              <StatItem
+                label="Promociones activas"
+                value={productsOnPromo.toString()}
+                helper="Descuentos, combos y happy hour"
+              />
+              <StatItem
+                label="Criticidad de inventario"
+                value={lowStockProducts.toString()}
+                helper="Revisa niveles menores a 10 unidades"
+              />
             </dl>
             <div className="grid gap-3 rounded-2xl bg-white/15 p-4 text-xs uppercase tracking-[0.2em]">
               <div className="space-y-1 text-white/80">
@@ -451,7 +500,8 @@ export default function BusinessPage() {
               <div className="space-y-1 text-white/80">
                 <span>Horario</span>
                 <p className="text-sm normal-case tracking-normal text-white">
-                  {business.horario.dias} · {business.horario.apertura} – {business.horario.cierre} hrs
+                  {business.horario.dias} · {business.horario.apertura} –{" "}
+                  {business.horario.cierre} hrs
                 </p>
               </div>
               <Link
@@ -470,7 +520,8 @@ export default function BusinessPage() {
               className="h-full w-full object-cover"
             />
             <figcaption className="absolute bottom-4 left-4 right-4 rounded-xl bg-black/40 px-4 py-3 text-xs uppercase tracking-[0.3em] text-white/80">
-              {business.ciudad} · Desde {new Date(business.creadoEn).toLocaleDateString("es-MX", {
+              {business.ciudad} · Desde{" "}
+              {new Date(business.creadoEn).toLocaleDateString("es-MX", {
                 month: "short",
                 year: "numeric",
               })}
@@ -489,17 +540,43 @@ export default function BusinessPage() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <PrimaryAction href="/business/products/new">+ Agregar producto</PrimaryAction>
+          <PrimaryAction href="/business/products/new">
+            + Agregar producto
+          </PrimaryAction>
           <PrimaryAction variant="outline">Importar catálogo</PrimaryAction>
-          <PrimaryAction variant="soft" onClick={() => handleBulkDiscount()}>Aplicar rebaja masiva</PrimaryAction>
+          <PrimaryAction variant="soft" onClick={() => handleBulkDiscount()}>
+            Aplicar rebaja masiva
+          </PrimaryAction>
         </div>
       </section>
 
-      <section aria-label="Indicadores principales" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Productos totales" value={totalProducts.toString()} helper="Incluye activos, borradores y agotados" />
-        <KpiCard label="Activos en catálogo" value={activeProducts.toString()} tone="teal" helper="Listos para la app y web" />
-        <KpiCard label="En promoción" value={productsOnPromo.toString()} tone="emerald" helper="Descuentos visibles al cliente" />
-        <KpiCard label="Inventario crítico" value={lowStockProducts.toString()} tone="rose" helper="Necesitan resurtido" />
+      <section
+        aria-label="Indicadores principales"
+        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
+        <KpiCard
+          label="Productos totales"
+          value={totalProducts.toString()}
+          helper="Incluye activos, borradores y agotados"
+        />
+        <KpiCard
+          label="Activos en catálogo"
+          value={activeProducts.toString()}
+          tone="teal"
+          helper="Listos para la app y web"
+        />
+        <KpiCard
+          label="En promoción"
+          value={productsOnPromo.toString()}
+          tone="emerald"
+          helper="Descuentos visibles al cliente"
+        />
+        <KpiCard
+          label="Inventario crítico"
+          value={lowStockProducts.toString()}
+          tone="rose"
+          helper="Necesitan resurtido"
+        />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[2fr,1fr]">
@@ -525,18 +602,31 @@ export default function BusinessPage() {
                 </thead>
                 <tbody className="divide-y divide-emerald-100 bg-white text-emerald-900 dark:bg-transparent dark:text-emerald-100">
                   {products.map((product) => (
-                    <tr key={product.id} className="transition hover:bg-emerald-50/50 dark:hover:bg-white/10">
+                    <tr
+                      key={product.id}
+                      className="transition hover:bg-emerald-50/50 dark:hover:bg-white/10"
+                    >
                       <td className="px-4 py-3">
                         <div className="flex flex-col">
-                          <span className="font-semibold">{product.nombre}</span>
+                          <span className="font-semibold">
+                            {product.nombre}
+                          </span>
                           <span className="text-xs text-emerald-900/60 dark:text-emerald-200/70">
                             {product.categoria} · {product.estado}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold">{peso.format(product.precio)}</td>
+                      <td className="px-4 py-3 font-semibold">
+                        {peso.format(product.precio)}
+                      </td>
                       <td className="px-4 py-3">
-                        <span className={product.stock <= 10 ? "font-semibold text-rose-600 dark:text-rose-300" : ""}>
+                        <span
+                          className={
+                            product.stock <= 10
+                              ? "font-semibold text-rose-600 dark:text-rose-300"
+                              : ""
+                          }
+                        >
                           {product.stock}
                         </span>
                       </td>
@@ -551,10 +641,23 @@ export default function BusinessPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap items-center justify-center gap-2">
-                          <TableAction onClick={() => handleEditPrice(product.id)}>Editar precio</TableAction>
-                          <TableAction onClick={() => handleUpdateStock(product.id)}>Actualizar stock</TableAction>
-                          <TableAction variant="ghost" onClick={() => handleToggleStatus(product.id)}>
-                            {product.estado === "Activo" ? "Desactivar" : "Activar"}
+                          <TableAction
+                            onClick={() => handleEditPrice(product.id)}
+                          >
+                            Editar precio
+                          </TableAction>
+                          <TableAction
+                            onClick={() => handleUpdateStock(product.id)}
+                          >
+                            Actualizar stock
+                          </TableAction>
+                          <TableAction
+                            variant="ghost"
+                            onClick={() => handleToggleStatus(product.id)}
+                          >
+                            {product.estado === "Activo"
+                              ? "Desactivar"
+                              : "Activar"}
                           </TableAction>
                         </div>
                       </td>
@@ -580,13 +683,19 @@ export default function BusinessPage() {
                   className="flex items-center justify-between rounded-2xl bg-white/90 px-4 py-3 shadow-sm ring-1 ring-emerald-200/50 dark:bg-white/5 dark:ring-white/10"
                 >
                   <div>
-                    <p className="font-semibold text-emerald-700 dark:text-emerald-300">{category}</p>
+                    <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+                      {category}
+                    </p>
                     <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
                       {info.count} productos · {info.destacados} destacados
                     </p>
                   </div>
                   <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
-                    {(info.destacados / Math.max(info.count, 1) * 100).toFixed(0)}% destacados
+                    {(
+                      (info.destacados / Math.max(info.count, 1)) *
+                      100
+                    ).toFixed(0)}
+                    % destacados
                   </span>
                 </li>
               ))}
@@ -614,7 +723,8 @@ export default function BusinessPage() {
                       {product.nombre}
                     </p>
                     <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
-                      {product.promocion} · Precio actual {peso.format(product.precio)}
+                      {product.promocion} · Precio actual{" "}
+                      {peso.format(product.precio)}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -661,10 +771,20 @@ export default function BusinessPage() {
   );
 }
 
-function StatItem({ label, value, helper }: { label: string; value: string; helper?: string }) {
+function StatItem({
+  label,
+  value,
+  helper,
+}: {
+  label: string;
+  value: string;
+  helper?: string;
+}) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-[0.3em] text-white/70">{label}</dt>
+      <dt className="text-xs uppercase tracking-[0.3em] text-white/70">
+        {label}
+      </dt>
       <dd className="mt-1 text-lg font-semibold">{value}</dd>
       {helper ? <p className="text-xs text-white/70">{helper}</p> : null}
     </div>
@@ -726,9 +846,13 @@ function KpiCard({
   return (
     <div className={`rounded-[18px] bg-gradient-to-br ${palette} p-0.5`}>
       <div className="rounded-[16px] bg-white/95 px-4 py-5 shadow-sm ring-1 ring-white/70 dark:bg-zinc-900/80">
-        <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/50">{label}</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/50">
+          {label}
+        </p>
         <p className="mt-2 text-3xl font-semibold">{value}</p>
-        {helper ? <p className="mt-1 text-xs text-emerald-900/60">{helper}</p> : null}
+        {helper ? (
+          <p className="mt-1 text-xs text-emerald-900/60">{helper}</p>
+        ) : null}
       </div>
     </div>
   );
@@ -746,9 +870,13 @@ function DashboardCard({
   return (
     <section className="rounded-3xl bg-white/95 p-6 shadow-lg ring-1 ring-emerald-200/60 backdrop-blur-sm dark:bg-white/10 dark:ring-white/10">
       <header className="mb-4 space-y-1">
-        <h2 className="text-xl font-semibold text-emerald-800 dark:text-emerald-200">{title}</h2>
+        <h2 className="text-xl font-semibold text-emerald-800 dark:text-emerald-200">
+          {title}
+        </h2>
         {description ? (
-          <p className="text-sm text-emerald-900/70 dark:text-emerald-200/70">{description}</p>
+          <p className="text-sm text-emerald-900/70 dark:text-emerald-200/70">
+            {description}
+          </p>
         ) : null}
       </header>
       {children}
@@ -765,7 +893,11 @@ function PromoBadge({ promotion }: { promotion: PromotionType }) {
     );
   }
 
-  if (promotion === "Oferta" || promotion === "Happy Hour" || promotion === "Combo") {
+  if (
+    promotion === "Oferta" ||
+    promotion === "Happy Hour" ||
+    promotion === "Combo"
+  ) {
     const palette =
       promotion === "Oferta"
         ? "bg-emerald-500/10 text-emerald-700"
@@ -774,7 +906,9 @@ function PromoBadge({ promotion }: { promotion: PromotionType }) {
           : "bg-amber-500/10 text-amber-700";
 
     return (
-      <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}>
+      <span
+        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+      >
         <span className="size-2 rounded-full bg-current" aria-hidden />
         {promotion}
       </span>

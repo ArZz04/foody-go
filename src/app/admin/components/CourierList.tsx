@@ -22,7 +22,9 @@ export function CourierList() {
       const matchesSearch =
         query.length === 0 ||
         courier.nombre.toLowerCase().includes(query) ||
-        courier.telefono.replace(/\s+/g, "").includes(query.replace(/\s+/g, "")) ||
+        courier.telefono
+          .replace(/\s+/g, "")
+          .includes(query.replace(/\s+/g, "")) ||
         courier.vehiculo.toLowerCase().includes(query) ||
         courier.zona?.toLowerCase().includes?.(query);
 
@@ -37,7 +39,9 @@ export function CourierList() {
     const total = couriers.length;
     const activos = couriers.filter((c) => c.estado === "Activo").length;
     const descanso = couriers.filter((c) => c.estado === "En descanso").length;
-    const suspendidos = couriers.filter((c) => c.estado === "Suspendido").length;
+    const suspendidos = couriers.filter(
+      (c) => c.estado === "Suspendido",
+    ).length;
     return { total, activos, descanso, suspendidos };
   }, []);
 
@@ -45,7 +49,9 @@ export function CourierList() {
     <section className="w-full rounded-3xl bg-white/95 px-6 py-8 shadow-lg ring-1 ring-red-200/60 backdrop-blur-sm dark:bg-white/10 dark:ring-white/10 lg:px-10 lg:py-10">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-red-700">Repartidores activos</h2>
+          <h2 className="text-2xl font-semibold text-red-700">
+            Repartidores activos
+          </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-300">
             Administra la flota, revisa horarios y estados de disponibilidad.
           </p>
@@ -60,7 +66,9 @@ export function CourierList() {
           />
           <select
             value={estadoFiltro}
-            onChange={(event) => setEstadoFiltro(event.target.value as EstadoFiltro)}
+            onChange={(event) =>
+              setEstadoFiltro(event.target.value as EstadoFiltro)
+            }
             className="rounded-xl border border-red-200/60 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
           >
             <option value="Todos">Todos los estados</option>
@@ -74,8 +82,16 @@ export function CourierList() {
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Repartidores totales" value={summary.total} />
         <SummaryCard label="Activos" value={summary.activos} accent="emerald" />
-        <SummaryCard label="En descanso" value={summary.descanso} accent="sky" />
-        <SummaryCard label="Suspendidos" value={summary.suspendidos} accent="rose" />
+        <SummaryCard
+          label="En descanso"
+          value={summary.descanso}
+          accent="sky"
+        />
+        <SummaryCard
+          label="Suspendidos"
+          value={summary.suspendidos}
+          accent="rose"
+        />
       </section>
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -94,7 +110,10 @@ export function CourierList() {
           <tbody className="divide-y divide-red-100/60 bg-white text-zinc-700 dark:bg-white/5 dark:text-zinc-200">
             {filteredCouriers.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-sm text-zinc-400">
+                <td
+                  colSpan={7}
+                  className="px-6 py-8 text-center text-sm text-zinc-400"
+                >
                   No se encontraron repartidores con los filtros actuales.
                 </td>
               </tr>
@@ -108,7 +127,8 @@ export function CourierList() {
       </div>
 
       <p className="mt-4 text-xs text-zinc-400">
-        Datos simulados para prototipo. Conecta tu API de repartidores cuando esté disponible.
+        Datos simulados para prototipo. Conecta tu API de repartidores cuando
+        esté disponible.
       </p>
     </section>
   );
@@ -136,7 +156,8 @@ function CourierRow({ courier }: { courier: CourierRecord }) {
         <div className="flex flex-col gap-0.5">
           <span>{courier.horario.zona}</span>
           <span className="text-xs text-zinc-400">
-            {courier.horario.turno} ({courier.horario.inicio} - {courier.horario.fin})
+            {courier.horario.turno} ({courier.horario.inicio} -{" "}
+            {courier.horario.fin})
           </span>
         </div>
       </td>
@@ -210,7 +231,9 @@ function CourierStatusBadge({ status }: { status: CourierStatus }) {
         : "bg-rose-100 text-rose-600";
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+    >
       <span className="size-2 rounded-full bg-current" />
       {status}
     </span>

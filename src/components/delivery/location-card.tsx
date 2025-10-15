@@ -27,21 +27,26 @@ interface LocationCardProps {
 }
 
 export function LocationCard({ order }: LocationCardProps) {
-  const [copiedField, setCopiedField] = useState<"address" | "references" | null>(null);
+  const [copiedField, setCopiedField] = useState<
+    "address" | "references" | null
+  >(null);
 
   const locationText = `${order.address.street}, ${order.address.neighborhood}, ${order.address.city}`;
   const referencesText = order.address.references;
   const phoneSanitized = order.contact.phone.replace(/\s+/g, "");
 
-  const handleCopy = useCallback(async (value: string, key: "address" | "references") => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedField(key);
-      setTimeout(() => setCopiedField(null), 2000);
-    } catch (error) {
-      console.error("No se pudo copiar el texto", error);
-    }
-  }, []);
+  const handleCopy = useCallback(
+    async (value: string, key: "address" | "references") => {
+      try {
+        await navigator.clipboard.writeText(value);
+        setCopiedField(key);
+        setTimeout(() => setCopiedField(null), 2000);
+      } catch (error) {
+        console.error("No se pudo copiar el texto", error);
+      }
+    },
+    [],
+  );
 
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${order.address.street}, ${order.address.city}`,
@@ -108,7 +113,9 @@ export function LocationCard({ order }: LocationCardProps) {
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => handleCopy(`${locationText}. ${referencesText}`, "address")}
+            onClick={() =>
+              handleCopy(`${locationText}. ${referencesText}`, "address")
+            }
             className={cn(
               "flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-lg transition backdrop-blur",
               copiedField === "address"
@@ -133,7 +140,9 @@ export function LocationCard({ order }: LocationCardProps) {
             )}
           >
             <Copy className="h-3.5 w-3.5" />
-            {copiedField === "references" ? "Referencias copiadas" : "Copiar referencias"}
+            {copiedField === "references"
+              ? "Referencias copiadas"
+              : "Copiar referencias"}
           </Button>
 
           <Button
@@ -142,7 +151,10 @@ export function LocationCard({ order }: LocationCardProps) {
             className="rounded-full border border-white/40 bg-white/20 text-xs font-semibold text-white backdrop-blur hover:bg-white/40"
             asChild
           >
-            <a href={`tel:${phoneSanitized}`} className="flex items-center gap-2">
+            <a
+              href={`tel:${phoneSanitized}`}
+              className="flex items-center gap-2"
+            >
               <PhoneCall className="h-3.5 w-3.5" />
               Llamar cliente
             </a>
@@ -167,7 +179,8 @@ export function LocationCard({ order }: LocationCardProps) {
         </div>
 
         <div className="rounded-2xl border border-dashed border-white/30 bg-white/15 p-4 text-xs text-white/80 shadow-inner backdrop-blur">
-          Nota: sin mapa en tiempo real. Usa la dirección, referencias y acciones rápidas para contactar al cliente.
+          Nota: sin mapa en tiempo real. Usa la dirección, referencias y
+          acciones rápidas para contactar al cliente.
         </div>
       </CardContent>
     </Card>

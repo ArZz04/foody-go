@@ -43,7 +43,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </nav>
           <div className="mt-auto space-y-2 text-xs text-zinc-400">
             <div className="rounded-xl border border-white/70 bg-white/80 px-3 py-2 text-zinc-500 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
-              <p className="font-semibold text-zinc-600 dark:text-zinc-200">v1.0.0</p>
+              <p className="font-semibold text-zinc-600 dark:text-zinc-200">
+                v1.0.0
+              </p>
               <p>Seguro y rápido</p>
             </div>
           </div>
@@ -60,7 +62,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   ☰
                 </button>
                 <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-red-400">Panel</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-red-400">
+                    Panel
+                  </p>
                   <h1 className="text-lg font-bold text-zinc-700 sm:text-xl dark:text-zinc-100">
                     Dashboard
                   </h1>

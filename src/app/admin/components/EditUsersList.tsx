@@ -2,20 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-type Usuario = {
-  id: number;
-  nombre: string;
-  correo: string;
-  telefono: string;
-  rol: string;
-  estatus: string;
-  creadoEn: string;
-};
-
 const ROLE_OPTIONS = ["Administrador", "Vendedor", "Repartidor", "Soporte"];
 
 export default function EditUsersList() {
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [usuarios, setUsuarios] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,24 +14,34 @@ export default function EditUsersList() {
 
     async function fetchUsuarios() {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) return console.warn("Token no encontrado");
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/users/admns", {
+        const response = await fetch("/api/users", {
           cache: "no-store",
+          headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          throw new Error(`Error ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error ${response.status}`);
 
-        const data: Usuario[] = await response.json();
-        setUsuarios(data);
+        const json = await response.json();
+        setUsuarios(
+          (json.users || []).map((u: any) => ({
+            id: u.id,
+            name: `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim(),
+            email: u.email ?? "",
+            phone: u.phone ?? "",
+            createdAt: u.created_at ?? "",
+            updatedAt: u.updated_at ?? "",
+          }))
+        );
+
+
       } catch (err) {
-        if ((err as Error).name === "AbortError") {
-          return;
-        }
+        if ((err as Error).name === "AbortError") return;
         console.error("Error al cargar usuarios", err);
         setError("No se pudieron cargar los usuarios.");
         setUsuarios([]);
@@ -51,15 +51,20 @@ export default function EditUsersList() {
     }
 
     fetchUsuarios();
-
     return () => controller.abort();
   }, []);
 
   const stats = useMemo(() => {
     const total = usuarios.length;
-    const activos = usuarios.filter((usuario) => usuario.estatus === "ACTIVO").length;
-    const administradores = usuarios.filter((usuario) => usuario.rol === "Administrador").length;
-    const repartidores = usuarios.filter((usuario) => usuario.rol === "Repartidor").length;
+    const activos = usuarios.filter(
+      (usuario) => usuario.estatus === "ACTIVO",
+    ).length;
+    const administradores = usuarios.filter(
+      (usuario) => usuario.rol === "Administrador",
+    ).length;
+    const repartidores = usuarios.filter(
+      (usuario) => usuario.rol === "Repartidor",
+    ).length;
     return { total, activos, administradores, repartidores };
   }, [usuarios]);
 
@@ -87,9 +92,12 @@ export default function EditUsersList() {
   return (
     <section className="space-y-6 rounded-2xl bg-white/90 p-6 shadow-md ring-1 ring-red-200/60 dark:bg-white/10 dark:ring-white/10">
       <header>
-        <h2 className="text-xl font-semibold text-red-700">Lista de usuarios</h2>
+        <h2 className="text-xl font-semibold text-red-700">
+          Lista de usuarios
+        </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-300">
-          Consulta y ajusta los roles de los usuarios registrados en la plataforma.
+          Consulta y ajusta los roles de los usuarios registrados en la
+          plataforma.
         </p>
       </header>
 
@@ -101,7 +109,11 @@ export default function EditUsersList() {
           value={stats.administradores}
           accent="violet"
         />
-        <SummaryCard label="Repartidores" value={stats.repartidores} accent="sky" />
+        <SummaryCard
+          label="Repartidores"
+          value={stats.repartidores}
+          accent="sky"
+        />
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -121,37 +133,53 @@ export default function EditUsersList() {
               <LoadingRow />
             ) : error ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-red-500">
+                <td
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-sm text-red-500"
+                >
                   {error}
                 </td>
               </tr>
             ) : usuarios.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-sm text-zinc-400">
+                <td
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-sm text-zinc-400"
+                >
                   No hay usuarios aún.
                 </td>
               </tr>
             ) : (
               usuarios.map((usuario) => (
-                <tr key={usuario.id} className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
-                  <td className="px-4 py-3 font-medium">{usuario.nombre}</td>
+                <tr
+                  key={usuario.id}
+                  className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
+                >
+                  <td className="px-4 py-3 font-medium">{usuario.name}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-0.5">
-                      <span>{usuario.correo}</span>
-                      <span className="text-xs text-zinc-400">{usuario.telefono || "—"}</span>
+                      <span>{usuario.email}</span>
+                      <span className="text-xs text-zinc-400">
+                        {usuario.phone || "—"}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
                     <select
-                      value={usuario.rol}
-                      onChange={(event) => handleRoleChange(usuario.id, event.target.value)}
+                      value={usuario.role}
+                      onChange={(event) =>
+                        handleRoleChange(usuario.id, event.target.value)
+                      }
                       className="rounded-lg border border-red-200/60 bg-white px-2 py-1 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
                     >
                       {(ROLE_OPTIONS.includes(usuario.rol)
                         ? ROLE_OPTIONS
                         : [usuario.rol, ...ROLE_OPTIONS]
                       ).map((roleOption) => (
-                        <option key={roleOption} value={roleOption}>
+                        <option
+                          key={`${usuario.id}-${roleOption}`}
+                          value={roleOption}
+                        >
                           {roleOption}
                         </option>
                       ))}
@@ -162,12 +190,15 @@ export default function EditUsersList() {
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-xs text-zinc-400">
-                      {usuario.creadoEn
-                        ? new Date(usuario.creadoEn).toLocaleDateString("es-MX", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
+                      {usuario.createdAt
+                        ? new Date(usuario.createdAt).toLocaleDateString(
+                            "es-MX",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )
                         : "—"}
                     </span>
                   </td>
@@ -187,7 +218,8 @@ export default function EditUsersList() {
         </table>
       </div>
       <p className="text-xs text-zinc-400">
-        Los cambios son locales. Integra este módulo con tu API para guardar roles y estatus.
+        Los cambios son locales. Integra este módulo con tu API para guardar
+        roles y estatus.
       </p>
     </section>
   );
@@ -224,7 +256,7 @@ function SummaryCard({
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const normalized = status.toUpperCase();
+  const normalized = (status || "DESCONOCIDO").toUpperCase();
   const isActive = normalized === "ACTIVO";
   const baseStyles =
     "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold";

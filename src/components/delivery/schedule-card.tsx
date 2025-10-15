@@ -75,7 +75,9 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
             <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
               Pausa sugerida
             </p>
-            <p className="text-sm text-emerald-800/80">{schedule.breakWindow}</p>
+            <p className="text-sm text-emerald-800/80">
+              {schedule.breakWindow}
+            </p>
           </div>
         ) : null}
 

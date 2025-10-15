@@ -73,7 +73,9 @@ export default function RoleMenu() {
     );
   }
 
-  const roles: RoleName[] = (Array.isArray(user.roles) ? user.roles : [user.roles]).filter(
+  const roles: RoleName[] = (
+    Array.isArray(user.roles) ? user.roles : [user.roles]
+  ).filter(
     (role): role is RoleName =>
       role === "REPARTIDOR" ||
       role === "VENDEDOR" ||
@@ -95,12 +97,18 @@ export default function RoleMenu() {
               Centro de acceso
             </p>
             <h1 className="text-3xl font-semibold sm:text-4xl">
-              Hola, <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-lime-200">{user.name}</span>
+              Hola,{" "}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-lime-200">
+                {user.name}
+              </span>
             </h1>
             {roles.length > 0 && (
               <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.25em] text-white/70">
                 {roles.map((role) => (
-                  <span key={role} className="rounded-full border border-white/30 px-3 py-1 backdrop-blur-sm">
+                  <span
+                    key={role}
+                    className="rounded-full border border-white/30 px-3 py-1 backdrop-blur-sm"
+                  >
                     {role}
                   </span>
                 ))}
@@ -140,7 +148,9 @@ function Card({ title, description, href, image, accent, chip }: RoleCard) {
         priority
       />
       {accent ? (
-        <div className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${accent}`} />
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${accent}`}
+        />
       ) : null}
       <div className="relative flex h-full flex-col items-center justify-between gap-6 p-6 text-white text-center">
         <div className="space-y-4">
@@ -157,7 +167,12 @@ function Card({ title, description, href, image, accent, chip }: RoleCard) {
         <div className="flex w-full items-center justify-between text-sm font-semibold text-white/90">
           <span className="inline-flex items-center gap-2">
             Entrar
-            <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+            <span
+              aria-hidden
+              className="transition-transform group-hover:translate-x-1"
+            >
+              →
+            </span>
           </span>
           <span className="rounded-full border border-white/60 px-3 py-1 text-xs uppercase tracking-wide">
             Abrir

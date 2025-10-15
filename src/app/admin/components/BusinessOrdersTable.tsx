@@ -99,7 +99,10 @@ export function BusinessOrdersTable({ orders }: BusinessOrdersTableProps) {
             </thead>
             <tbody className="divide-y divide-red-100/40 bg-white dark:bg-white/5">
               {filteredOrders.map((pedido) => (
-                <tr key={pedido.id} className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
+                <tr
+                  key={pedido.id}
+                  className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
+                >
                   <td className="px-4 py-3 font-medium">{pedido.id}</td>
                   <td className="px-4 py-3">{pedido.cliente}</td>
                   <td className="px-4 py-3">
@@ -137,7 +140,9 @@ function OrderStatusBadge({ status }: { status: BusinessOrder["estado"] }) {
         : "bg-rose-100 text-rose-600";
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+    >
       <span className="size-2 rounded-full bg-current" />
       {status}
     </span>

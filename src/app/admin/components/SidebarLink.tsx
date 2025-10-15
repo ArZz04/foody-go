@@ -29,7 +29,9 @@ export function SidebarLink({ href, label, icon }: SidebarLinkProps) {
         <span
           className={clsx(
             "flex size-8 items-center justify-center rounded-xl bg-white/80 text-lg shadow-sm transition group-hover:scale-105 dark:bg-white/10",
-            active ? "text-red-600 dark:text-red-200" : "text-zinc-400 dark:text-zinc-500",
+            active
+              ? "text-red-600 dark:text-red-200"
+              : "text-zinc-400 dark:text-zinc-500",
           )}
           aria-hidden
         >

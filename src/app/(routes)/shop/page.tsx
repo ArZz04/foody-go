@@ -40,7 +40,7 @@ export default function ShopPage() {
 
     if (filtroCategoria !== "Todos" && filtroGiro !== "Todos") {
       const prods = productos.filter(
-        (p) => p.giro === filtroGiro && p.categoria === filtroCategoria
+        (p) => p.giro === filtroGiro && p.categoria === filtroCategoria,
       );
       const girosPermitidos = new Set(prods.map((p) => p.giro));
       result = result.filter((n) => girosPermitidos.has(n.giro));
@@ -53,11 +53,17 @@ export default function ShopPage() {
   const categorias =
     filtroGiro === "Todos"
       ? []
-      : ["Todos", ...new Set(productos.filter((p) => p.giro === filtroGiro).map((p) => p.categoria))];
+      : [
+          "Todos",
+          ...new Set(
+            productos
+              .filter((p) => p.giro === filtroGiro)
+              .map((p) => p.categoria),
+          ),
+        ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-
       {/* Barra de giros */}
       <FilterBar
         items={giros}
@@ -104,7 +110,9 @@ export default function ShopPage() {
             ))}
           </div>
         ) : (
-          <p className="text-center text-gray-500 mt-8">No hay negocios disponibles.</p>
+          <p className="text-center text-gray-500 mt-8">
+            No hay negocios disponibles.
+          </p>
         )}
       </main>
     </div>

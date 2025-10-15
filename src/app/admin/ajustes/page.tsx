@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -37,13 +37,33 @@ type Business = {
 };
 
 const INITIAL_DEVICES: Device[] = [
-  { id: 1, name: "MacBook Pro 16”", location: "CDMX", lastActive: "Hace 2 horas" },
-  { id: 2, name: "iPhone 15 Pro", location: "Querétaro", lastActive: "Hace 15 minutos" },
-  { id: 3, name: "iPad Air", location: "Guadalajara", lastActive: "Hace 3 días" },
+  {
+    id: 1,
+    name: "MacBook Pro 16”",
+    location: "CDMX",
+    lastActive: "Hace 2 horas",
+  },
+  {
+    id: 2,
+    name: "iPhone 15 Pro",
+    location: "Querétaro",
+    lastActive: "Hace 15 minutos",
+  },
+  {
+    id: 3,
+    name: "iPad Air",
+    location: "Guadalajara",
+    lastActive: "Hace 3 días",
+  },
 ];
 
 const INITIAL_BUSINESSES: Business[] = [
-  { id: 1, name: "Taquería El Primo", category: "Comida Mexicana", active: true },
+  {
+    id: 1,
+    name: "Taquería El Primo",
+    category: "Comida Mexicana",
+    active: true,
+  },
   { id: 2, name: "Green Bowls", category: "Saludable", active: true },
   { id: 3, name: "Café Aurora", category: "Cafetería", active: false },
 ];
@@ -85,7 +105,8 @@ export default function AdminSettingsPage() {
               ⚙️ Ajustes del Sistema
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-300">
-              Administra preferencias, seguridad y operaciones clave del ecosistema FoodyGo.
+              Administra preferencias, seguridad y operaciones clave del
+              ecosistema FoodyGo.
             </p>
           </div>
           <Button variant="destructive" className="rounded-lg px-5">
@@ -284,7 +305,10 @@ export default function AdminSettingsPage() {
                 ))}
               </ul>
             </div>
-            <Button variant="outline" className="w-full rounded-lg border-red-200/60 text-red-600 hover:bg-red-100">
+            <Button
+              variant="outline"
+              className="w-full rounded-lg border-red-200/60 text-red-600 hover:bg-red-100"
+            >
               Cerrar sesión en todos los dispositivos
             </Button>
           </CardContent>
@@ -295,11 +319,15 @@ export default function AdminSettingsPage() {
             <div>
               <CardTitle className="text-lg text-red-600">Negocios</CardTitle>
               <CardDescription>
-                Controla la actividad de los aliados comerciales dentro de la plataforma.
+                Controla la actividad de los aliados comerciales dentro de la
+                plataforma.
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button variant="outline" className="rounded-lg border-red-200/60 text-red-600 hover:bg-red-100">
+              <Button
+                variant="outline"
+                className="rounded-lg border-red-200/60 text-red-600 hover:bg-red-100"
+              >
                 Editar negocio
               </Button>
               <Button variant="destructive" className="rounded-lg">
@@ -345,7 +373,8 @@ export default function AdminSettingsPage() {
                 Pagos y comisiones
               </CardTitle>
               <CardDescription>
-                Ajusta los porcentajes y métodos de pago disponibles para la operación.
+                Ajusta los porcentajes y métodos de pago disponibles para la
+                operación.
               </CardDescription>
             </div>
             <Button variant="destructive" className="rounded-lg">
@@ -408,10 +437,14 @@ export default function AdminSettingsPage() {
                 Soporte y ayuda
               </CardTitle>
               <CardDescription>
-                Conecta con el equipo de soporte o envía retroalimentación rápida.
+                Conecta con el equipo de soporte o envía retroalimentación
+                rápida.
               </CardDescription>
             </div>
-            <Button variant="outline" className="rounded-lg border-red-200/60 text-red-600 hover:bg-red-100">
+            <Button
+              variant="outline"
+              className="rounded-lg border-red-200/60 text-red-600 hover:bg-red-100"
+            >
               Contactar soporte
             </Button>
           </CardHeader>
@@ -498,7 +531,11 @@ type ToggleSwitchProps = {
   ariaLabel: string;
 };
 
-function ToggleSwitch({ checked, onCheckedChange, ariaLabel }: ToggleSwitchProps) {
+function ToggleSwitch({
+  checked,
+  onCheckedChange,
+  ariaLabel,
+}: ToggleSwitchProps) {
   return (
     <button
       type="button"

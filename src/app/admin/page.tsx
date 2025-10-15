@@ -32,10 +32,34 @@ export default function AdminDashboardPage() {
 
   const BAR_DATA = [2, 5, 7, 6, 8, 9, 11, 13, 10, 12, 9, 8];
   const RECENT_BUSINESSES = [
-    { id: 1, nombre: "Cafetería Central", ciudad: "Guadalajara", giro: "Cafetería", status: "Verificado" },
-    { id: 2, nombre: "Tacos El Güero", ciudad: "Zapopan", giro: "Taquería", status: "Activo" },
-    { id: 3, nombre: "Panadería Delicias", ciudad: "Tlaquepaque", giro: "Panadería", status: "Verificado" },
-    { id: 4, nombre: "Helados Frosti", ciudad: "Tonalá", giro: "Heladería", status: "Verificado" },
+    {
+      id: 1,
+      nombre: "Cafetería Central",
+      ciudad: "Guadalajara",
+      giro: "Cafetería",
+      status: "Verificado",
+    },
+    {
+      id: 2,
+      nombre: "Tacos El Güero",
+      ciudad: "Zapopan",
+      giro: "Taquería",
+      status: "Activo",
+    },
+    {
+      id: 3,
+      nombre: "Panadería Delicias",
+      ciudad: "Tlaquepaque",
+      giro: "Panadería",
+      status: "Verificado",
+    },
+    {
+      id: 4,
+      nombre: "Helados Frosti",
+      ciudad: "Tonalá",
+      giro: "Heladería",
+      status: "Verificado",
+    },
   ];
   const ACTIVITY = [
     { title: "Nuevo pedido #1234 por $250.00", time: "Hace 10 minutos" },
@@ -55,7 +79,8 @@ export default function AdminDashboardPage() {
           </span>
           <h2 className="text-3xl font-bold md:text-4xl">¡Hola, Admin!</h2>
           <p className="max-w-2xl text-white/85">
-            Este es tu panel de control. Revisa el rendimiento, acciones rápidas y actividad reciente.
+            Este es tu panel de control. Revisa el rendimiento, acciones rápidas
+            y actividad reciente.
           </p>
           <div className="flex flex-wrap gap-3 pt-2">
             <DashButton>+ Crear negocio</DashButton>
@@ -76,19 +101,26 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      <section aria-label="Resúmenes" className="grid gap-6 md:grid-cols-[1.6fr_1fr]">
+      <section
+        aria-label="Resúmenes"
+        className="grid gap-6 md:grid-cols-[1.6fr_1fr]"
+      >
         <Card title="Rendimiento diario">
           <div className="grid gap-6 lg:grid-cols-[1fr,300px]">
             <div className="space-y-4">
               <div className="rounded-[22px] border border-white/70 bg-white/95 p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
-                <p className="text-sm font-medium text-red-600">Tráfico en vivo</p>
+                <p className="text-sm font-medium text-red-600">
+                  Tráfico en vivo
+                </p>
                 <p className="mt-1 text-3xl font-bold">+32%</p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   vs promedio de la última semana
                 </p>
               </div>
               <div className="rounded-[22px] border border-white/70 bg-white/95 p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
-                <p className="text-sm font-medium text-emerald-600">Tiempo promedio de entrega</p>
+                <p className="text-sm font-medium text-emerald-600">
+                  Tiempo promedio de entrega
+                </p>
                 <p className="mt-1 text-3xl font-bold">28 min</p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Meta: 30 min
@@ -96,7 +128,9 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="space-y-4 rounded-[22px] border border-white/70 bg-white/95 p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
-              <p className="text-sm font-medium text-red-600">Pedidos por hora</p>
+              <p className="text-sm font-medium text-red-600">
+                Pedidos por hora
+              </p>
               <div className="grid grid-cols-12 gap-1">
                 {BAR_DATA.map((value, index) => (
                   <div key={index} className="space-y-1 text-center">
@@ -116,7 +150,8 @@ export default function AdminDashboardPage() {
           <Card title="Equipo activo">
             <ul className="space-y-3 text-sm">
               {admins.slice(0, 4).map((user: any) => {
-                const initials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
+                const initials =
+                  `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
                 return (
                   <li
                     key={user.id}
@@ -130,7 +165,9 @@ export default function AdminDashboardPage() {
 
                       {/* 🧾 Info del usuario */}
                       <div>
-                        <p className="font-medium">{user.first_name} {user.last_name}</p>
+                        <p className="font-medium">
+                          {user.first_name} {user.last_name}
+                        </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {user.email || user.phone}
                         </p>
@@ -162,7 +199,9 @@ export default function AdminDashboardPage() {
                 <tbody className="divide-y divide-white/70 bg-white/95 text-zinc-700 dark:divide-white/10 dark:bg-white/5 dark:text-zinc-200">
                   {RECENT_BUSINESSES.map((business) => (
                     <tr key={business.id}>
-                      <td className="px-4 py-2 font-medium">{business.nombre}</td>
+                      <td className="px-4 py-2 font-medium">
+                        {business.nombre}
+                      </td>
                       <td className="px-4 py-2 text-sm">{business.ciudad}</td>
                       <td className="px-4 py-2 text-sm">{business.giro}</td>
                       <td className="px-4 py-2">
@@ -171,7 +210,9 @@ export default function AdminDashboardPage() {
                         </span>
                       </td>
                       <td className="px-4 py-2 text-right">
-                        <button className="text-red-600 hover:underline">Ver</button>
+                        <button className="text-red-600 hover:underline">
+                          Ver
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -228,7 +269,9 @@ export default function AdminDashboardPage() {
       </section>
 
       <section id="usuarios" className="pt-6 md:pt-8">
-        <h2 className="mb-3 text-lg font-semibold md:text-xl">Gestión de usuarios</h2>
+        <h2 className="mb-3 text-lg font-semibold md:text-xl">
+          Gestión de usuarios
+        </h2>
         <EditUsersList />
       </section>
     </div>
@@ -254,15 +297,29 @@ function DashButton({
         : "bg-white/10 text-white backdrop-blur ring-1 ring-white/30 hover:-translate-y-0.5 hover:bg-white/20";
   const Comp = href ? Link : "button";
   // @ts-ignore
-  return <Comp href={href} className={`${base} ${styles}`}>{children}</Comp>;
+  return (
+    <Comp href={href} className={`${base} ${styles}`}>
+      {children}
+    </Comp>
+  );
 }
 
-function KPI({ label, value, delta }: { label: string; value: string; delta?: string }) {
+function KPI({
+  label,
+  value,
+  delta,
+}: {
+  label: string;
+  value: string;
+  delta?: string;
+}) {
   return (
     <div className="relative overflow-hidden rounded-[22px] bg-gradient-to-br from-rose-100/80 via-red-200/70 to-red-300/40 p-[1px] shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]">
       <div className="relative h-full rounded-[20px] bg-white/95 p-4 shadow-lg ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10">
         <div className="pointer-events-none absolute -top-10 right-0 h-16 w-16 rounded-full bg-rose-200/60 blur-3xl" />
-        <p className="text-xs uppercase tracking-[0.3em] text-red-400">{label}</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-red-400">
+          {label}
+        </p>
         <div className="mt-2 text-3xl font-semibold text-zinc-800 dark:text-white md:text-[2.25rem]">
           {value}
         </div>
@@ -277,12 +334,20 @@ function KPI({ label, value, delta }: { label: string; value: string; delta?: st
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="relative overflow-hidden rounded-[26px] bg-white/95 p-6 shadow-xl ring-1 ring-white/70 backdrop-blur-sm dark:bg-zinc-900/80 dark:ring-white/10">
       <div className="pointer-events-none absolute inset-x-6 top-0 h-24 rounded-full bg-gradient-to-br from-red-100/40 via-transparent to-transparent blur-3xl" />
       <div className="relative z-10">
-        <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-100">{title}</h3>
+        <h3 className="text-lg font-semibold text-zinc-700 dark:text-zinc-100">
+          {title}
+        </h3>
         <div className="mt-2 h-1 w-12 rounded-full bg-gradient-to-r from-rose-400/70 to-red-400/70" />
       </div>
       <div className="relative z-10 mt-5">{children}</div>

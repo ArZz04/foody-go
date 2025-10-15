@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  getBusinessById,
-  type BusinessOrder,
-} from "../../data/businesses";
+import { getBusinessById, type BusinessOrder } from "../../data/businesses";
 import { BusinessOrdersTable } from "../../components/BusinessOrdersTable";
 
 interface PageProps {
@@ -35,7 +32,9 @@ export default function BusinessDetailPage({ params }: PageProps) {
           <p className="text-sm uppercase tracking-[0.3em] text-zinc-400">
             Negocio #{business.id}
           </p>
-          <h1 className="text-3xl font-semibold text-red-700">{business.nombre}</h1>
+          <h1 className="text-3xl font-semibold text-red-700">
+            {business.nombre}
+          </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-300">
             {business.categoria} · {business.ciudad}
           </p>
@@ -51,7 +50,9 @@ export default function BusinessDetailPage({ params }: PageProps) {
       <section className="grid gap-4 rounded-3xl border border-red-200/60 bg-white/95 p-6 shadow-lg dark:border-white/10 dark:bg-white/10 md:grid-cols-[1.2fr,1fr]">
         <div className="space-y-3 rounded-xl bg-red-50/60 p-5 dark:bg-white/5">
           <h2 className="text-base font-semibold text-red-600">Ubicación</h2>
-          <p className="text-sm text-zinc-700 dark:text-zinc-200">{business.direccion}</p>
+          <p className="text-sm text-zinc-700 dark:text-zinc-200">
+            {business.direccion}
+          </p>
           <p className="text-xs text-zinc-400">{business.referencias}</p>
           <div className="flex flex-wrap gap-2 pt-2">
             <a
@@ -64,18 +65,26 @@ export default function BusinessDetailPage({ params }: PageProps) {
         </div>
 
         <div className="space-y-3 rounded-xl border border-red-200/60 bg-white/90 p-5 text-sm shadow-sm dark:border-white/10 dark:bg-white/5">
-          <h2 className="text-base font-semibold text-red-600">Información general</h2>
+          <h2 className="text-base font-semibold text-red-600">
+            Información general
+          </h2>
           <dl className="grid grid-cols-1 gap-3 text-zinc-700 dark:text-zinc-200 sm:grid-cols-2">
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Dueño</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                Dueño
+              </dt>
               <dd>{business.contacto}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Teléfono</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                Teléfono
+              </dt>
               <dd>{business.telefono}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Horario</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                Horario
+              </dt>
               <dd>
                 {business.horario.dias}
                 <br />
@@ -83,13 +92,17 @@ export default function BusinessDetailPage({ params }: PageProps) {
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Estado</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                Estado
+              </dt>
               <dd>
                 <StatusBadge status={business.estado} />
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Inicio en FoodyGo</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+                Inicio en FoodyGo
+              </dt>
               <dd>
                 {new Date(business.creadoEn).toLocaleDateString("es-MX", {
                   day: "2-digit",
@@ -183,7 +196,9 @@ function StatusBadge({ status }: { status: BusinessStatus }) {
         : "bg-rose-100 text-rose-600";
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+    >
       <span className="size-2 rounded-full bg-current" />
       {status}
     </span>

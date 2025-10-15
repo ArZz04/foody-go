@@ -63,7 +63,8 @@ export function CourierAssignmentsTable({
         <div>
           <h2 className="text-xl font-semibold">Pedidos despachados</h2>
           <p className="text-xs text-zinc-400">
-            Mostrando {filteredAssignments.length} de {assignments.length} entregas registradas.
+            Mostrando {filteredAssignments.length} de {assignments.length}{" "}
+            entregas registradas.
           </p>
         </div>
         {monthOptions.length > 0 ? (
@@ -102,7 +103,10 @@ export function CourierAssignmentsTable({
             </thead>
             <tbody className="divide-y divide-red-100/40 bg-white dark:bg-white/5">
               {filteredAssignments.map((assignment) => (
-                <tr key={assignment.id} className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
+                <tr
+                  key={assignment.id}
+                  className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
+                >
                   <td className="px-4 py-3 font-medium">{assignment.id}</td>
                   <td className="px-4 py-3">{assignment.pedido}</td>
                   <td className="px-4 py-3">{assignment.negocio}</td>
@@ -147,7 +151,9 @@ function AssignmentStatusBadge({
         : "bg-rose-100 text-rose-600";
 
   return (
-    <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}>
+    <span
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+    >
       <span className="size-2 rounded-full bg-current" />
       {status}
     </span>

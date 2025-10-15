@@ -14,15 +14,21 @@ export function CourierInfoCard({ courier }: CourierInfoCardProps) {
         <h2 className="text-base font-semibold text-red-600">Contacto</h2>
         <dl className="space-y-2">
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Teléfono</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Teléfono
+            </dt>
             <dd>{courier.telefono}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Correo</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Correo
+            </dt>
             <dd>{courier.email}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Incorporación</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Incorporación
+            </dt>
             <dd>
               {new Date(courier.inicioEnFoodyGo).toLocaleDateString("es-MX", {
                 day: "2-digit",
@@ -49,26 +55,38 @@ export function CourierInfoCard({ courier }: CourierInfoCardProps) {
       </div>
 
       <div className="space-y-3 rounded-xl border border-red-200/60 bg-white/90 p-5 text-sm shadow-sm dark:border-white/10 dark:bg-white/5">
-        <h2 className="text-base font-semibold text-red-600">Vehículo & desempeño</h2>
+        <h2 className="text-base font-semibold text-red-600">
+          Vehículo & desempeño
+        </h2>
         <dl className="grid grid-cols-1 gap-3 text-zinc-700 dark:text-zinc-200">
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Vehículo</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Vehículo
+            </dt>
             <dd>{courier.vehiculo}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Placas</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Placas
+            </dt>
             <dd>{courier.placas}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Calificación</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Calificación
+            </dt>
             <dd>{courier.calificacion.toFixed(1)} / 5</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">T. promedio de entrega</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              T. promedio de entrega
+            </dt>
             <dd>{courier.promedioEntrega}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">Estado</dt>
+            <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
+              Estado
+            </dt>
             <dd>
               <CourierStatusBadge status={courier.estado} />
             </dd>

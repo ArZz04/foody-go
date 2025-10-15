@@ -12,11 +12,19 @@ interface CourierHeaderProps {
   status: CourierStatus;
 }
 
-export function CourierHeader({ courierId, name, zone, shift, status }: CourierHeaderProps) {
+export function CourierHeader({
+  courierId,
+  name,
+  zone,
+  shift,
+  status,
+}: CourierHeaderProps) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <p className="text-sm uppercase tracking-[0.3em] text-zinc-400">Repartidor #{courierId}</p>
+        <p className="text-sm uppercase tracking-[0.3em] text-zinc-400">
+          Repartidor #{courierId}
+        </p>
         <h1 className="text-3xl font-semibold text-red-700">{name}</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-300">
           {shift} · {zone}

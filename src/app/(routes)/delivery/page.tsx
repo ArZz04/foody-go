@@ -124,34 +124,34 @@ export default function DeliveryDashboardPage() {
     >
       <div className="min-h-screen bg-[linear-gradient(180deg,rgba(17,32,26,0.78)_0%,rgba(230,238,232,0.94)_45%,rgba(245,245,240,0.98)_100%)] text-[#1f2d27]">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
-        <DeliveryHeader
-          driverName={driverName}
-          serviceArea="Zona Centro"
-          pendingOrders={currentOrders.length}
-          lastSync="Hace 3 min"
-        />
+          <DeliveryHeader
+            driverName={driverName}
+            serviceArea="Zona Centro"
+            pendingOrders={currentOrders.length}
+            lastSync="Hace 3 min"
+          />
 
-        <div className="grid gap-6 xl:grid-cols-[1.8fr,1.2fr]">
-          <CurrentDeliveriesCard orders={currentOrders} />
+          <div className="grid gap-6 xl:grid-cols-[1.8fr,1.2fr]">
+            <CurrentDeliveriesCard orders={currentOrders} />
 
-          <div className="space-y-6">
-            {highlightedOrder ? (
-              <LocationCard order={highlightedOrder} />
-            ) : (
-              <div className="rounded-[26px] border border-dashed border-white/30 bg-white/10 p-6 text-sm text-white/80 shadow-inner backdrop-blur">
-                No hay entregas para mostrar ubicación.
-              </div>
-            )}
-            <ScheduleCard schedule={nextSchedule} />
+            <div className="space-y-6">
+              {highlightedOrder ? (
+                <LocationCard order={highlightedOrder} />
+              ) : (
+                <div className="rounded-[26px] border border-dashed border-white/30 bg-white/10 p-6 text-sm text-white/80 shadow-inner backdrop-blur">
+                  No hay entregas para mostrar ubicación.
+                </div>
+              )}
+              <ScheduleCard schedule={nextSchedule} />
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
+            <EarningsCard earnings={earningsSummary} />
+            <NotificationsCard notifications={recentNotifications} />
           </div>
         </div>
-
-        <div className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
-          <EarningsCard earnings={earningsSummary} />
-          <NotificationsCard notifications={recentNotifications} />
-        </div>
       </div>
-    </div>
     </main>
   );
 }

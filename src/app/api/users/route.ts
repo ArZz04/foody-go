@@ -21,11 +21,19 @@ export async function GET(req: Request) {
     // Devolver todos los usuarios verificados
     const [rows] = await pool.query(
       `
-      SELECT id, first_name, last_name, email, phone, verify
-      FROM users
-      WHERE verify = 1
-      `,
-      [],
+  SELECT 
+    u.id, 
+    u.first_name, 
+    u.last_name, 
+    u.email, 
+    u.phone, 
+    u.created_at, 
+    u.updated_at,
+    GROUP_CONCAT(ur.role_id ORDER BY ur.role_id) AS roles
+  FROM users u
+  LEFT JOIN user_roles ur ON ur.user_id = u.id
+  GROUP BY u.id
+  `,
     );
 
     return NextResponse.json({

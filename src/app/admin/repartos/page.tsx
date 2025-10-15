@@ -6,7 +6,8 @@ export default function AdminRepartosPage() {
       <header className="space-y-2">
         <h1 className="text-3xl font-semibold">Repartos</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-300">
-          Supervisa la flota de repartidores, revisa asignaciones recientes y métricas de desempeño.
+          Supervisa la flota de repartidores, revisa asignaciones recientes y
+          métricas de desempeño.
         </p>
       </header>
       <CourierList />

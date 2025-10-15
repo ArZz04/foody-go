@@ -15,9 +15,7 @@ interface NotificationsCardProps {
   notifications: DeliveryNotification[];
 }
 
-export function NotificationsCard({
-  notifications,
-}: NotificationsCardProps) {
+export function NotificationsCard({ notifications }: NotificationsCardProps) {
   return (
     <Card className="overflow-hidden rounded-[26px] border border-white/20 bg-white/10 text-[#1f2d27] shadow-xl backdrop-blur-lg">
       <CardHeader className="border-b border-white/10 bg-gradient-to-r from-emerald-400/30 via-emerald-600/25 to-emerald-900/25 pb-6 text-white">
