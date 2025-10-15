@@ -2,17 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-const ROLE_OPTIONS = ["Administrador", "Vendedor", "Repartidor", "Soporte"];
-
 export default function EditUsersList() {
-  const [usuarios, setUsuarios] = useState<User[]>([]);
+  const [users, setusers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
 
-    async function fetchUsuarios() {
+    async function fetchUsers() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return console.warn("Token no encontrado");
@@ -28,7 +26,7 @@ export default function EditUsersList() {
         if (!response.ok) throw new Error(`Error ${response.status}`);
 
         const json = await response.json();
-        setUsuarios(
+        setusers(
           (json.users || []).map((u: any) => ({
             id: u.id,
             name: `${u.first_name ?? ""} ${u.last_name ?? ""}`.trim(),
@@ -36,53 +34,40 @@ export default function EditUsersList() {
             phone: u.phone ?? "",
             createdAt: u.created_at ?? "",
             updatedAt: u.updated_at ?? "",
+            status: u.status ?? "DESCONOCIDO",
           }))
         );
 
 
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
-        console.error("Error al cargar usuarios", err);
-        setError("No se pudieron cargar los usuarios.");
-        setUsuarios([]);
+        console.error("Error al cargar users", err);
+        setError("No se pudieron cargar los users.");
+        setusers([]);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchUsuarios();
+    fetchUsers();
     return () => controller.abort();
   }, []);
 
   const stats = useMemo(() => {
-    const total = usuarios.length;
-    const activos = usuarios.filter(
-      (usuario) => usuario.estatus === "ACTIVO",
+    const total = users.length;
+    const activos = users.filter(
+      (usuario) => usuario.status === 1,
     ).length;
-    const administradores = usuarios.filter(
-      (usuario) => usuario.rol === "Administrador",
-    ).length;
-    const repartidores = usuarios.filter(
-      (usuario) => usuario.rol === "Repartidor",
-    ).length;
-    return { total, activos, administradores, repartidores };
-  }, [usuarios]);
-
-  const handleRoleChange = (id: number, role: string) => {
-    setUsuarios((prev) =>
-      prev.map((usuario) =>
-        usuario.id === id ? { ...usuario, rol: role } : usuario,
-      ),
-    );
-  };
+    return { total, activos };
+  }, [users]);
 
   const handleStatusToggle = (id: number) => {
-    setUsuarios((prev) =>
+    setusers((prev) =>
       prev.map((usuario) =>
         usuario.id === id
           ? {
               ...usuario,
-              estatus: usuario.estatus === "ACTIVO" ? "INACTIVO" : "ACTIVO",
+              status: usuario.status === 1 ? 0 : 1,
             }
           : usuario,
       ),
@@ -93,27 +78,17 @@ export default function EditUsersList() {
     <section className="space-y-6 rounded-2xl bg-white/90 p-6 shadow-md ring-1 ring-red-200/60 dark:bg-white/10 dark:ring-white/10">
       <header>
         <h2 className="text-xl font-semibold text-red-700">
-          Lista de usuarios
+          Lista de Usuarios
         </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-300">
-          Consulta y ajusta los roles de los usuarios registrados en la
+          Consulta y ajusta los roles de los users registrados en la
           plataforma.
         </p>
       </header>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard label="Usuarios totales" value={stats.total} />
+        <SummaryCard label="users totales" value={stats.total} />
         <SummaryCard label="Activos" value={stats.activos} accent="emerald" />
-        <SummaryCard
-          label="Administradores"
-          value={stats.administradores}
-          accent="violet"
-        />
-        <SummaryCard
-          label="Repartidores"
-          value={stats.repartidores}
-          accent="sky"
-        />
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -122,7 +97,6 @@ export default function EditUsersList() {
             <tr>
               <th className="px-4 py-3">Usuario</th>
               <th className="px-4 py-3">Contacto</th>
-              <th className="px-4 py-3">Rol</th>
               <th className="px-4 py-3">Estatus</th>
               <th className="px-4 py-3">Registro</th>
               <th className="px-4 py-3 text-center">Acciones</th>
@@ -140,17 +114,17 @@ export default function EditUsersList() {
                   {error}
                 </td>
               </tr>
-            ) : usuarios.length === 0 ? (
+            ) : users.length === 0 ? (
               <tr>
                 <td
                   colSpan={6}
                   className="px-4 py-8 text-center text-sm text-zinc-400"
                 >
-                  No hay usuarios aún.
+                  No hay users aún.
                 </td>
               </tr>
             ) : (
-              usuarios.map((usuario) => (
+              users.map((usuario) => (
                 <tr
                   key={usuario.id}
                   className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
@@ -165,28 +139,7 @@ export default function EditUsersList() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <select
-                      value={usuario.role}
-                      onChange={(event) =>
-                        handleRoleChange(usuario.id, event.target.value)
-                      }
-                      className="rounded-lg border border-red-200/60 bg-white px-2 py-1 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
-                    >
-                      {(ROLE_OPTIONS.includes(usuario.rol)
-                        ? ROLE_OPTIONS
-                        : [usuario.rol, ...ROLE_OPTIONS]
-                      ).map((roleOption) => (
-                        <option
-                          key={`${usuario.id}-${roleOption}`}
-                          value={roleOption}
-                        >
-                          {roleOption}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge status={usuario.estatus} />
+                    <StatusBadge status={usuario.status} />
                   </td>
                   <td className="px-4 py-3">
                     <span className="text-xs text-zinc-400">
@@ -208,7 +161,7 @@ export default function EditUsersList() {
                       onClick={() => handleStatusToggle(usuario.id)}
                       className="inline-flex items-center justify-center rounded-lg border border-red-200/60 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10"
                     >
-                      Cambiar estatus
+                      Editar
                     </button>
                   </td>
                 </tr>
@@ -255,8 +208,8 @@ function SummaryCard({
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const normalized = (status || "DESCONOCIDO").toUpperCase();
+function StatusBadge({ status }: { status: number }) {
+  const normalized = (status || 0) === 1 ? "ACTIVO" : "INACTIVO";
   const isActive = normalized === "ACTIVO";
   const baseStyles =
     "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold";
@@ -278,7 +231,7 @@ function LoadingRow() {
       <td colSpan={6} className="px-4 py-6">
         <div className="flex items-center justify-center gap-3 text-sm text-zinc-400">
           <span className="inline-flex size-4 animate-spin rounded-full border-2 border-red-200 border-t-transparent" />
-          Cargando usuarios...
+          Cargando users...
         </div>
       </td>
     </tr>

@@ -1,3 +1,4 @@
+
 type User = {
   id: number;
   name: string;
@@ -5,4 +6,5 @@ type User = {
   phone: string;
   createdAt: string;
   updatedAt?: string;
+  status: number;
 };

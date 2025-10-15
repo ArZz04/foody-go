@@ -29,6 +29,7 @@ export async function GET(req: Request) {
     u.phone, 
     u.created_at, 
     u.updated_at,
+    u.status,
     GROUP_CONCAT(ur.role_id ORDER BY ur.role_id) AS roles
   FROM users u
   LEFT JOIN user_roles ur ON ur.user_id = u.id
