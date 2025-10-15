@@ -293,19 +293,23 @@ export default function AdminUsersPage() {
                 </label>
 
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="h-4 w-4 accent-red-500" defaultChecked />
-                    <span className="text-sm text-zinc-300">Dueño</span>
-                  </label>
-                  <div className="ml-6 flex flex-wrap gap-2">
-                    <span className="rounded-lg bg-zinc-800 px-2 py-1 text-xs font-semibold text-zinc-300">
-                      TQUITOS EL PERRON
-                    </span>
-                    <span className="rounded-lg bg-zinc-800 px-2 py-1 text-xs font-semibold text-zinc-300">
-                      PUNTO DE ARCOS
-                    </span>
-                  </div>
-                </div>
+  <label className="block text-sm font-medium text-zinc-300">
+    Dueño
+  </label>
+
+  <select
+    defaultValue="TQUITOS EL PERRON"
+    className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 
+               focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+  >
+    <option value="TQUITOS EL PERRON">TQUITOS EL PERRON</option>
+    <option value="PUNTO DE ARCOS">PUNTO DE ARCOS</option>
+  </select>
+
+  <p className="text-xs text-zinc-500">
+    Selecciona el negocio asociado al dueño.
+  </p>
+</div>
 
                 <label className="flex items-center gap-2">
                   <input type="checkbox" className="h-4 w-4 accent-red-500" />
