@@ -17,7 +17,7 @@ const METRICS = [
   { label: "Pedidos pendientes", value: "5", delta: "En preparación", tone: "amber" },
   { label: "Ingreso estimado", value: "$12,360", delta: "Semana actual", tone: "sky" },
   { label: "Productos agotados", value: "2 cortes", delta: "Reponer inventario", tone: "rose" },
-];
+] as const;
 
 type OrderTicket = {
   id: string;
