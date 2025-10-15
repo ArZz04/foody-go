@@ -4,6 +4,7 @@ import { NavbarWrapper } from "@/app/components/NavbarWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { OrdersProvider } from "@/context/OrdersContext";
 import "./globals.css";
+import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
   title: "Foody Go",
@@ -26,7 +27,7 @@ export default function RootLayout({
         <AuthProvider>
           <OrdersProvider>
             <div className="min-h-screen flex flex-col">
-              <NavbarWrapper />
+              <Navbar />
               {children}
             </div>
           </OrdersProvider>
