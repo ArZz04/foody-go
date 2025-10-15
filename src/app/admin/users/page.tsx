@@ -297,14 +297,15 @@ export default function AdminUsersPage() {
     Dueño
   </label>
 
-  <select
-    defaultValue="TQUITOS EL PERRON"
-    className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 
-               focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-  >
-    <option value="TQUITOS EL PERRON">TQUITOS EL PERRON</option>
-    <option value="PUNTO DE ARCOS">PUNTO DE ARCOS</option>
-  </select>
+<select
+  multiple
+  defaultValue={["TQUITOS EL PERRON", "PUNTO DE ARCOS"]}
+  className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-zinc-100 
+             focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+>
+  <option value="TQUITOS EL PERRON">TQUITOS EL PERRON</option>
+  <option value="PUNTO DE ARCOS">PUNTO DE ARCOS</option>
+</select>
 
   <p className="text-xs text-zinc-500">
     Selecciona el negocio asociado al dueño.
