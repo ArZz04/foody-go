@@ -67,6 +67,7 @@ export default function AdminDashboardPage() {
     { title: "Negocio 'Tacos El Güero' verificado", time: "Hace 1 hora" },
     { title: "Pedido #1233 entregado por Daniela Pérez", time: "Hace 2 horas" },
   ];
+
   return (
     <div className="mx-auto max-w-7xl space-y-10 px-4 py-6 sm:px-6 md:py-10">
       <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-rose-500 via-red-500 to-red-600 p-6 text-white shadow-[0px_32px_80px_-32px_rgba(244,63,94,0.7)] ring-1 ring-white/20 sm:p-9">
@@ -291,6 +292,8 @@ function DashButton({
         : "bg-white/10 text-white backdrop-blur ring-1 ring-white/30 hover:-translate-y-0.5 hover:bg-white/20";
   const Comp = href ? Link : "button";
   // @ts-ignore
+
+  if (!href) return null;
   return (
     <Comp href={href} className={`${base} ${styles}`}>
       {children}
