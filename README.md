@@ -10,7 +10,7 @@
 |--------|------------|-----|--------|
 | **Juan Arvizu** | 230111367 | Desarrollador principal / Arquitectura del sistema | [@ArZz04](https://github.com/ArZz04) |
 | **Yaritza Chavez** | 230110692 | Análisis de requerimientos / Diseño UX | [@Chavez-Yaritza](https://github.com/Chavez-Yaritza-02) |
-| **Andrea del Carmen Rojas** | — | Diseño UX | [@Fakerdyy](https://github.com/Fakerdyy) |
+| **Andrea del Carmen Rojas** | 230112586 | Diseño UX | [@Fakerdyy](https://github.com/Fakerdyy) |
 
 ---
 
