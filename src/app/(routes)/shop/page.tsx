@@ -160,7 +160,7 @@ export default function ShopPage() {
               </h2>
             </div>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-              {filtered.length} abiertos
+              {filtered.length} abiertoss
             </span>
           </div>
           {loading ? (
