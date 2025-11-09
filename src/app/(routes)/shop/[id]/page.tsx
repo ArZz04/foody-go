@@ -358,7 +358,7 @@ export default function BusinessDetailPage() {
                                   addPromotionDirect(promo, promoRaw.price)
                                 }
                               >
-                                Agregar
+                                Agregars
                               </button>
                             </div>
                           </div>
