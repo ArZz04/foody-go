@@ -189,6 +189,10 @@ export default function BusinessDetailPage() {
       selectedProduct?.categoria ?? selectedProduct?.giro ?? ""
     ] ?? [];
 
+  const isTacoProduct =
+    selectedProduct?.giro?.toLowerCase() === "taquería" ||
+    (selectedProduct?.categoria?.toLowerCase().includes("taco") ?? false);
+
   const toggleExtra = (id: string) => {
     setSelectedExtras((prev) => ({ ...prev, [id]: !prev[id] }));
   };
