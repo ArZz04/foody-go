@@ -31,13 +31,6 @@ const uniqueStrings = (values: Array<string | undefined>) =>
   Array.from(new Set(values.filter(isString)));
 
 const PLACEHOLDER_IDS = Array.from({ length: 8 }, (_, i) => `placeholder-${i}`);
-const QUICK_FILTERS = [
-  { label: "Entrega inmediata", helper: "Menos de 25 min", icon: "⚡" },
-  { label: "Envío gratis", helper: "Tarifa $0", icon: "🆓" },
-  { label: "Promo local", helper: "-20% selección", icon: "🥗" },
-  { label: "Nuevos aliados", helper: "Llegaron hoy", icon: "🆕" },
-  { label: "Mejor rating", helper: "4.8+", icon: "⭐" },
-];
 
 const BADGE_POOL = ["Promo", "Top", "Nuevo", "Local"];
 
@@ -100,31 +93,29 @@ export default function ShopPage() {
   return (
     <div className="min-h-screen bg-[#f5f7fb]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
-        <section className="rounded-[28px] border border-white/60 bg-white p-4 shadow-sm">
-          <header className="flex flex-wrap items-center justify-between gap-3">
+        <section className="rounded-[40px] border border-white/50 bg-white/60 p-6 shadow-[0_25px_80px_rgba(59,47,47,0.08)] backdrop-blur-2xl">
+          <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+              <p className="text-xs uppercase tracking-[0.4em] text-[#bca181]">
                 Explora
               </p>
-              <h2 className="text-lg font-semibold text-slate-900">
-                Filtros rápidos
+              <h2 className="font-['Playfair_Display'] text-3xl font-semibold text-[#3b2f2f]">
+                Todos los aliados
               </h2>
+              <p className="text-sm text-[#6d5b4f]">
+                Productos rurales curados con cariño local.
+              </p>
             </div>
-          </header>
-          <div className="mt-4 flex gap-3 overflow-x-auto scrollbar-hide">
-            {QUICK_FILTERS.map((filter) => (
-              <button
-                key={filter.label}
-                type="button"
-                className="min-w-[150px] rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-left text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-white"
-              >
-                <span className="text-xl">{filter.icon}</span>
-                <p>{filter.label}</p>
-                <span className="text-xs font-normal text-slate-400">
-                  {filter.helper}
+            <div className="flex flex-wrap gap-3 rounded-[30px] border border-white/70 bg-white/75 px-4 py-2 text-xs text-[#6d5b4f] shadow-inner backdrop-blur">
+              {giros.slice(1, 5).map((giroName) => (
+                <span
+                  key={giroName}
+                  className="rounded-full bg-[#f9f2e9] px-3 py-1 font-semibold"
+                >
+                  {giroName}
                 </span>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
@@ -160,7 +151,7 @@ export default function ShopPage() {
               </h2>
             </div>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-              {filtered.length} abiertoss
+              {filtered.length} abiertos
             </span>
           </div>
           {loading ? (
