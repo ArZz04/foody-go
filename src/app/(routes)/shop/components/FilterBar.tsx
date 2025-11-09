@@ -1,5 +1,7 @@
 "use client";
 
+import clsx from "clsx";
+
 interface FilterBarProps {
   items: string[];
   selected: string;
@@ -16,22 +18,35 @@ export default function FilterBar({
   icon,
 }: FilterBarProps) {
   return (
-    <div className="bg-white sticky top-0 z-10">
-      <div className="flex gap-2 overflow-x-auto px-4 py-3 scrollbar-hide border-b border-gray-100">
-        {items.map((item) => (
-          <button
-            key={item}
-            onClick={() => onSelect(item)}
-            className={`px-4 py-2 rounded-full border text-sm font-medium whitespace-nowrap transition ${
-              selected === item
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-600 border-gray-300 hover:bg-blue-100"
-            }`}
-          >
-            {item}
-          </button>
-        ))}
+    <section className="sticky top-0 z-30 bg-[#f5f7fb]/90 backdrop-blur">
+      <div className="flex flex-col gap-2 border-b border-slate-100 px-4 py-3">
+        {title ? (
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            {icon}
+            {title}
+          </div>
+        ) : null}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {items.map((item) => {
+            const active = selected === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => onSelect(item)}
+                className={clsx(
+                  "inline-flex items-center gap-1 rounded-2xl px-4 py-2 text-sm font-medium shadow-sm transition",
+                  active
+                    ? "bg-emerald-500 text-white shadow-emerald-200"
+                    : "bg-white text-slate-600 shadow-slate-100 hover:bg-slate-50",
+                )}
+              >
+                {item}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

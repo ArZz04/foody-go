@@ -190,6 +190,134 @@ export async function GET() {
         precio: 55,
         giro: "Heladería",
       },
+
+      // 🍽️ Restaurante
+      {
+        id: 12,
+        nombre: "Ensalada de quinoa",
+        categoria: "Platos fuertes",
+        precio: 120,
+        giro: "Restaurante",
+      },
+      {
+        id: 13,
+        nombre: "Salmón a la parrilla",
+        categoria: "Platos fuertes",
+        precio: 210,
+        giro: "Restaurante",
+      },
+
+      // 💊 Farmacia
+      {
+        id: 14,
+        nombre: "Analgesico 24h",
+        categoria: "Medicamentos",
+        precio: 85,
+        giro: "Farmacia",
+      },
+      {
+        id: 15,
+        nombre: "Kit vitaminas C",
+        categoria: "Cuidado personal",
+        precio: 150,
+        giro: "Farmacia",
+      },
+
+      // 🔧 Servicio automotriz
+      {
+        id: 16,
+        nombre: "Cambio de aceite",
+        categoria: "Servicios",
+        precio: 420,
+        giro: "Servicio automotriz",
+      },
+      {
+        id: 17,
+        nombre: "Alineación y balanceo",
+        categoria: "Servicios",
+        precio: 360,
+        giro: "Servicio automotriz",
+      },
+
+      // 📦 Tienda de abarrotes
+      {
+        id: 18,
+        nombre: "Caja de frutas surtidas",
+        categoria: "Despensa fresca",
+        precio: 180,
+        giro: "Tienda de abarrotes",
+      },
+      {
+        id: 19,
+        nombre: "Combo básicos semana",
+        categoria: "Despensa seca",
+        precio: 220,
+        giro: "Tienda de abarrotes",
+      },
+
+      // 💻 Tienda de electrónica
+      {
+        id: 20,
+        nombre: "Cargador USB-C 30W",
+        categoria: "Accesorios",
+        precio: 320,
+        giro: "Tienda de electrónica",
+      },
+      {
+        id: 21,
+        nombre: "Audífonos inalámbricos",
+        categoria: "Audio",
+        precio: 550,
+        giro: "Tienda de electrónica",
+      },
+
+      // 🧴 Spa y estética
+      {
+        id: 22,
+        nombre: "Facial hidratante",
+        categoria: "Servicios",
+        precio: 480,
+        giro: "Spa y estética",
+      },
+      {
+        id: 23,
+        nombre: "Masaje relajante 60min",
+        categoria: "Servicios",
+        precio: 650,
+        giro: "Spa y estética",
+      },
+
+      // 💇 Barbería
+      {
+        id: 24,
+        nombre: "Corte clásico",
+        categoria: "Servicios",
+        precio: 170,
+        giro: "Barbería",
+      },
+      {
+        id: 25,
+        nombre: "Afeitado con navaja",
+        categoria: "Servicios",
+        precio: 140,
+        giro: "Barbería",
+      },
+
+      // 📚 Papelería
+      {
+        id: 26,
+        nombre: "Paquete cuadernos premium",
+        categoria: "Escolar",
+        precio: 110,
+        giro: "Papelería",
+      },
+      {
+        id: 27,
+        nombre: "Kit de marcadores pastel",
+        categoria: "Escolar",
+        precio: 95,
+        giro: "Papelería",
+      },
     ];
 
     return NextResponse.json({ negocios, productos });
