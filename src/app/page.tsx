@@ -24,7 +24,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8 py-6 shadow-lg">
-                Ordenar ahora
+                Ordenar ahoras
               </Button>
               <Button
                 asChild
