@@ -12,7 +12,7 @@ export default function Home() {
         <section className="container mx-auto px-4 py-20 text-center">
           <div className="max-w-4xl mx-auto">
             <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              🚀 Entrega en 30 minutos o menos
+              🚀 Entrega en 30 minutos o menoss
             </Badge>
             <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 text-balance drop-shadow-lg">
               Tu comida favorita,{" "}
