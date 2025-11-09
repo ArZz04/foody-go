@@ -9,13 +9,16 @@ import {
   Plus,
   Search,
   ShoppingBag,
-  Star,
   X,
 } from "lucide-react";
+import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { MenuItemRow } from "@/components/menu/MenuItemRow";
+import { SectionHeader } from "@/components/menu/SectionHeader";
+import { getSectionTheme } from "@/components/menu/sectionThemes";
 
 type Negocio = {
   id: number | string;
@@ -85,6 +88,14 @@ const NAV_TABS = [
   { key: "recomendados", label: "Recomendados" },
 ] as const;
 
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
 const SALSA_OPTIONS = [
   { id: "pico", label: "Pico de gallo", heat: "Suave" },
   { id: "verde", label: "Salsa verde tatemada", heat: "Media" },
@@ -114,6 +125,8 @@ export default function BusinessDetailPage() {
   const [activeTab, setActiveTab] = useState<
     "promos" | "favoritos" | "recomendados"
   >("promos");
+  const [activeSection, setActiveSection] = useState("");
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
     if (Number.isNaN(negocioId)) {
@@ -176,6 +189,17 @@ export default function BusinessDetailPage() {
     return Array.from(grouped.entries());
   }, [menu]);
 
+  const themedSections = useMemo(
+    () =>
+      sections.map(([category, items]) => ({
+        category,
+        items,
+        theme: getSectionTheme(category),
+        slug: slugify(category),
+      })),
+    [sections],
+  );
+
   const openProduct = (item: Producto) => {
     setSelectedProduct(item);
     setSelectedExtras({});
@@ -183,6 +207,41 @@ export default function BusinessDetailPage() {
     setQuantity(1);
     setFeedback(null);
   };
+
+  const scrollToSection = (slug: string) => {
+    setActiveSection(slug);
+    sectionRefs.current[slug]?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  useEffect(() => {
+    if (themedSections.length > 0 && !activeSection) {
+      setActiveSection(themedSections[0].slug);
+    }
+  }, [activeSection, themedSections]);
+
+  useEffect(() => {
+    if (themedSections.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: "-25% 0px -55% 0px" },
+    );
+
+    themedSections.forEach(({ slug }) => {
+      const node = sectionRefs.current[slug];
+      if (node) observer.observe(node);
+    });
+
+    return () => observer.disconnect();
+  }, [themedSections]);
 
   const currentComplements =
     COMPLEMENT_OPTIONS[
@@ -252,7 +311,7 @@ export default function BusinessDetailPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#f5f7fb]">
+      <div className="min-h-screen bg-[#f8f5f0]">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-6">
           <Link
             href="/shop"
@@ -392,75 +451,86 @@ export default function BusinessDetailPage() {
                 </div>
               </header>
 
-              {sections.length === 0 ? (
+              {themedSections.length > 0 ? (
+                <div className="sticky top-2 z-20 -mx-4 px-4">
+                  <div className="scrollbar-hide flex gap-2 overflow-x-auto rounded-full border border-white/60 bg-white/80 px-3 py-3 shadow-[0_18px_36px_rgba(0,0,0,0.08)] backdrop-blur">
+                    {themedSections.map(({ category, slug, theme }) => (
+                      <button
+                        key={slug}
+                        type="button"
+                        onClick={() => scrollToSection(slug)}
+                        aria-pressed={activeSection === slug}
+                        className={clsx(
+                          "whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                          activeSection === slug
+                            ? "focus-visible:ring-amber-300"
+                            : "focus-visible:ring-emerald-200",
+                        )}
+                        style={{
+                          borderColor:
+                            activeSection === slug ? theme.accent : "#E2D9D0",
+                          backgroundColor:
+                            activeSection === slug
+                              ? theme.accentMuted
+                              : "#F8F5F0",
+                          color:
+                            activeSection === slug
+                              ? theme.text
+                              : "#7B6A5D",
+                          boxShadow:
+                            activeSection === slug
+                              ? "0 10px 24px rgba(0,0,0,0.08)"
+                              : "none",
+                        }}
+                      >
+                        {theme.emoji} {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {themedSections.length === 0 ? (
                 <p className="rounded-[32px] border border-white/60 bg-white/90 p-6 text-sm text-slate-500">
                   Aún no hay productos asociados a este giro.
                 </p>
               ) : (
-                sections.map(([category, items]) => (
+                themedSections.map(({ category, items, theme, slug }) => (
                   <section
-                    key={category}
-                    className="rounded-[32px] border border-white/60 bg-white/90 p-6 shadow-sm"
+                    key={slug}
+                    id={slug}
+                    ref={(node) => {
+                      sectionRefs.current[slug] = node;
+                    }}
+                    className="rounded-[32px] border border-white/60 bg-white/95 p-6 shadow-sm shadow-amber-100/40 backdrop-blur-sm"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                          Sección
-                        </p>
-                        <h2 className="text-xl font-semibold text-slate-900">
-                          {category}
-                        </h2>
-                      </div>
-                      <span className="text-xs text-slate-400">
-                        {items.length} artículos
-                      </span>
-                    </div>
+                    <SectionHeader
+                      title={`${category} · ${items.length} artículos`}
+                      description={theme.microcopy}
+                      theme={theme}
+                    />
 
-                    <ul className="mt-6 space-y-3">
-                      {items.map((item) => {
+                    <ul className="mt-6 space-y-4">
+                      {items.map((item, index) => {
                         const imageSrc =
                           PRODUCT_IMAGES[item.categoria ?? item.giro ?? ""] ??
                           "/coffe.png";
                         return (
                           <li key={item.id}>
-                            <button
-                              type="button"
-                              onClick={() => openProduct(item)}
-                              className="flex w-full items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3 text-left text-sm text-slate-700 transition hover:border-emerald-200 hover:bg-white"
-                            >
-                              <div className="flex w-full items-center gap-4">
-                                <div className="flex-1">
-                                  <p className="font-semibold text-slate-900">
-                                    {item.nombre}
-                                  </p>
-                                  <p className="text-xs text-slate-500">
-                                    {item.categoria ?? "General"}
-                                  </p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                  <div className="text-right">
-                                    <span className="text-base font-semibold text-slate-900">
-                                      {item.precio
-                                        ? `$${item.precio.toFixed(2)}`
-                                        : "—"}
-                                    </span>
-                                    <div className="mt-1 inline-flex items-center gap-1 text-xs text-amber-500">
-                                      <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300" />
-                                      Popular
-                                    </div>
-                                  </div>
-                                  <div className="relative h-14 w-14 overflow-hidden rounded-2xl border border-slate-100">
-                                    <Image
-                                      src={imageSrc}
-                                      alt={item.nombre}
-                                      fill
-                                      sizes="56px"
-                                      className="object-cover"
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </button>
+                            <MenuItemRow
+                              name={item.nombre}
+                              subtitle={item.categoria ?? category}
+                              price={item.precio}
+                              oldPrice={
+                                item.precio
+                                  ? Number((item.precio * 1.15).toFixed(2))
+                                  : undefined
+                              }
+                              imageSrc={imageSrc}
+                              theme={theme}
+                              onSelect={() => openProduct(item)}
+                              popular={index % 3 === 0}
+                            />
                           </li>
                         );
                       })}
