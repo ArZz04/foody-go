@@ -1,153 +1,118 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MoveRight } from "lucide-react";
+import { HeroStats } from "@/components/home/HeroStats";
+import { ReviewRotator } from "@/components/home/ReviewRotator";
+import { LiveActivity } from "@/components/home/LiveActivity";
+import { HeroActions } from "@/components/home/HeroActions";
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      <main className="relative text-white">
-        {/* Hero Section */}
-        <section className="container mx-auto px-4 py-20 text-center">
-          <div className="max-w-4xl mx-auto">
-            <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm">
-              🚀 Entrega en 30 minutos o menoss
-            </Badge>
-            <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 text-balance drop-shadow-lg">
-              Tu comida favorita,{" "}
-              <span className="text-primary-foreground">al instante</span>
-            </h1>
-            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto text-pretty">
-              Descubre miles de restaurantes locales. Ordena con un click y
-              disfruta de la mejor comida en la comodidad de tu hogarS.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-lg px-8 py-6 shadow-lg">
-                Ordenar ahoras
+    <div
+      className="min-h-screen bg-cover bg-center text-[#3E2F28]"
+      style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
+    >
+      <div className="min-h-screen bg-gradient-to-b from-black/70 via-black/60 to-black/80">
+        <main className="relative pb-16">
+          <section className="relative w-full pb-16 pt-20">
+            <div className="relative overflow-hidden px-6 py-20 shadow-[inset_0_-60px_120px_rgba(0,0,0,0.55)] lg:px-16">
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
+              />
+              <div className="absolute inset-0 bg-black/35" />
+
+              <LiveActivity />
+
+              <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center text-white">
+                <Badge className="mb-6 border border-white/60 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-[#2E5946]">
+                  Apoyando aliados locales
+                </Badge>
+                <h1 className="font-serif text-4xl leading-tight text-white md:text-6xl">
+                  Tu comida favorita, al instante
+                </h1>
+                <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
+                  Apoyando a los primeros aliados de Mazamitla y rancherías cercanas.
+                  Sabores hechos en casa, entregados con calidez rural y puntualidad moderna.
+                </p>
+                <HeroActions />
+                <HeroStats />
+                <ReviewRotator />
+              </div>
+            </div>
+          </section>
+
+          <section className="px-4 py-16">
+            <div className="mx-auto max-w-6xl rounded-[36px] border border-white/15 bg-white/90 px-6 py-12 shadow-[0_25px_60px_rgba(0,0,0,0.25)] backdrop-blur">
+              <div className="mb-12 text-center">
+                <h2 className="font-serif text-4xl text-[#3E2F28]">
+                  ¿Por qué elegir Foody Go?
+                </h2>
+                <p className="mt-3 text-lg text-[#5F5148]">
+                  La experiencia gourmet-local que impulsa a los barrios de Jalisco
+                </p>
+              </div>
+              <div className="grid gap-8 md:grid-cols-3">
+                <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
+                  <CardContent className="p-8 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                      ⚡
+                    </div>
+                    <h3 className="text-xl font-semibold text-[#3E2F28]">
+                      Súper rápido
+                    </h3>
+                    <p className="mt-3 text-sm text-[#5F5148]">
+                      Aliados confirmando pedidos en minutos y rutas optimizadas para tu zona.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
+                  <CardContent className="p-8 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                      🍕
+                    </div>
+                    <h3 className="text-xl font-semibold text-[#3E2F28]">
+                      Variedad local
+                    </h3>
+                    <p className="mt-3 text-sm text-[#5F5148]">
+                      Cafeterías, panaderías y taquerías familiares reunidas en un mismo lugar.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
+                  <CardContent className="p-8 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                      💳
+                    </div>
+                    <h3 className="text-xl font-semibold text-[#3E2F28]">
+                      Pago seguro
+                    </h3>
+                    <p className="mt-3 text-sm text-[#5F5148]">
+                      Métodos de pago confiables y soporte cercano para aliados y comensales.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </section>
+
+          <section className="container mx-auto px-4 py-20 text-center">
+            <div className="mx-auto max-w-3xl rounded-[36px] border border-[#E2D9D0] bg-[#F8F5F0] px-6 py-12 shadow-[0_25px_55px_rgba(0,0,0,0.1)]">
+              <h2 className="font-serif text-4xl text-[#3E2F28]">
+                ¿Listo para apoyar a los aliados locales?
+              </h2>
+              <p className="mt-3 text-lg text-[#5F5148]">
+                Únete a la comunidad Foody Go y descubre el sabor artesanal que tenemos cerca de casa.
+              </p>
+              <Button className="mt-8 rounded-full bg-[#3E2F28] px-10 py-3 text-base text-white hover:bg-[#2e201b]">
+                Comenzar ahora
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="group relative overflow-hidden text-lg px-8 py-6 border-white/60 bg-white/10 text-white backdrop-blur transition duration-300 ease-out hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(255,255,255,0.35)]"
-              >
-                <Link href="/shop" className="flex items-center gap-2">
-                  <span className="relative z-10 flex items-center gap-2 font-medium transition-transform duration-300 group-hover:translate-x-1 group-hover:text-foreground">
-                    Ver tiendas
-                    <MoveRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                  <span className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-r from-white/40 via-white to-white/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </Link>
-              </Button>
             </div>
-          </div>
-        </section>
-
-        {/* Stats Section */}
-        <section className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
-                500+
-              </div>
-              <div className="text-white/70">Restaurantes</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
-                25min
-              </div>
-              <div className="text-white/70">Tiempo promedio</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
-                50k+
-              </div>
-              <div className="text-white/70">Clientes felices</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-white mb-2 drop-shadow">
-                4.8★
-              </div>
-              <div className="text-white/70">Calificación</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Features Section */}
-        <section className="container mx-auto px-4 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              ¿Por qué elegir food-go?
-            </h2>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              La experiencia de delivery más rápida y confiable de la ciudad
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-black/50 border-white/10 backdrop-blur">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">⚡</span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  Súper rápido
-                </h3>
-                <p className="text-white/80">
-                  Entrega garantizada en 30 minutos o tu pedido es gratis
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-black/50 border-white/10 backdrop-blur">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🍕</span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  Variedad infinita
-                </h3>
-                <p className="text-white/80">
-                  Desde pizza hasta sushi, encuentra exactamente lo que se te
-                  antoja
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-black/50 border-white/10 backdrop-blur">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">💳</span>
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  Pago seguro
-                </h3>
-                <p className="text-white/80">
-                  Múltiples métodos de pago con la máxima seguridad
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="container mx-auto px-4 py-20 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-5xl font-bold text-white mb-6 text-balance drop-shadow-lg">
-              ¿Listo para tu próxima{" "}
-              <span className="text-primary-foreground">comida perfecta?</span>
-            </h2>
-            <p className="text-xl text-white/80 mb-8">
-              Únete a miles de usuarios que ya disfrutan de la mejor experiencia
-              de delivery
-            </p>
-            <Button size="lg" className="text-lg px-12 py-6 shadow-lg">
-              Comenzar ahora
-            </Button>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }

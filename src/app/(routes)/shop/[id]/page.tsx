@@ -14,11 +14,12 @@ import {
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MenuItemRow } from "@/components/menu/MenuItemRow";
 import { SectionHeader } from "@/components/menu/SectionHeader";
 import { getSectionTheme } from "@/components/menu/sectionThemes";
+import { getCoordsForCity, type LatLng } from "@/lib/geo";
 
 type Negocio = {
   id: number | string;
@@ -52,9 +53,14 @@ type PromotionCard = {
 type CartItem = {
   id: string;
   nombre: string;
+  negocio: string;
+  ciudad?: string;
+  coords?: LatLng;
+  image: string;
   extras: string[];
+  tags?: string[];
   quantity: number;
-  total: number;
+  unitPrice: number;
 };
 
 const PRODUCT_IMAGES: Record<string, string> = {
@@ -104,8 +110,11 @@ const SALSA_OPTIONS = [
   { id: "cebolla", label: "Cebolla y habanero encurtido", heat: "Fuego" },
 ] as const;
 
+const CART_STORAGE_KEY = "foody:cart";
+
 export default function BusinessDetailPage() {
   const params = useParams<{ id: string }>();
+  const router = useRouter();
   const negocioId = Number(params?.id ?? NaN);
   const [negocio, setNegocio] = useState<Negocio | null>(null);
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -155,6 +164,24 @@ export default function BusinessDetailPage() {
 
     fetchData();
   }, [negocioId]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as CartItem[];
+        setCart(parsed);
+      } catch (err) {
+        console.error("No se pudo leer el carrito guardado", err);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+  }, [cart]);
 
   const menu = useMemo(() => {
     if (!negocio) return [];
@@ -274,17 +301,27 @@ export default function BusinessDetailPage() {
             (salsa) => `Salsa: ${salsa.label}`,
           )
         : [];
+    const imageSrc =
+      PRODUCT_IMAGES[
+        selectedProduct.categoria ?? selectedProduct.giro ?? ""
+      ] ?? "/coffe.png";
+    const negocioCity = negocio?.ciudad;
+    const coords = getCoordsForCity(negocioCity);
 
-    setCart((prev) => [
-      ...prev,
-      {
-        id: `${selectedProduct.id}-${Date.now()}`,
-        nombre: selectedProduct.nombre,
-        extras: [...extrasChosen, ...salsaChosen],
-        quantity,
-        total: totalPrice,
-      },
-    ]);
+    const newItem: CartItem = {
+      id: `${selectedProduct.id}-${Date.now()}`,
+      nombre: selectedProduct.nombre,
+      negocio: negocio?.nombre ?? "Negocio local",
+      ciudad: negocioCity,
+      coords,
+      image: imageSrc,
+      extras: [...extrasChosen, ...salsaChosen],
+      tags: selectedProduct.categoria ? [selectedProduct.categoria] : [],
+      quantity,
+      unitPrice: basePrice + totalExtras,
+    };
+
+    setCart((prev) => [...prev, newItem]);
     setCartOpen(true);
     setFeedback("Producto agregado al carrito.");
     setTimeout(() => {
@@ -293,19 +330,29 @@ export default function BusinessDetailPage() {
     }, 1200);
   };
 
-  const cartTotal = cart.reduce((sum, item) => sum + item.total, 0);
+  const cartTotal = cart.reduce(
+    (sum, item) => sum + item.unitPrice * item.quantity,
+    0,
+  );
 
   const addPromotionDirect = (product: Producto, promoPrice: number) => {
-    setCart((prev) => [
-      ...prev,
-      {
-        id: `${product.id}-promo-${Date.now()}`,
-        nombre: `${product.nombre} (Promo)`,
-        extras: [],
-        quantity: 1,
-        total: promoPrice,
-      },
-    ]);
+    const imageSrc =
+      PRODUCT_IMAGES[product.categoria ?? product.giro ?? ""] ?? "/coffe.png";
+    const negocioCity = negocio?.ciudad;
+    const coords = getCoordsForCity(negocioCity);
+    const promoItem: CartItem = {
+      id: `${product.id}-promo-${Date.now()}`,
+      nombre: `${product.nombre} (Promo)`,
+      negocio: negocio?.nombre ?? "Negocio local",
+      ciudad: negocioCity,
+      coords,
+      image: imageSrc,
+      extras: [],
+      tags: [product.categoria ?? "Promo"],
+      quantity: 1,
+      unitPrice: promoPrice,
+    };
+    setCart((prev) => [...prev, promoItem]);
     setCartOpen(true);
   };
 
@@ -737,7 +784,7 @@ export default function BusinessDetailPage() {
                       </p>
                     </div>
                     <span className="text-sm font-semibold text-slate-900">
-                      ${item.total.toFixed(2)}
+                      ${(item.unitPrice * item.quantity).toFixed(2)}
                     </span>
                   </li>
                 ))}
@@ -771,7 +818,7 @@ export default function BusinessDetailPage() {
                       {item.nombre}
                     </p>
                     <span className="text-sm font-semibold text-slate-900">
-                      ${item.total.toFixed(2)}
+                      ${(item.unitPrice * item.quantity).toFixed(2)}
                     </span>
                   </div>
                   <p className="text-xs text-slate-500">
@@ -788,8 +835,9 @@ export default function BusinessDetailPage() {
             <button
               type="button"
               className="rounded-2xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+              onClick={() => router.push("/carrito")}
             >
-              Finalizar pedido · ${cartTotal.toFixed(2)}
+              Ir al carrito · ${cartTotal.toFixed(2)}
             </button>
           </aside>
         </>

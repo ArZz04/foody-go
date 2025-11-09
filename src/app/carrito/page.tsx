@@ -2,41 +2,89 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import {
+  getCoordsForCity,
+  haversineDistance,
+  type LatLng,
+} from "@/lib/geo";
 
-const cartItems = [
-  {
-    id: "postres-01",
-    name: "Caja sorpresa de postres",
-    store: "Postres y Antojitos",
-    notes: "Incluye 6 mini cheesecakes y brownies",
-    price: 210,
-    quantity: 1,
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
-    tags: ["Dulce", "Popular"],
-  },
-  {
-    id: "bebidas-01",
-    name: "Smoothie energético",
-    store: "Smoothie Lab",
-    notes: "Smoothie de frutos rojos con proteína vegana",
-    price: 95,
-    quantity: 2,
-    image:
-      "https://images.unsplash.com/photo-1527169402691-feff5539e52c?auto=format&fit=crop&w=800&q=80",
-    tags: ["Vegano", "Promo"],
-  },
-];
+type StoredCartItem = {
+  id: string;
+  nombre: string;
+  negocio: string;
+  ciudad?: string;
+  coords?: LatLng;
+  image: string;
+  extras: string[];
+  tags?: string[];
+  quantity: number;
+  unitPrice?: number;
+  price?: number;
+};
 
-const deliveryFee = 39;
-const serviceFee = 12;
+const DEFAULT_DELIVERY_FEE = 39;
+const SERVICE_FEE = 12;
+const BASE_DELIVERY = 25;
+const COST_PER_KM = 4.2;
+const CART_STORAGE_KEY = "foody:cart";
 
 export default function CarritoPage() {
   const { user } = useAuth();
+  const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
+  const [customerLocation, setCustomerLocation] = useState<LatLng | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as StoredCartItem[];
+        setCartItems(
+          parsed.map((item) => {
+            if (!item.coords && item.ciudad) {
+              const fallback = getCoordsForCity(item.ciudad);
+              if (fallback) {
+                return { ...item, coords: fallback };
+              }
+            }
+            return item;
+          }),
+        );
+      } catch (error) {
+        console.error("No se pudo cargar el carrito", error);
+      }
+    }
+  }, []);
+
+  const persistCart = (items: StoredCartItem[]) => {
+    setCartItems(items);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    }
+  };
+
+  const handleQuantityChange = (id: string, delta: number) => {
+    persistCart(
+      cartItems
+        .map((item) =>
+          item.id === id
+            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
+            : item,
+        )
+        .filter((item) => item.quantity > 0),
+    );
+  };
+
+  const handleRemove = (id: string) => {
+    persistCart(cartItems.filter((item) => item.id !== id));
+  };
 
   if (!user) {
     return (
@@ -77,11 +125,75 @@ export default function CarritoPage() {
     );
   }
 
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-[70vh] bg-white/90">
+        <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 px-4 py-20 text-center text-emerald-900">
+          <div className="rounded-full bg-emerald-50 p-6 text-4xl">🌾</div>
+          <h1 className="text-3xl font-semibold">Tu carrito está vacío</h1>
+          <p className="text-sm text-emerald-800/80">
+            Explora las tiendas rurales y agrega tus antojos favoritos.
+          </p>
+          <Button
+            asChild
+            className="rounded-full bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700"
+          >
+            <Link href="/tiendas">Ver tiendas</Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const getItemPrice = (item: StoredCartItem) =>
+    item.unitPrice ?? item.price ?? 0;
+
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity,
+    (acc, item) => acc + getItemPrice(item) * item.quantity,
     0,
   );
-  const total = subtotal + deliveryFee + serviceFee;
+
+  const deliveryFee = useMemo(() => {
+    if (!customerLocation) {
+      return DEFAULT_DELIVERY_FEE;
+    }
+    const distances = cartItems
+      .map((item) => item.coords || getCoordsForCity(item.ciudad))
+      .filter((coords): coords is LatLng => Boolean(coords))
+      .map((coords) => haversineDistance(customerLocation, coords));
+
+    if (distances.length === 0) return DEFAULT_DELIVERY_FEE;
+    const maxDistance = Math.max(...distances);
+    const dynamic = BASE_DELIVERY + maxDistance * COST_PER_KM;
+    return Number(dynamic.toFixed(2));
+  }, [cartItems, customerLocation]);
+
+  const total = subtotal + deliveryFee + SERVICE_FEE;
+
+  const handleDetectLocation = () => {
+    if (!window?.navigator?.geolocation) {
+      setLocationError("Tu dispositivo no permite obtener la ubicación.");
+      return;
+    }
+    setLocating(true);
+    setLocationError(null);
+    window.navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCustomerLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+        setLocating(false);
+      },
+      (err) => {
+        setLocationError(
+          err.message || "No pudimos obtener tu ubicación en este momento.",
+        );
+        setLocating(false);
+      },
+      { enableHighAccuracy: true },
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white/80 text-emerald-950">
@@ -105,32 +217,34 @@ export default function CarritoPage() {
                   <Image
                     src={item.image}
                     fill
-                    alt={item.name}
+                    alt={item.nombre}
                     className="object-cover"
                     sizes="(min-width: 1024px) 160px, (min-width: 640px) 200px, 100vw"
-                    placeholder="blur"
                   />
                 </div>
                 <div className="flex flex-1 flex-col gap-3">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <h2 className="text-lg font-semibold text-emerald-950">
-                        {item.name}
+                        {item.nombre}
                       </h2>
                       <p className="text-sm text-emerald-900/70">
-                        {item.store}
+                        {item.negocio}
                       </p>
-                      <p className="text-xs text-emerald-900/60">
-                        {item.notes}
-                      </p>
+                      {item.extras.length > 0 ? (
+                        <p className="text-xs text-emerald-900/60">
+                          {item.extras.join(", ")}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="text-right text-sm font-semibold text-emerald-900">
-                      MX${(item.price * item.quantity).toFixed(2)}
+                      MX${(item.unitPrice * item.quantity).toFixed(2)}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs">
                     <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 px-3 py-1">
                       <button
+                        onClick={() => handleQuantityChange(item.id, -1)}
                         className="text-emerald-600"
                         aria-label="Disminuir"
                       >
@@ -140,6 +254,7 @@ export default function CarritoPage() {
                         {item.quantity}
                       </span>
                       <button
+                        onClick={() => handleQuantityChange(item.id, 1)}
                         className="text-emerald-600"
                         aria-label="Aumentar"
                       >
@@ -147,7 +262,7 @@ export default function CarritoPage() {
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {item.tags.map((tag) => (
+                      {item.tags?.map((tag) => (
                         <Badge
                           key={`${item.id}-${tag}`}
                           variant="secondary"
@@ -157,7 +272,10 @@ export default function CarritoPage() {
                         </Badge>
                       ))}
                     </div>
-                    <button className="ml-auto text-xs font-semibold text-emerald-700 underline-offset-4 hover:underline">
+                    <button
+                      className="ml-auto text-xs font-semibold text-emerald-700 underline-offset-4 hover:underline"
+                      onClick={() => handleRemove(item.id)}
+                    >
                       Quitar
                     </button>
                   </div>
@@ -198,13 +316,37 @@ export default function CarritoPage() {
               </div>
               <div className="flex items-center justify-between">
                 <dt>Servicio</dt>
-                <dd>MX${serviceFee.toFixed(2)}</dd>
+                <dd>MX${SERVICE_FEE.toFixed(2)}</dd>
               </div>
               <div className="flex items-center justify-between border-t border-dashed border-emerald-100 pt-3 text-base font-semibold text-emerald-950">
                 <dt>Total</dt>
                 <dd>MX${total.toFixed(2)}</dd>
               </div>
             </dl>
+            <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={handleDetectLocation}
+                disabled={locating}
+                className="w-full rounded-2xl border border-emerald-200 bg-white py-2 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {customerLocation
+                  ? "Actualizar mi ubicación"
+                  : "Calcular envío con mi ubicación"}
+              </button>
+              {locationError ? (
+                <p className="text-xs text-rose-500">{locationError}</p>
+              ) : null}
+              {customerLocation ? (
+                <p className="text-xs text-emerald-700">
+                  Envío estimado según tu ubicación actual.
+                </p>
+              ) : (
+                <p className="text-xs text-emerald-800/70">
+                  Si compartes tu ubicación, ajustamos el costo de envío por distancia.
+                </p>
+              )}
+            </div>
             <Button className="mt-6 w-full bg-emerald-600 text-white hover:bg-emerald-700">
               Confirmar y pagar
             </Button>

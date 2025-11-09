@@ -1,36 +1,89 @@
 "use client";
 
-import type { CategoryKey } from "@/lib/categoryTheme";
-import { CATEGORY_THEMES } from "@/lib/categoryTheme";
+import { useRef } from "react";
 
-type Props = {
-  active: CategoryKey;
-  onChange: (next: CategoryKey) => void;
-};
+interface CategoryChipsProps {
+  active?: string;
+  onChange?: (key: string) => void;
+}
 
-export function CategoryChips({ active, onChange }: Props) {
+const CATEGORIES = [
+  { key: "all", label: "Todos", icon: "✨" },
+  { key: "cafeteria", label: "Cafetería", icon: "☕" },
+  { key: "taqueria", label: "Taquería", icon: "🌮" },
+  { key: "panaderia", label: "Panadería", icon: "🥖" },
+  { key: "heladeria", label: "Heladería", icon: "🍨" },
+  { key: "pasteleria", label: "Pastelería", icon: "🎂" },
+  { key: "restaurante", label: "Restaurante", icon: "🍽️" },
+  { key: "abarrotes", label: "Abarrotes", icon: "🧺" },
+  { key: "farmacia", label: "Farmacia", icon: "💊" },
+  { key: "electronica", label: "Electrónica", icon: "🔌" },
+];
+
+export function CategoryChips({
+  active = "all",
+  onChange,
+}: CategoryChipsProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollBy = (offset: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="sticky top-4 z-10 rounded-[30px] border border-[#eadfce] bg-[#f8f5f0]/90 px-3 py-3 shadow-[0_15px_40px_rgba(59,47,40,0.08)]">
-      <div className="flex gap-3 overflow-x-auto scroll-smooth px-1 py-1 scrollbar-thin">
-        {(Object.keys(CATEGORY_THEMES) as CategoryKey[]).map((key) => {
-          const theme = CATEGORY_THEMES[key];
-          const isActive = key === active;
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onChange(key)}
-              className={`rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c9a46a] ${
-                isActive
-                  ? "border-[rgba(0,0,0,0.08)] bg-white text-[#3e2f28] shadow-[0_10px_25px_rgba(62,47,40,0.15)]"
-                  : "border-transparent bg-white/70 text-[#7a6b5f] hover:border-[#eadfce]"
-              }`}
-            >
-              {theme.emoji} {theme.name}
-            </button>
-          );
-        })}
+    <div className="relative">
+      <div className="rounded-2xl border border-slate-100 bg-white/70 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.03)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/70">
+        <button
+          type="button"
+          className="absolute left-3 top-1/2 hidden -translate-y-1/2 rounded-full border border-white/60 bg-white/90 p-2 text-slate-600 shadow hover:bg-white md:block"
+          aria-label="Scroll izquierdo"
+          onClick={() => scrollBy(-200)}
+        >
+          ‹
+        </button>
+        <button
+          type="button"
+          className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-full border border-white/60 bg-white/90 p-2 text-slate-600 shadow hover:bg-white md:block"
+          aria-label="Scroll derecho"
+          onClick={() => scrollBy(200)}
+        >
+          ›
+        </button>
+        <div className="relative px-4">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-white to-transparent dark:from-slate-900" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent dark:from-slate-900" />
+          <div
+            ref={scrollRef}
+            className="overflow-x-auto scroll-smooth snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            <div className="flex gap-3 px-2 py-2">
+              {CATEGORIES.map((category) => {
+                const isActive = active === category.key;
+                return (
+                  <button
+                    key={category.key}
+                    type="button"
+                    className={`snap-start rounded-[16px] px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6D8B74]/40 active:scale-[0.97] ${
+                      isActive
+                        ? "bg-gradient-to-b from-[#9BBF83] to-[#6D8B74] text-white shadow-[0_8px_18px_rgba(109,139,116,0.35)]"
+                        : "border border-[#E2D9D0] bg-white/80 text-slate-700 shadow-sm backdrop-blur hover:-translate-y-[2px] hover:bg-white"
+                    }`}
+                    aria-pressed={isActive}
+                    onClick={() => onChange?.(category.key)}
+                  >
+                    <span className="mr-1">{category.icon}</span>
+                    {category.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+
+export default CategoryChips;
