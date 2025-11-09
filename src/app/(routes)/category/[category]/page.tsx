@@ -72,11 +72,11 @@ const MOCK_PRODUCTS: Record<
 };
 
 type PageProps = {
-  params: { category: CategoryKey };
+  params: Promise<{ category: CategoryKey }>;
 };
 
-export default function CategoryPage({ params }: PageProps) {
-  const { category } = params;
+export default async function CategoryPage({ params }: PageProps) {
+  const { category } = await params;
   if (!CATEGORY_THEMES[category]) {
     notFound();
   }
