@@ -20,7 +20,7 @@ export default function Home() {
             </h1>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto text-pretty">
               Descubre miles de restaurantes locales. Ordena con un click y
-              disfruta de la mejor comida en la comodidad de tu hogar.
+              disfruta de la mejor comida en la comodidad de tu hogarS.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-lg px-8 py-6 shadow-lg">
