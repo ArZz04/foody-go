@@ -34,6 +34,44 @@ const PLACEHOLDER_IDS = Array.from({ length: 8 }, (_, i) => `placeholder-${i}`);
 
 const BADGE_POOL = ["Promo", "Top", "Nuevo", "Local"];
 
+const HERO_PHRASES = [
+  "Hecho con amor local ❤️",
+  "Sabores que cuentan historias 🍞",
+  "Cada aliado, una historia por descubrir 🌾",
+];
+
+const CTA_LINES = [
+  "Explora tu zona 🍃",
+  "Apoya negocios de tu comunidad 🤝",
+  "Descubre algo nuevo hoy ✨",
+];
+
+const CATEGORY_THEMES: Record<
+  string,
+  { emoji: string; title: string; gradient: string }
+> = {
+  Cafetería: {
+    emoji: "☕",
+    title: "Tu café de confianza",
+    gradient: "from-[#f8f0e3] via-[#fbeee8] to-[#f9e7da]",
+  },
+  Panadería: {
+    emoji: "🥐",
+    title: "Pan recién salido del horno",
+    gradient: "from-[#f9f1e2] via-[#f4e7d6] to-[#f1e0ce]",
+  },
+  Taquería: {
+    emoji: "🌮",
+    title: "Tortillas calientes & salsas",
+    gradient: "from-[#fcefe4] via-[#f9e6d6] to-[#f5dcc8]",
+  },
+  default: {
+    emoji: "🌾",
+    title: "Rutas gourmet del campo",
+    gradient: "from-[#f8f5f0] via-[#f3ece4] to-[#efe9e2]",
+  },
+};
+
 export default function ShopPage() {
   const [negocios, setNegocios] = useState<Negocio[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -41,6 +79,8 @@ export default function ShopPage() {
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [filtered, setFiltered] = useState<Negocio[]>([]);
   const [loading, setLoading] = useState(true);
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [ctaIndex, setCtaIndex] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -77,6 +117,14 @@ export default function ShopPage() {
     setFiltered(result);
   }, [filtroGiro, filtroCategoria, negocios, productos]);
 
+  useEffect(() => {
+    const id = setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % HERO_PHRASES.length);
+      setCtaIndex((prev) => (prev + 1) % CTA_LINES.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, []);
+
   const giros = ["Todos", ...uniqueStrings(negocios.map((n) => n.giro))];
   const categorias =
     filtroGiro === "Todos"
@@ -90,31 +138,68 @@ export default function ShopPage() {
           ),
         ];
 
+  const openCount = filtered.length || negocios.length;
+  const visitedProgress = Math.min(
+    openCount,
+    Math.max(3, Math.round(openCount / 4)),
+  );
+  const theme =
+    CATEGORY_THEMES[filtroGiro as keyof typeof CATEGORY_THEMES] ??
+    CATEGORY_THEMES.default;
+
   return (
     <div className="min-h-screen bg-[#f5f7fb]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
-        <section className="rounded-[40px] border border-white/50 bg-white/60 p-6 shadow-[0_25px_80px_rgba(59,47,47,0.08)] backdrop-blur-2xl">
+        <section
+          className={`rounded-[40px] border border-white/50 bg-gradient-to-br ${theme.gradient} p-6 shadow-[0_25px_80px_rgba(59,47,40,0.12)] backdrop-blur`}
+        >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[#bca181]">
-                Explora
+                {theme.emoji} Aliados
               </p>
-              <h2 className="font-['Playfair_Display'] text-3xl font-semibold text-[#3b2f2f]">
-                Todos los aliados
+              <h2 className="font-serif text-4xl font-semibold text-[#3b2f28]">
+                {theme.title}
               </h2>
-              <p className="text-sm text-[#6d5b4f]">
-                Productos rurales curados con cariño local.
+              <p
+                key={phraseIndex}
+                className="font-sans text-sm text-[#57534e] transition duration-500"
+              >
+                {HERO_PHRASES[phraseIndex]}
               </p>
             </div>
-            <div className="flex flex-wrap gap-3 rounded-[30px] border border-white/70 bg-white/75 px-4 py-2 text-xs text-[#6d5b4f] shadow-inner backdrop-blur">
-              {giros.slice(1, 5).map((giroName) => (
-                <span
-                  key={giroName}
-                  className="rounded-full bg-[#f9f2e9] px-3 py-1 font-semibold"
-                >
-                  {giroName}
+            <div className="rounded-[30px] border border-white/70 bg-white/75 px-5 py-3 text-sm text-[#6d5b4f] shadow-inner backdrop-blur">
+              {CTA_LINES[ctaIndex]}
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-[26px] border border-white/60 bg-white/70 p-4 text-sm text-[#5c4c43] shadow-inner">
+              <p className="text-xs uppercase tracking-[0.35em] text-[#c9a46a]">
+                Comunidad
+              </p>
+              <p className="text-2xl font-semibold text-[#3b2f28]">
+                {openCount} abiertos hoy 🌞
+              </p>
+              <p className="text-xs text-[#7c6a5c]">Apoya negocios cercanos</p>
+            </div>
+            <div className="rounded-[26px] border border-white/60 bg-white/70 p-4 shadow-inner">
+              <p className="text-xs uppercase tracking-[0.35em] text-[#c9a46a]">
+                Tu recorrido
+              </p>
+              <div className="mt-2 flex items-center justify-between text-sm text-[#5c4c43]">
+                <span>
+                  Has visitado {visitedProgress} de {openCount} aliados
                 </span>
-              ))}
+                <span className="text-[#6d8b74]">👣</span>
+              </div>
+              <div className="mt-3 h-2 rounded-full bg-[#eadfce]/70">
+                <div
+                  className="h-full rounded-full bg-[#6d8b74] transition"
+                  style={{
+                    width: `${Math.min(100, (visitedProgress / (openCount || 1)) * 100)}%`,
+                  }}
+                />
+              </div>
             </div>
           </div>
         </section>
@@ -184,6 +269,19 @@ export default function ShopPage() {
               No hay negocios disponibles.
             </p>
           )}
+        </section>
+
+        <section className="rounded-[36px] border border-[#eadfce] bg-[#f8f5f0] p-6 text-center font-sans text-[#5c4c43] shadow-inner">
+          <p className="text-xs uppercase tracking-[0.4em] text-[#c9a46a]">
+            Comunidad Foody Go
+          </p>
+          <h3 className="mt-2 font-serif text-2xl text-[#3b2f28]">
+            {CTA_LINES[ctaIndex]}
+          </h3>
+          <p className="mt-1 text-sm">
+            Cada aliado es un taller de historias; haz clic en uno y descubre
+            qué están cocinando hoy.
+          </p>
         </section>
       </div>
     </div>

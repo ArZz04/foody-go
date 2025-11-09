@@ -4,6 +4,7 @@ import { Bike, Clock3, Heart, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 
 interface BusinessCardProps {
   nombre: string;
@@ -62,6 +63,21 @@ export default function BusinessCard({
   href,
   onClick,
 }: BusinessCardProps) {
+  const dynamicBadge = useMemo(() => {
+    if (badge) return badge;
+    const options = ["Top", "Promo", "Nuevo"] as const;
+    return options[Math.floor(Math.random() * options.length)];
+  }, [badge]);
+
+  const storytellerText = useMemo(() => {
+    const base = giro?.toLowerCase?.() ?? "aliado";
+    if (base.includes("cafe")) return "Tostado lento, servido con historias";
+    if (base.includes("pan")) return "Masa madre y horno de adobe";
+    if (base.includes("taco")) return "Tortillas calientes y salsas vivas";
+    if (base.includes("huerto")) return "De la tierra directo a tu mesa";
+    return "Hecho con amor local";
+  }, [giro]);
+
   return (
     <CardShell
       href={href}
@@ -71,9 +87,9 @@ export default function BusinessCard({
       <div className="relative h-36 w-full overflow-hidden rounded-[22px]">
         <Image src={imagen} alt={nombre} fill className="object-cover" />
         <div className="absolute inset-0 bg-black/15" />
-        {badge ? (
-          <span className="absolute left-3 top-3 rounded-full bg-[#fef6ea]/85 px-3 py-1 text-xs font-semibold text-[#a46b3d] shadow">
-            {badge}
+        {dynamicBadge ? (
+          <span className="absolute left-3 top-3 rounded-full bg-[#fef6ea]/90 px-3 py-1 text-xs font-semibold text-[#a46b3d] shadow">
+            {dynamicBadge}
           </span>
         ) : null}
         <button
@@ -111,6 +127,9 @@ export default function BusinessCard({
         <p className="mt-1 font-['Nunito_Sans'] text-sm text-[#5c4c43] line-clamp-1">
           {ciudad ?? "Cerca de ti"}
         </p>
+        <p className="text-xs font-['Nunito_Sans'] text-[#7c6a5c] opacity-90">
+          {storytellerText}
+        </p>
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-4 text-xs text-[#5c4c43]">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 font-medium text-[#3b2f2f]">
@@ -121,6 +140,21 @@ export default function BusinessCard({
             <Clock3 className="h-4 w-4 text-[#c29a6a]" />
             {etaMinutes ? `${etaMinutes} min` : "Horario extendido"}
           </span>
+          <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-[#6d8b74]">
+            Hecho con amor ❤️
+          </span>
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 rounded-[26px] opacity-0 transition group-hover:opacity-100">
+          <div className="absolute inset-0 rounded-[26px] bg-gradient-to-t from-black/35 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5 text-sm font-semibold text-white">
+            <span className="rounded-full bg-white/20 px-4 py-1 backdrop-blur">
+              Ver más ☕
+            </span>
+            <span className="text-xs text-white/80">
+              Sabores que cuentan historias
+            </span>
+          </div>
         </div>
       </div>
     </CardShell>
