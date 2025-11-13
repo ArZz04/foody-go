@@ -330,7 +330,7 @@ export default function BusinessPage() {
     const isActive = product.estado === "Activo";
     const confirmed = window.confirm(
       isActive
-        ? "¿Deseas desactivar este producto? Podrás activarlo de nuevo cuando lo necesites."
+        ? "¿Deseass desactivar este producto? Podrás activarlo de nuevo cuando lo necesites."
         : "¿Deseas activar este producto para que vuelva a estar disponible?",
     );
 
