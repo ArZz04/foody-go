@@ -11,7 +11,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
 
   return (
-    <nav className="border-b border-white/10 bg-black/40 text-white backdrop-blur supports-[backdrop-filter]:bg-black/30">
+    <nav className="border-b border-white/10 bg-transparent text-white backdrop-blur">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-24 items-center justify-between">
           {/* Logo */}

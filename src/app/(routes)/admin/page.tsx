@@ -3,10 +3,16 @@
 
 import Link from "next/link";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { AdminChatPanel } from "./components/AdminChatPanel";
+import { useFoodyEvents, type FoodyRealtimeEvent } from "@/lib/realtime/eventBus";
 
 export default function AdminDashboardPage() {
   const [admins, setAdmins] = useState([]);
+  const [chatFocusToken, setChatFocusToken] = useState(0);
+  const [incomingEvent, setIncomingEvent] = useState<FoodyRealtimeEvent | null>(null);
+  const chatSectionRef = useRef<HTMLDivElement | null>(null);
 
   // 🔹 Petición al endpoint /api/users/admins
   useEffect(() => {
@@ -29,6 +35,20 @@ export default function AdminDashboardPage() {
     }
     fetchAdmins();
   }, []);
+
+  const handleRealtimeEvent = useCallback((event: FoodyRealtimeEvent) => {
+    if (event.type === "incident" || event.type === "chat") {
+      setIncomingEvent(event);
+      setChatFocusToken(Date.now());
+    }
+  }, []);
+
+  useFoodyEvents(handleRealtimeEvent, [handleRealtimeEvent]);
+
+  useEffect(() => {
+    if (!chatFocusToken) return;
+    chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [chatFocusToken]);
 
   const BAR_DATA = [2, 5, 7, 6, 8, 9, 11, 13, 10, 12, 9, 8];
   const RECENT_BUSINESSES = [
@@ -260,7 +280,19 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
       </section>
-      
+
+      <section
+        id="chat-center"
+        aria-label="Chat con equipos"
+        className="scroll-mt-32 pb-4"
+        ref={chatSectionRef}
+      >
+        <AdminChatPanel
+          focusToken={chatFocusToken}
+          incomingEvent={incomingEvent}
+        />
+      </section>
+
     </div>
   );
 }

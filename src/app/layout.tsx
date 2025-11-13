@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { NavbarWrapper } from "@/app/components/NavbarWrapper";
-import { AuthProvider } from "@/context/AuthContext";
-import { OrdersProvider } from "@/context/OrdersContext";
 import "./globals.css";
+import Providers from "./providers";
 import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
@@ -20,18 +18,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body
-        className={`${inter.className} min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center md:bg-fixed bg-black/60 bg-blend-multiply`}
+        className={`${inter.className} min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-black/60 bg-blend-multiply md:bg-fixed`}
       >
-        <AuthProvider>
-          <OrdersProvider>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              {children}
-            </div>
-          </OrdersProvider>
-        </AuthProvider>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

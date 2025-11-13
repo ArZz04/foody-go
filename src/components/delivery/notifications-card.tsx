@@ -1,4 +1,4 @@
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Bell, CheckCircle2, MessageCircle, AlertTriangle } from "lucide-react";
 
 import {
   Card,
@@ -70,6 +70,19 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
             ))}
           </ul>
         )}
+        <div className="grid gap-3 border-t border-dashed border-white/30 pt-4 text-sm text-emerald-900/80">
+          <button className="flex items-center justify-center gap-2 rounded-xl border border-emerald-400/60 bg-white/70 px-4 py-2 font-semibold text-emerald-700 shadow hover:bg-white">
+            <MessageCircle className="h-4 w-4" />
+            Abrir chat con soporte
+          </button>
+          <button className="flex items-center justify-center gap-2 rounded-xl border border-amber-400/60 bg-white/70 px-4 py-2 font-semibold text-amber-700 shadow hover:bg-white">
+            <AlertTriangle className="h-4 w-4" />
+            Incidencia en entrega
+          </button>
+          <p className="text-xs text-emerald-900/60">
+            Activa las notificaciones push para recibir nuevas órdenes y mensajes del administrador al instante.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );

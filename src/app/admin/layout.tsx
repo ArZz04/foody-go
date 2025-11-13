@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { type AdminNavLink, DesktopMenu, MobileMenu } from "./components/nav";
+import { AdminChatBubble } from "./components/AdminChatBubble";
 
 const NAV_LINKS: AdminNavLink[] = [
   {
@@ -107,6 +108,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           </footer>
         </section>
       </div>
+      <AdminChatBubble />
     </div>
   );
 }

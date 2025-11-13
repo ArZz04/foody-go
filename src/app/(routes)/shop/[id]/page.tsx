@@ -790,6 +790,15 @@ export default function BusinessDetailPage() {
                 ))}
               </ul>
             ) : null}
+            {cartOpen ? (
+              <button
+                type="button"
+                className="mt-4 w-full rounded-2xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
+                onClick={() => router.push("/carrito")}
+              >
+                Finalizar pedido · ${cartTotal.toFixed(2)}
+              </button>
+            ) : null}
           </div>
 
           <aside
@@ -837,7 +846,7 @@ export default function BusinessDetailPage() {
               className="rounded-2xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600"
               onClick={() => router.push("/carrito")}
             >
-              Ir al carrito · ${cartTotal.toFixed(2)}
+              Finalizar pedido · ${cartTotal.toFixed(2)}
             </button>
           </aside>
         </>

@@ -13,6 +13,8 @@ import type {
   DeliverySchedule,
 } from "@/components/delivery/types";
 import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { emitFoodyEvent } from "@/lib/realtime/eventBus";
 
 const currentOrders: DeliveryOrder[] = [
   {
@@ -113,9 +115,11 @@ const recentNotifications: DeliveryNotification[] = [
 ];
 
 export default function DeliveryDashboardPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [notifications, setNotifications] = useState(recentNotifications);
   const highlightedOrder = currentOrders[0];
-  const driverName = user?.name;
+  const driverName = user?.name ?? "Repartidor Foody";
+  const driverId = user?.email ?? user?.id ?? "repartidor";
 
   return (
     <main
@@ -129,6 +133,54 @@ export default function DeliveryDashboardPage() {
             serviceArea="Zona Centro"
             pendingOrders={currentOrders.length}
             lastSync="Hace 3 min"
+            onLogout={logout}
+            onReportIncident={(payload) => {
+              setNotifications((prev) => [
+                {
+                  id: `incident-${Date.now()}`,
+                  title: `Incidencia: ${payload.type}`,
+                  message: `${payload.notes.slice(0, 80)}${
+                    payload.notes.length > 80 ? "..." : ""
+                  }`,
+                  timestamp: "Hace instantes",
+                  unread: true,
+                },
+                ...prev,
+              ]);
+              emitFoodyEvent({
+                type: "incident",
+                payload: {
+                  entityId: driverId,
+                  entityType: "repartidor",
+                  name: driverName,
+                  reference: payload.type,
+                  message: payload.notes,
+                  priority: payload.type !== "otro",
+                },
+              });
+            }}
+            onChatMessage={(message) => {
+              setNotifications((prev) => [
+                {
+                  id: `chat-${Date.now()}`,
+                  title: "Mensaje a soporte",
+                  message,
+                  timestamp: "Chat enviado",
+                  unread: false,
+                },
+                ...prev,
+              ]);
+              emitFoodyEvent({
+                type: "chat",
+                payload: {
+                  entityId: driverId,
+                  entityType: "repartidor",
+                  name: driverName,
+                  reference: "Chat con soporte",
+                  message,
+                },
+              });
+            }}
           />
 
           <div className="grid gap-6 xl:grid-cols-[1.8fr,1.2fr]">
@@ -148,7 +200,7 @@ export default function DeliveryDashboardPage() {
 
           <div className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
             <EarningsCard earnings={earningsSummary} />
-            <NotificationsCard notifications={recentNotifications} />
+            <NotificationsCard notifications={notifications} />
           </div>
         </div>
       </div>

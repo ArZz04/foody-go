@@ -21,6 +21,7 @@ export default function Home() {
                 style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
               />
               <div className="absolute inset-0 bg-black/35" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#f8f2e9]/90 via-[#f8f2e9]/30 to-transparent" />
 
               <LiveActivity />
 

@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Package } from "lucide-react";
+import { Package, Pause } from "lucide-react";
 
 import type { DeliveryOrder } from "./types";
 
@@ -51,15 +51,34 @@ export function CurrentDeliveriesCard({ orders }: CurrentDeliveriesCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-5 pt-6">
-        <p className="text-4xl font-semibold text-emerald-700">
-          {orders.length}
-        </p>
-        <Button
-          type="button"
-          className="w-full rounded-xl border border-emerald-500/60 bg-emerald-500/80 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-emerald-500"
-        >
-          Ver detalles
-        </Button>
+        <div className="flex items-center justify-between">
+          <p className="text-4xl font-semibold text-emerald-700">
+            {orders.length}
+          </p>
+          <Button
+            type="button"
+            className="rounded-full border border-emerald-500/60 bg-emerald-500/80 px-4 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur hover:bg-emerald-500"
+          >
+            Ver resumen
+          </Button>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="flex items-center justify-center gap-2 rounded-xl border border-amber-300/60 bg-white/80 text-xs font-semibold text-amber-700 shadow-sm hover:bg-white"
+          >
+            <Pause className="h-4 w-4" />
+            Pausar 10 min
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className="rounded-xl border border-slate-300/60 bg-white/80 text-xs font-semibold text-emerald-700 shadow-sm hover:bg-white"
+          >
+            Ver detalle
+          </Button>
+        </div>
         {orders.length === 0 ? (
           <p className="rounded-xl border border-dashed border-white/30 bg-white/20 p-6 text-center text-sm text-emerald-900/80">
             No tienes entregas asignadas en este momento.
