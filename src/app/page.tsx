@@ -14,14 +14,14 @@ export default function Home() {
     >
       <div className="min-h-screen bg-gradient-to-b from-black/70 via-black/60 to-black/80">
         <main className="relative pb-16">
-          <section className="relative w-full pb-16 pt-20">
+          <section className="relative w-full pb-16">
             <div className="relative overflow-hidden px-6 py-20 shadow-[inset_0_-60px_120px_rgba(0,0,0,0.55)] lg:px-16">
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
               />
               <div className="absolute inset-0 bg-black/35" />
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#f8f2e9]/90 via-[#f8f2e9]/30 to-transparent" />
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-20 " />
 
               <LiveActivity />
 

@@ -27,28 +27,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const userData = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+  const storedUser = localStorage.getItem("user");
 
-    if (token && userData) {
-      (async () => {
-        try {
-          const res = await fetch("/api/auth/verify", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+  if (!token || !storedUser) return;
 
-          if (res.ok) {
-            setUser(JSON.parse(userData));
-          } else {
-            logout();
-          }
-        } catch (err) {
-          console.error("Error al verificar token:", err);
-          logout();
-        }
-      })();
+  (async () => {
+    try {
+      // 1️⃣ Verificar token
+      const verifyRes = await fetch("/api/auth/verify", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!verifyRes.ok) {
+        logout();
+        return;
+      }
+
+      // 2️⃣ Obtener roles actualizados del backend
+      const rolesRes = await fetch("/api/auth/role", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      let roles: string[] = [];
+      if (rolesRes.ok) {
+        const data = await rolesRes.json();
+        roles = Array.isArray(data.roles)
+          ? data.roles.map((r: any) => r.name)
+          : [];
+      }
+
+      // 3️⃣ Reconstruir objeto user actualizado
+      const parsedUser = JSON.parse(storedUser);
+      const updatedUser = { ...parsedUser, roles };
+
+      setUser(updatedUser);
+
+      // 4️⃣ Guardar actualización
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      localStorage.setItem("roles", JSON.stringify(roles));
+      
+    } catch (error) {
+      console.error("Error verificando sesión:", error);
+      logout();
     }
-  }, []);
+  })();
+}, []);
+
 
   const login = async (userData: User, token: string) => {
     localStorage.setItem("token", token);

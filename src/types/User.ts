@@ -1,5 +1,6 @@
 
 export type User = {
+  status_id: number;
   id: number;
   name: string;
   email: string;

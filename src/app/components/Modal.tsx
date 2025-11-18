@@ -4,6 +4,7 @@ import type * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { DialogDescription } from "@/components/ui/dialog"
 
 interface ResponsiveModalProps {
   open: boolean
@@ -34,7 +35,12 @@ export default function ResponsiveModal({ open, onOpenChange, title, icon, child
             "sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
             "sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95",
           )}
+          
         >
+
+          <DialogDescription className="sr-only">
+            Modifica los datos del usuario y guarda los cambios.
+          </DialogDescription>
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-800 px-6 py-4">
             <div className="flex items-center gap-3">

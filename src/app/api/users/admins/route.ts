@@ -21,11 +21,10 @@ export async function GET(req: Request) {
     // Devolver todos los usuarios verificados
     const [rows] = await pool.query(
       `
-      SELECT id, first_name, last_name, email, phone, verify
+      SELECT id, first_name, last_name, email, phone, is_verified
       FROM users
-      WHERE verify = 1
-      `,
-      [],
+      WHERE is_verified = 1 AND status_id = 1
+      `
     );
 
     return NextResponse.json({
