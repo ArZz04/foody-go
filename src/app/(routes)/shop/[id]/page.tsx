@@ -19,7 +19,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { MenuItemRow } from "@/components/menu/MenuItemRow";
 import { SectionHeader } from "@/components/menu/SectionHeader";
 import { getSectionTheme } from "@/components/menu/sectionThemes";
-import { getCoordsForCity, type LatLng } from "@/lib/geo";
 
 type Negocio = {
   id: number | string;
@@ -55,7 +54,6 @@ type CartItem = {
   nombre: string;
   negocio: string;
   ciudad?: string;
-  coords?: LatLng;
   image: string;
   extras: string[];
   tags?: string[];
@@ -306,14 +304,12 @@ export default function BusinessDetailPage() {
         selectedProduct.categoria ?? selectedProduct.giro ?? ""
       ] ?? "/coffe.png";
     const negocioCity = negocio?.ciudad;
-    const coords = getCoordsForCity(negocioCity);
 
     const newItem: CartItem = {
       id: `${selectedProduct.id}-${Date.now()}`,
       nombre: selectedProduct.nombre,
       negocio: negocio?.nombre ?? "Negocio local",
       ciudad: negocioCity,
-      coords,
       image: imageSrc,
       extras: [...extrasChosen, ...salsaChosen],
       tags: selectedProduct.categoria ? [selectedProduct.categoria] : [],
@@ -339,13 +335,11 @@ export default function BusinessDetailPage() {
     const imageSrc =
       PRODUCT_IMAGES[product.categoria ?? product.giro ?? ""] ?? "/coffe.png";
     const negocioCity = negocio?.ciudad;
-    const coords = getCoordsForCity(negocioCity);
     const promoItem: CartItem = {
       id: `${product.id}-promo-${Date.now()}`,
       nombre: `${product.nombre} (Promo)`,
       negocio: negocio?.nombre ?? "Negocio local",
       ciudad: negocioCity,
-      coords,
       image: imageSrc,
       extras: [],
       tags: [product.categoria ?? "Promo"],
