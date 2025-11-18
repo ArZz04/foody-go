@@ -25,13 +25,14 @@ function validateAuth(req: NextRequest): boolean {
 // ============================
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
+    const params = await context.params;
     const id = params.id;
 
     const [rows]: any = await pool.query(
@@ -63,13 +64,14 @@ export async function GET(
 // ============================
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
+    const params = await context.params;
     const businessId = params.id;
     const body = await req.json();
 
@@ -152,13 +154,14 @@ export async function PUT(
 // ============================
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
+    const params = await context.params;
     const id = params.id;
 
     await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [id]);
