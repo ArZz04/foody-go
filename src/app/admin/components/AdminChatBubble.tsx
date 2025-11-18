@@ -3,7 +3,6 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useMemo, useState, useEffect } from "react";
 import { MessageCircle } from "lucide-react";
-import { subscribeFoodyEvents } from "@/lib/realtime/eventBus";
 import { cn } from "@/lib/utils";
 
 export function AdminChatBubble({ initialUnread = 3 }: { initialUnread?: number }) {
@@ -11,17 +10,6 @@ export function AdminChatBubble({ initialUnread = 3 }: { initialUnread?: number 
   const pathname = usePathname();
   const [unread, setUnread] = useState(initialUnread);
   const [pulse, setPulse] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = subscribeFoodyEvents((event) => {
-      if (event.type === "incident" || event.type === "chat") {
-        setUnread((prev) => prev + 1);
-        setPulse(true);
-        setTimeout(() => setPulse(false), 1000);
-      }
-    });
-    return unsubscribe;
-  }, []);
 
   const targetHref = useMemo(() => {
     const base = pathname?.startsWith("/admin") ? pathname : "/admin";
