@@ -7,18 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import {
-  getCoordsForCity,
-  haversineDistance,
-  type LatLng,
-} from "@/lib/geo";
 
 type StoredCartItem = {
   id: string;
   nombre: string;
   negocio: string;
   ciudad?: string;
-  coords?: LatLng;
   image: string;
   extras: string[];
   tags?: string[];
@@ -36,7 +30,7 @@ const CART_STORAGE_KEY = "foody:cart";
 export default function CarritoPage() {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
-  const [customerLocation, setCustomerLocation] = useState<LatLng | null>(null);
+  const [customerLocation, setCustomerLocation] = useState<  | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
 
@@ -48,12 +42,6 @@ export default function CarritoPage() {
         const parsed = JSON.parse(stored) as StoredCartItem[];
         setCartItems(
           parsed.map((item) => {
-            if (!item.coords && item.ciudad) {
-              const fallback = getCoordsForCity(item.ciudad);
-              if (fallback) {
-                return { ...item, coords: fallback };
-              }
-            }
             return item;
           }),
         );
@@ -158,17 +146,11 @@ export default function CarritoPage() {
       return DEFAULT_DELIVERY_FEE;
     }
     const distances = cartItems
-      .map((item) => item.coords || getCoordsForCity(item.ciudad))
-      .filter((coords): coords is LatLng => Boolean(coords))
-      .map((coords) => haversineDistance(customerLocation, coords));
 
     if (distances.length === 0) return DEFAULT_DELIVERY_FEE;
-    const maxDistance = Math.max(...distances);
-    const dynamic = BASE_DELIVERY + maxDistance * COST_PER_KM;
-    return Number(dynamic.toFixed(2));
   }, [cartItems, customerLocation]);
 
-  const total = subtotal + deliveryFee + SERVICE_FEE;
+  const total = subtotal + SERVICE_FEE;
 
   const handleDetectLocation = () => {
     if (!window?.navigator?.geolocation) {
@@ -179,10 +161,6 @@ export default function CarritoPage() {
     setLocationError(null);
     window.navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setCustomerLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
         setLocating(false);
       },
       (err) => {
@@ -312,7 +290,7 @@ export default function CarritoPage() {
               </div>
               <div className="flex items-center justify-between">
                 <dt>Envío</dt>
-                <dd>MX${deliveryFee.toFixed(2)}</dd>
+                <dd>MX$200</dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt>Servicio</dt>
