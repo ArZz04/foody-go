@@ -21,14 +21,16 @@ function validateAuth(req: NextRequest) {
 // ============================
 // 📌 GET — Obtener negocio por ID
 // ============================
-export async function GET(req: NextRequest, { params }: any) {
-  
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
+    const id = context.params.id;
+
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
-
-    const id = params.id;
 
     const [rows]: any = await pool.query(
       `
@@ -127,13 +129,13 @@ export async function PUT(
       [owner_id, businessId]
     );
 
-    const [updated] = await pool.query(
+    const [updated]: any = await pool.query(
       `SELECT * FROM business WHERE id = ?`,
       [businessId]
     );
 
     return NextResponse.json(
-      { message: "Negocio actualizado correctamente", business: (updated as any)[0] },
+      { message: "Negocio actualizado correctamente", business: updated[0] },
       { status: 200 }
     );
 
@@ -144,7 +146,7 @@ export async function PUT(
 }
 
 // ============================
-// 🗑 DELETE
+// 🗑 DELETE — Eliminar negocio
 // ============================
 export async function DELETE(
   req: NextRequest,
@@ -155,7 +157,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    const { id } = context.params;
+    const id = context.params.id;
 
     await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [id]);
     await pool.query(`DELETE FROM business WHERE id = ?`, [id]);
