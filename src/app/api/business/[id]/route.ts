@@ -21,16 +21,14 @@ function validateAuth(req: NextRequest) {
 // ============================
 // 📌 GET — Obtener negocio por ID
 // ============================
-export async function GET(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: any) {
+  
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    const { id } = context.params;
+    const id = params.id;
 
     const [rows]: any = await pool.query(
       `
