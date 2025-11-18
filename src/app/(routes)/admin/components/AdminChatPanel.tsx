@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ChatEntityType } from "@/types/chat";
-import type { FoodyRealtimeEvent } from "@/lib/realtime/eventBus";
 
 type ThreadType = ChatEntityType;
 
@@ -89,10 +88,9 @@ const FILTERS: { key: "todos" | ThreadType; label: string }[] = [
 
 interface AdminChatPanelProps {
   focusToken?: number;
-  incomingEvent?: FoodyRealtimeEvent | null;
 }
 
-export function AdminChatPanel({ focusToken, incomingEvent }: AdminChatPanelProps) {
+export function AdminChatPanel({ focusToken }: AdminChatPanelProps) {
   const [threads, setThreads] = useState(INITIAL_THREADS);
   const [activeId, setActiveId] = useState(threads[0]?.id ?? "");
   const [message, setMessage] = useState("");
@@ -106,50 +104,6 @@ export function AdminChatPanel({ focusToken, incomingEvent }: AdminChatPanelProp
     return () => clearTimeout(timeout);
   }, [focusToken]);
 
-  useEffect(() => {
-  if (!incomingEvent) return;
-  if (incomingEvent.type === "incident" || incomingEvent.type === "chat") {
-    const payload = incomingEvent.payload;
-    setThreads((prev) => {
-      const existing = prev.find((thread) => thread.id === payload.entityId);
-
-      // 🔥 CORRECCIÓN: Verificar el tipo de evento para acceder a `priority`
-      const baseThread: ChatThread =
-        existing ?? {
-          id: payload.entityId,
-          name: payload.name,
-          type: payload.entityType,
-          reference: payload.reference ?? "",
-          priority: incomingEvent.type === "incident" && (payload as any).priority ? "alerta" : "normal",
-          unread: true,
-          messages: [],
-        };
-
-      const updated: ChatThread = {
-        ...baseThread,
-        reference: payload.reference ?? baseThread.reference,
-        priority:
-          incomingEvent.type === "incident" && (payload as any).priority
-            ? "alerta"
-            : baseThread.priority,
-        unread: true,
-        messages: [
-          ...baseThread.messages,
-          {
-            id: `incoming-${Date.now()}`,
-            author: "contact",
-            content: payload.message,
-            timestamp: "Ahora",
-          },
-        ],
-      };
-
-      const others = prev.filter((thread) => thread.id !== updated.id);
-      return [updated, ...others];
-    });
-    setActiveId(payload.entityId);
-  }
-}, [incomingEvent]);
 
   const filteredThreads = useMemo(() => {
     if (filter === "todos") return threads;
