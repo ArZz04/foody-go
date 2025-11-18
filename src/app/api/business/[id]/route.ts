@@ -1,46 +1,50 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import pool from "@/lib/db";
 import jwt from "jsonwebtoken";
 
 // ============================
 // 📌 Middleware auth helper
 // ============================
-function validateAuth(req: Request) {
+function validateAuth(req: NextRequest) {
   const auth = req.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) {
-    return null;
-  }
+  if (!auth?.startsWith("Bearer ")) return false;
+
   const token = auth.split(" ")[1];
   try {
     jwt.verify(token, process.env.JWT_SECRET as string);
     return true;
   } catch {
-    return null;
+    return false;
   }
 }
 
 // ============================
 // 📌 GET — Obtener negocio por ID
 // ============================
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
+    const { id } = context.params;
+
     const [rows]: any = await pool.query(
       `
-        SELECT 
-          b.*,
-          bo.user_id AS owner_id
-        FROM business b
-        LEFT JOIN business_owners bo ON bo.business_id = b.id AND bo.status_id = 1
-        WHERE b.id = ? LIMIT 1
+      SELECT 
+        b.*,
+        bo.user_id AS owner_id
+      FROM business b
+      LEFT JOIN business_owners bo ON bo.business_id = b.id AND bo.status_id = 1
+      WHERE b.id = ? LIMIT 1
       `,
-      [params.id]
+      [id]
     );
 
-    if (!rows || rows.length === 0) {
+    if (!rows?.length) {
       return NextResponse.json({ message: "Negocio no encontrado" }, { status: 404 });
     }
 
@@ -56,7 +60,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 // 📌 PUT — Actualizar negocio
 // ============================
 export async function PUT(
-  req: Request,
+  req: NextRequest,
   context: { params: { id: string } }
 ) {
   try {
@@ -80,7 +84,6 @@ export async function PUT(
       status_id = 1,
     } = body;
 
-    // Validación mínima
     if (!owner_id || !name || !business_category_id) {
       return NextResponse.json(
         { error: "owner_id, name y business_category_id son requeridos" },
@@ -88,7 +91,6 @@ export async function PUT(
       );
     }
 
-    // Update business
     await pool.query(
       `
       UPDATE business SET
@@ -118,7 +120,6 @@ export async function PUT(
       ]
     );
 
-    // Update owner relation
     await pool.query(
       `
       UPDATE business_owners
@@ -128,14 +129,13 @@ export async function PUT(
       [owner_id, businessId]
     );
 
-    // Return updated business
-    const [updated] = await pool.query(`SELECT * FROM business WHERE id = ?`, [businessId]);
+    const [updated] = await pool.query(
+      `SELECT * FROM business WHERE id = ?`,
+      [businessId]
+    );
 
     return NextResponse.json(
-      {
-        message: "Negocio actualizado correctamente",
-        business: (updated as any)[0],
-      },
+      { message: "Negocio actualizado correctamente", business: (updated as any)[0] },
       { status: 200 }
     );
 
@@ -146,16 +146,21 @@ export async function PUT(
 }
 
 // ============================
-// 🗑 DELETE — (opcional)
+// 🗑 DELETE
 // ============================
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: { id: string } }
+) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [params.id]);
-    await pool.query(`DELETE FROM business WHERE id = ?`, [params.id]);
+    const { id } = context.params;
+
+    await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [id]);
+    await pool.query(`DELETE FROM business WHERE id = ?`, [id]);
 
     return NextResponse.json({ message: "Negocio eliminado" }, { status: 200 });
 
