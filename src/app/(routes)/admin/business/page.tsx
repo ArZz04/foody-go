@@ -475,7 +475,7 @@ console.log("📌 user_id recibido:", business.business_owner?.user_id)
       {/* LEGAL INFORMATION */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div className="space-y-1">
-          <label className="text-xs text-zinc-400 font-semibold">Razón Social</label>
+          <label className="text-xs text-zinc-400 font-semibold">Razón Social<span className="text-red-500">*</span></label>
           <input
             type="text"
             value={legal_name}
@@ -485,7 +485,7 @@ console.log("📌 user_id recibido:", business.business_owner?.user_id)
         </div>
 
         <div className="space-y-1">
-          <label className="text-xs text-zinc-400 font-semibold">RFC / Tax ID</label>
+          <label className="text-xs text-zinc-400 font-semibold">RFC / Tax ID <span className="text-red-500">*</span></label>
           <input
             type="text"
             value={tax_id}
