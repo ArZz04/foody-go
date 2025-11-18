@@ -107,48 +107,49 @@ export function AdminChatPanel({ focusToken, incomingEvent }: AdminChatPanelProp
   }, [focusToken]);
 
   useEffect(() => {
-    if (!incomingEvent) return;
-    if (incomingEvent.type === "incident" || incomingEvent.type === "chat") {
-      const payload = incomingEvent.payload;
-      setThreads((prev) => {
-        const existing = prev.find((thread) => thread.id === payload.entityId);
+  if (!incomingEvent) return;
+  if (incomingEvent.type === "incident" || incomingEvent.type === "chat") {
+    const payload = incomingEvent.payload;
+    setThreads((prev) => {
+      const existing = prev.find((thread) => thread.id === payload.entityId);
 
-        const baseThread: ChatThread =
-          existing ?? {
-            id: payload.entityId,
-            name: payload.name,
-            type: payload.entityType,
-            reference: payload.reference ?? "",
-            priority: incomingEvent.type === "incident" && payload.priority ? "alerta" : "normal",
-            unread: true,
-            messages: [],
-          };
-
-        const updated: ChatThread = {
-          ...baseThread,
-          reference: payload.reference ?? baseThread.reference,
-          priority:
-            incomingEvent.type === "incident" && payload.priority
-              ? "alerta"
-              : baseThread.priority,
+      // 🔥 CORRECCIÓN: Verificar el tipo de evento para acceder a `priority`
+      const baseThread: ChatThread =
+        existing ?? {
+          id: payload.entityId,
+          name: payload.name,
+          type: payload.entityType,
+          reference: payload.reference ?? "",
+          priority: incomingEvent.type === "incident" && (payload as any).priority ? "alerta" : "normal",
           unread: true,
-          messages: [
-            ...baseThread.messages,
-            {
-              id: `incoming-${Date.now()}`,
-              author: "contact",
-              content: payload.message,
-              timestamp: "Ahora",
-            },
-          ],
+          messages: [],
         };
 
-        const others = prev.filter((thread) => thread.id !== updated.id);
-        return [updated, ...others];
-      });
-      setActiveId(payload.entityId);
-    }
-  }, [incomingEvent]);
+      const updated: ChatThread = {
+        ...baseThread,
+        reference: payload.reference ?? baseThread.reference,
+        priority:
+          incomingEvent.type === "incident" && (payload as any).priority
+            ? "alerta"
+            : baseThread.priority,
+        unread: true,
+        messages: [
+          ...baseThread.messages,
+          {
+            id: `incoming-${Date.now()}`,
+            author: "contact",
+            content: payload.message,
+            timestamp: "Ahora",
+          },
+        ],
+      };
+
+      const others = prev.filter((thread) => thread.id !== updated.id);
+      return [updated, ...others];
+    });
+    setActiveId(payload.entityId);
+  }
+}, [incomingEvent]);
 
   const filteredThreads = useMemo(() => {
     if (filter === "todos") return threads;
