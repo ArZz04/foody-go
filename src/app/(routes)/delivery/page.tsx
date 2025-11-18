@@ -14,7 +14,6 @@ import type {
 } from "@/components/delivery/types";
 import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
-import { emitFoodyEvent } from "@/lib/realtime/eventBus";
 
 const currentOrders: DeliveryOrder[] = [
   {
@@ -135,51 +134,13 @@ export default function DeliveryDashboardPage() {
             lastSync="Hace 3 min"
             onLogout={logout}
             onReportIncident={(payload) => {
-              setNotifications((prev) => [
-                {
-                  id: `incident-${Date.now()}`,
-                  title: `Incidencia: ${payload.type}`,
-                  message: `${payload.notes.slice(0, 80)}${
-                    payload.notes.length > 80 ? "..." : ""
-                  }`,
-                  timestamp: "Hace instantes",
-                  unread: true,
-                },
-                ...prev,
-              ]);
-              emitFoodyEvent({
-                type: "incident",
-                payload: {
-                  entityId: driverId,
-                  entityType: "repartidor",
-                  name: driverName,
-                  reference: payload.type,
-                  message: payload.notes,
-                  priority: payload.type !== "otro",
-                },
-              });
-            }}
-            onChatMessage={(message) => {
-              setNotifications((prev) => [
-                {
-                  id: `chat-${Date.now()}`,
-                  title: "Mensaje a soporte",
-                  message,
-                  timestamp: "Chat enviado",
-                  unread: false,
-                },
-                ...prev,
-              ]);
-              emitFoodyEvent({
-                type: "chat",
-                payload: {
-                  entityId: driverId,
-                  entityType: "repartidor",
-                  name: driverName,
-                  reference: "Chat con soporte",
-                  message,
-                },
-              });
+              // emitFoodyEvent({ --- IGNORE ---
+              //   type: "incident",
+              //   payload: {
+              //     driverId,
+              //     ...payload,
+              //   },
+              // }); --- IGNORE ---
             }}
           />
 

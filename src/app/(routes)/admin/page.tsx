@@ -5,12 +5,10 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AdminChatPanel } from "./components/AdminChatPanel";
-import { useFoodyEvents, type FoodyRealtimeEvent } from "@/lib/realtime/eventBus";
 
 export default function AdminDashboardPage() {
   const [admins, setAdmins] = useState([]);
   const [chatFocusToken, setChatFocusToken] = useState(0);
-  const [incomingEvent, setIncomingEvent] = useState<FoodyRealtimeEvent | null>(null);
   const chatSectionRef = useRef<HTMLDivElement | null>(null);
 
   // 🔹 Petición al endpoint /api/users/admins
@@ -35,14 +33,6 @@ export default function AdminDashboardPage() {
     fetchAdmins();
   }, []);
 
-  const handleRealtimeEvent = useCallback((event: FoodyRealtimeEvent) => {
-    if (event.type === "incident" || event.type === "chat") {
-      setIncomingEvent(event);
-      setChatFocusToken(Date.now());
-    }
-  }, []);
-
-  useFoodyEvents(handleRealtimeEvent, [handleRealtimeEvent]);
 
   useEffect(() => {
     if (!chatFocusToken) return;
@@ -290,46 +280,10 @@ export default function AdminDashboardPage() {
         </div>
       </section>
 
-      {/* CHAT SECTION */}
-      <section
-        id="chat-center"
-        aria-label="Chat con equipos"
-        className="scroll-mt-32 pb-4"
-        ref={chatSectionRef}
-      >
-        <AdminChatPanel
-          focusToken={chatFocusToken}
-          incomingEvent={incomingEvent}
-        />
-      </section>
-
     </div>
   );
 }
 
-function DashButton({
-  children,
-  href,
-  variant = "primary",
-  className,
-}: {
-  children: React.ReactNode;
-  href?: string;
-  variant?: "primary" | "secondary" | "ghost";
-  className?: string;
-}) {
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300 focus-visible:ring-offset-1";
-  const styles =
-    variant === "primary"
-      ? "bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-lg shadow-red-500/25 hover:shadow-xl"
-      : variant === "secondary"
-        ? "bg-white/95 text-red-600 shadow-sm ring-1 ring-red-200/60 hover:-translate-y-0.5 hover:shadow-md"
-        : "bg-white/10 text-white backdrop-blur ring-1 ring-white/30 hover:-translate-y-0.5 hover:bg-white/20";
-  const Comp = href ? Link : "button";
-  // @ts-ignore
-  return <Comp href={href} className={`${base} ${styles} ${className}`}>{children}</Comp>;
-}
 
 function KPI({
   label,
