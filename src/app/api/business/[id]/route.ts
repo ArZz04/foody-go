@@ -56,15 +56,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 // 📌 PUT — Actualizar negocio
 // ============================
 export async function PUT(
-  req: Request, 
-  { params }: { params: Promise<{ id: string }> }
+  req: Request,
+  context: { params: { id: string } }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    const { id: businessId } = await params;
+    const businessId = context.params.id;
     const body = await req.json();
 
     const {
