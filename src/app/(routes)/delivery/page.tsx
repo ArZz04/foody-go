@@ -119,7 +119,7 @@ export default function DeliveryDashboardPage() {
   const [notifications, setNotifications] = useState(recentNotifications);
   const highlightedOrder = currentOrders[0];
   const driverName = user?.name ?? "Repartidor Foody";
-  const driverId = user?.email ?? user?.id ?? "repartidor";
+  const driverId: string = user?.id?.toString() ?? "repartidor";
 
   return (
     <main
