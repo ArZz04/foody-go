@@ -3,17 +3,19 @@ import pool from "@/lib/db";
 import jwt from "jsonwebtoken";
 
 // ============================
-// 📌 Middleware auth helper
+// 🔐 Validación de token
 // ============================
-function validateAuth(req: NextRequest) {
+function validateAuth(req: NextRequest): boolean {
   const auth = req.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) return false;
+  if (!auth || !auth.startsWith("Bearer ")) return false;
 
   const token = auth.split(" ")[1];
+
   try {
     jwt.verify(token, process.env.JWT_SECRET as string);
     return true;
-  } catch {
+  } catch (error) {
+    console.error("❌ Token inválido:", error);
     return false;
   }
 }
@@ -23,23 +25,23 @@ function validateAuth(req: NextRequest) {
 // ============================
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const id = context.params.id;
-
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
+    const id = params.id;
+
     const [rows]: any = await pool.query(
       `
-      SELECT 
-        b.*,
-        bo.user_id AS owner_id
-      FROM business b
-      LEFT JOIN business_owners bo ON bo.business_id = b.id AND bo.status_id = 1
-      WHERE b.id = ? LIMIT 1
+        SELECT 
+          b.*,
+          bo.user_id AS owner_id
+        FROM business b
+        LEFT JOIN business_owners bo ON bo.business_id = b.id AND bo.status_id = 1
+        WHERE b.id = ? LIMIT 1
       `,
       [id]
     );
@@ -51,7 +53,7 @@ export async function GET(
     return NextResponse.json({ business: rows[0] }, { status: 200 });
 
   } catch (error) {
-    console.error("❌ Error GET business/:id:", error);
+    console.error("❌ Error GET /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
@@ -61,14 +63,14 @@ export async function GET(
 // ============================
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    const businessId = context.params.id;
+    const businessId = params.id;
     const body = await req.json();
 
     const {
@@ -93,18 +95,18 @@ export async function PUT(
 
     await pool.query(
       `
-      UPDATE business SET
-        name = ?,
-        business_category_id = ?,
-        city = ?,
-        district = ?,
-        address = ?,
-        legal_name = ?,
-        tax_id = ?,
-        address_notes = ?,
-        status_id = ?,
-        updated_at = NOW()
-      WHERE id = ?;
+        UPDATE business SET
+          name = ?,
+          business_category_id = ?,
+          city = ?,
+          district = ?,
+          address = ?,
+          legal_name = ?,
+          tax_id = ?,
+          address_notes = ?,
+          status_id = ?,
+          updated_at = NOW()
+        WHERE id = ?;
       `,
       [
         name,
@@ -122,9 +124,9 @@ export async function PUT(
 
     await pool.query(
       `
-      UPDATE business_owners
-      SET user_id = ?, updated_at = NOW()
-      WHERE business_id = ?;
+        UPDATE business_owners
+        SET user_id = ?, updated_at = NOW()
+        WHERE business_id = ?;
       `,
       [owner_id, businessId]
     );
@@ -140,7 +142,7 @@ export async function PUT(
     );
 
   } catch (error) {
-    console.error("❌ Error PUT business/:id:", error);
+    console.error("❌ Error PUT /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
@@ -150,14 +152,14 @@ export async function PUT(
 // ============================
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
     }
 
-    const id = context.params.id;
+    const id = params.id;
 
     await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [id]);
     await pool.query(`DELETE FROM business WHERE id = ?`, [id]);
@@ -165,7 +167,7 @@ export async function DELETE(
     return NextResponse.json({ message: "Negocio eliminado" }, { status: 200 });
 
   } catch (error) {
-    console.error("❌ Error DELETE business/:id:", error);
+    console.error("❌ Error DELETE /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
