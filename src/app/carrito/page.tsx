@@ -238,7 +238,7 @@ export default function CarritoPage() {
                       ) : null}
                     </div>
                     <div className="text-right text-sm font-semibold text-emerald-900">
-                      MX${(item.unitPrice * item.quantity).toFixed(2)}
+                      MX${(getItemPrice(item) * item.quantity).toFixed(2)}
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-3 text-xs">
