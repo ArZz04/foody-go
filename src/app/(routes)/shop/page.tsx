@@ -156,7 +156,7 @@ export default function ShopPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.4em] text-[#bca181]">
-                {theme.emoji} Aliados
+                {theme.emoji} Aliadoss
               </p>
               <h2 className="font-serif text-4xl font-semibold text-[#3b2f28]">
                 {theme.title}
