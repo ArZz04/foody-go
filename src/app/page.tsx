@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { HeroStats } from "@/components/home/HeroStats";
 import { ReviewRotator } from "@/components/home/ReviewRotator";
-import { LiveActivity } from "@/components/home/LiveActivity";
 import { HeroActions } from "@/components/home/HeroActions";
 
 export default function Home() {
@@ -22,8 +21,6 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-black/35" />
               <div className="pointer-events-none absolute inset-x-0 top-0 h-20 " />
-
-              <LiveActivity />
 
               <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center text-white">
                 <Badge className="mb-6 border border-white/60 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-[#2E5946]">
