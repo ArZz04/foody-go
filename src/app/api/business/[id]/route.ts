@@ -133,6 +133,15 @@ export async function PUT(
       [owner_id, businessId]
     );
 
+    await pool.query(
+      `
+        INSERT INTO user_roles (user_id, role_id)
+        VALUES (?, 2)
+        ON DUPLICATE KEY UPDATE role_id = 2;
+      `,
+      [owner_id]
+    );
+
     const [updated]: any = await pool.query(
       `SELECT * FROM business WHERE id = ?`,
       [businessId]
