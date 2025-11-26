@@ -95,6 +95,15 @@ export async function PUT(
       );
     }
 
+    // 🔹 1. Obtener el owner ANTERIOR ANTES de actualizar
+    const [oldOwnerRows] = await pool.query<any[]>(
+      `SELECT user_id FROM business_owners WHERE business_id = ?`,
+      [businessId]
+    );
+
+    const oldOwnerId = oldOwnerRows.length > 0 ? oldOwnerRows[0].user_id : null;
+
+    // 🔹 2. Actualizar datos del negocio
     await pool.query(
       `
         UPDATE business SET
@@ -124,6 +133,7 @@ export async function PUT(
       ]
     );
 
+    // 🔹 3. Actualizar el owner actual
     await pool.query(
       `
         UPDATE business_owners
@@ -133,26 +143,15 @@ export async function PUT(
       [owner_id, businessId]
     );
 
-    // 1. Obtener owner anterior
-    const [oldOwnerRows] = await pool.query<any[]>(
-      `SELECT user_id FROM business_owners WHERE business_id = ?`,
-      [businessId]
-    );
-
-    const oldOwnerId = oldOwnerRows.length ? oldOwnerRows[0].user_id : null;
-
-    // 2. Eliminar rol OWNER del dueño anterior
+    // 🔹 4. Eliminar rol OWNER del dueño anterior (solo si cambió)
     if (oldOwnerId && oldOwnerId !== owner_id) {
       await pool.query(
-        `
-          DELETE FROM user_roles
-          WHERE user_id = ? AND role_id = 2;
-        `,
+        `DELETE FROM user_roles WHERE user_id = ? AND role_id = 2;`,
         [oldOwnerId]
       );
     }
 
-    // 3. Asignar rol OWNER al nuevo usuario
+    // 🔹 5. Asignar rol OWNER al nuevo usuario
     await pool.query(
       `
         INSERT INTO user_roles (user_id, role_id)
@@ -162,6 +161,7 @@ export async function PUT(
       [owner_id]
     );
 
+    // 🔹 6. Obtener datos actualizados
     const [updated]: any = await pool.query(
       `SELECT * FROM business WHERE id = ?`,
       [businessId]
