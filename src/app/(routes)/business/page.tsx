@@ -1,10 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-import { businesses } from "@/app/(routes)/admin/data/businesses";
+import BusinessTabs from "./components/BusinessTabs";
 
 type ProductStatus = "Activo" | "Agotado" | "Borrador";
 type PromotionType = "Ninguna" | "Oferta" | "Happy Hour" | "Combo" | string;
@@ -23,188 +23,141 @@ interface Product {
   actualizadoEn: string;
 }
 
-const BUSINESS_PRODUCTS: Record<number, Product[]> = {
-  1: [
-    {
-      id: "CAF-101",
-      nombre: "Latte con almendra",
-      categoria: "Bebidas calientes",
-      precio: 65,
-      stock: 28,
-      costo: 32,
-      margen: 51,
-      estado: "Activo",
-      promocion: "Oferta",
-      destacado: true,
-      actualizadoEn: "2024-06-10T09:30:00",
-    },
-    {
-      id: "CAF-118",
-      nombre: "Cold Brew Vainilla",
-      categoria: "Bebidas frías",
-      precio: 72,
-      stock: 12,
-      costo: 36,
-      margen: 50,
-      estado: "Activo",
-      promocion: "Happy Hour",
-      actualizadoEn: "2024-06-09T18:00:00",
-    },
-    {
-      id: "CAF-134",
-      nombre: "Rebanada pastel de zanahoria",
-      categoria: "Repostería",
-      precio: 58,
-      stock: 6,
-      costo: 27,
-      margen: 53,
-      estado: "Activo",
-      promocion: "Ninguna",
-      actualizadoEn: "2024-06-08T12:40:00",
-    },
-    {
-      id: "CAF-142",
-      nombre: "Panini de pavo y queso",
-      categoria: "Snacks",
-      precio: 85,
-      stock: 18,
-      costo: 41,
-      margen: 52,
-      estado: "Activo",
-      promocion: "Combo",
-      actualizadoEn: "2024-06-10T07:15:00",
-    },
-    {
-      id: "CAF-155",
-      nombre: "Galleta doble chocolate",
-      categoria: "Repostería",
-      precio: 32,
-      stock: 48,
-      costo: 14,
-      margen: 56,
-      estado: "Activo",
-      promocion: "Ninguna",
-      actualizadoEn: "2024-06-10T08:05:00",
-    },
-  ],
-  2: [
-    {
-      id: "TAC-200",
-      nombre: "Taco al pastor",
-      categoria: "Tacos",
-      precio: 28,
-      stock: 210,
-      costo: 12,
-      margen: 57,
-      estado: "Activo",
-      promocion: "Happy Hour",
-      destacado: true,
-      actualizadoEn: "2024-06-10T00:05:00",
-    },
-    {
-      id: "TAC-212",
-      nombre: "Orden de costilla",
-      categoria: "Especiales",
-      precio: 98,
-      stock: 32,
-      costo: 45,
-      margen: 54,
-      estado: "Activo",
-      promocion: "Ninguna",
-      actualizadoEn: "2024-06-09T22:45:00",
-    },
-    {
-      id: "TAC-233",
-      nombre: "Gringas pastor",
-      categoria: "Especiales",
-      precio: 69,
-      stock: 8,
-      costo: 31,
-      margen: 55,
-      estado: "Activo",
-      promocion: "Oferta",
-      actualizadoEn: "2024-06-09T21:25:00",
-    },
-    {
-      id: "TAC-248",
-      nombre: "Volcán de sirloin",
-      categoria: "Antojitos",
-      precio: 44,
-      stock: 4,
-      costo: 21,
-      margen: 52,
-      estado: "Agotado",
-      promocion: "Ninguna",
-      actualizadoEn: "2024-06-08T23:05:00",
-    },
-  ],
-  3: [
-    {
-      id: "PAN-301",
-      nombre: "Concha tradicional",
-      categoria: "Pan dulce",
-      precio: 18,
-      stock: 86,
-      costo: 6,
-      margen: 67,
-      estado: "Activo",
-      promocion: "Oferta",
-      destacado: true,
-      actualizadoEn: "2024-06-10T06:45:00",
-    },
-    {
-      id: "PAN-327",
-      nombre: "Baguette integral",
-      categoria: "Pan artesanal",
-      precio: 42,
-      stock: 14,
-      costo: 18,
-      margen: 57,
-      estado: "Activo",
-      promocion: "Ninguna",
-      actualizadoEn: "2024-06-09T16:20:00",
-    },
-    {
-      id: "PAN-333",
-      nombre: "Pay de queso",
-      categoria: "Pasteles",
-      precio: 85,
-      stock: 3,
-      costo: 39,
-      margen: 54,
-      estado: "Agotado",
-      promocion: "Combo",
-      actualizadoEn: "2024-06-09T13:40:00",
-    },
-  ],
-};
-
-const BUSINESS_COVER_IMAGES: Record<number, string> = {
-  1: "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=1400&q=80",
-  2: "https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1400&q=80",
-  3: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=1400&q=80",
-};
-
 const peso = new Intl.NumberFormat("es-MX", {
   style: "currency",
   currency: "MXN",
 });
 
 export default function BusinessPage() {
-  const businessOwnerId = businesses[0]?.id ?? 1;
+  const [businesses, setBusinesses] = useState([]);
+  const [businessInfo, setBusinessInfo] = useState<any>(null);
+  const [businessHours, setBusinessHours] = useState<any[]>([]);
+  const [selectedBusiness, setSelectedBusiness] = useState<number | null>(null);
+  
+    useEffect(() => {
+  async function fetchBusinesses() {
+    try {
+      const token = localStorage.getItem("token");
 
-  const business = useMemo(
-    () =>
-      businesses.find((item) => item.id === businessOwnerId) ?? businesses[0],
-    [businessOwnerId],
-  );
+      const payload = token ? JSON.parse(atob(token.split(".")[1])) : null;
+      const userId = payload?.id;
+
+      if (!token) {
+        console.error("No hay token en localStorage");
+        return;
+      }
+
+      const res = await fetch(`/api/users/owner/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Error al cargar negocios");
+      }
+
+      const data = await res.json();
+
+      if (!data.businesses) {
+        console.error("La API no retornó 'businesses'");
+        return;
+      }
+
+      // ✅ mapear al formato esperado por el frontend
+      const parsedBusinesses = data.businesses.map((b: any) => ({
+        id: b.id,
+        nombre: b.name,
+        ciudad: b.city,
+        categoria: "General", // o "Sin categoría", lo que tú quieras
+      }));
+
+      setBusinesses(parsedBusinesses);
+
+      if (parsedBusinesses.length > 0) {
+        setSelectedBusiness(parsedBusinesses[0].id);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  fetchBusinesses();
+}, []);
+
+useEffect(() => {
+  if (!selectedBusiness) return;
+
+  async function fetchBusinessInfo() {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch(`/api/business/${selectedBusiness}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Error al cargar el negocio");
+
+      const data = await res.json();
+
+      setBusinessInfo({
+        id: data.business.id,
+        name: data.business.name,
+        categoryId: data.business.business_category_id,
+        category_name: data.business.category_name,
+        city: data.business.city,
+        district: data.business.district,
+        address: data.business.address,
+        legal_name: data.business.legal_name,
+        tax_id: data.business.tax_id,
+        address_notes: data.business.address_notes,
+        created_at: data.business.created_at,
+        updated_at: data.business.updated_at,
+        statusId: data.business.status_id,
+      });
+      setBusinessHours(data.hours || []);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  fetchBusinessInfo();
+}, [selectedBusiness]);
+
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
-    const data = BUSINESS_PRODUCTS[business.id] ?? [];
-    setProducts(data.map((item) => ({ ...item })));
-  }, [business.id]);
+  if (!selectedBusiness) return;
+
+  async function fetchCategories() {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch(`/api/categories/${selectedBusiness}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setCategories(data.categories || []);
+      }
+    } catch (error) {
+      console.error("Error cargando categorías:", error);
+    }
+  }
+
+  fetchCategories();
+}, [selectedBusiness]);
+
 
   const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } =
     useMemo(() => {
@@ -224,23 +177,14 @@ export default function BusinessPage() {
       };
     }, [products]);
 
-  const categorySummary = useMemo(
-    () =>
-      products.reduce<Record<string, { count: number; destacados: number }>>(
-        (acc, product) => {
-          if (!acc[product.categoria]) {
-            acc[product.categoria] = { count: 0, destacados: 0 };
-          }
-          acc[product.categoria].count += 1;
-          if (product.destacado) {
-            acc[product.categoria].destacados += 1;
-          }
-          return acc;
-        },
-        {},
-      ),
-    [products],
-  );
+  const categorySummary = useMemo(() => {
+  return categories.map((c) => ({
+    name: c.name,
+    productos: 0,     // luego puedes reemplazar esto si agregas productos
+    destacados: 0,    // si agregas "featured" en categorías
+  }));
+}, [categories]);
+
 
   const promoProducts = useMemo(
     () =>
@@ -445,8 +389,6 @@ export default function BusinessPage() {
     );
   }
 
-  const businessCover =
-    BUSINESS_COVER_IMAGES[business.id] ?? BUSINESS_COVER_IMAGES[1];
 
   return (
     <main className="mx-auto max-w-7xl space-y-10 px-4 py-10 sm:px-6 lg:px-8">
@@ -460,19 +402,29 @@ export default function BusinessPage() {
           className="absolute -right-24 -top-24 size-64 rounded-full bg-white/20 blur-3xl"
         />
         <div className="relative grid gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
+          {/* PEQUEÑO TABS PARA ELEGIR NEGOCIO DEPENDIENTO LOS QUE RETORNE EL API EN /api/users/owner/:id */}
+
+          <BusinessTabs
+            businesses={businesses}
+            selectedId={selectedBusiness}
+            onSelect={(id) => setSelectedBusiness(id)}
+          />
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
               Negocio
             </div>
             <div className="space-y-4">
               <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
-                {business.nombre}
+                {businessInfo?.name ?? "Cargando..."}
               </h1>
+
               <p className="max-w-2xl text-sm text-white/90 md:text-base lg:text-lg">
-                {business.categoria} en {business.ciudad}. Gestiona el catálogo,
-                precios y promociones de este negocio desde un único panel
-                operativo.
+                {businessInfo
+                  ? `${businessInfo.category_name} en ${businessInfo.city}. Gestiona el catálogo,
+                    precios y promociones de este negocio desde un único panel operativo.`
+                  : "Cargando descripción..."}
               </p>
+
             </div>
             <dl className="grid gap-4 text-sm md:grid-cols-3">
               <StatItem
@@ -492,41 +444,32 @@ export default function BusinessPage() {
             </dl>
             <div className="grid gap-3 rounded-2xl bg-white/15 p-4 text-xs uppercase tracking-[0.2em]">
               <div className="space-y-1 text-white/80">
-                <span>Contacto</span>
-                <p className="text-sm normal-case tracking-normal text-white">
-                  {business.contacto} · {business.telefono}
-                </p>
+                <span>FISCAL</span>
+                  <p className="text-sm normal-case tracking-normal text-white">
+                      {businessInfo?.legal_name ?? "—"} · RFC {businessInfo?.tax_id ?? "—"}
+                    </p>
               </div>
               <div className="space-y-1 text-white/80">
                 <span>Horario</span>
-                <p className="text-sm normal-case tracking-normal text-white">
-                  {business.horario.dias} · {business.horario.apertura} –{" "}
-                  {business.horario.cierre} hrs
-                </p>
+                {businessHours?.map((h) => (
+                  <p key={h.day_of_week} className="text-sm normal-case tracking-normal text-white">
+                    {h.is_closed
+                      ? `${h.day_name}: Cerrado`
+                      : !h.open_time
+                        ? `${h.day_name}: No definido`
+                        : `${h.day_name}: ${h.open_time} – ${h.close_time} hrs`}
+                  </p>
+                ))}
               </div>
+
               <Link
-                href={`/admin/negocios/${business.id}`}
+                href={`/admin/negocios/hardid`}
                 className="inline-flex items-center gap-2 text-sm font-semibold normal-case tracking-normal text-white transition hover:opacity-80"
               >
-                Ver perfil completo <span aria-hidden>→</span>
+                Editar Horarios <span aria-hidden>→</span>
               </Link>
             </div>
           </div>
-          <figure className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
-            <img
-              src={businessCover}
-              alt={`Imagen de ${business.nombre}`}
-              className="h-full w-full object-cover"
-            />
-            <figcaption className="absolute bottom-4 left-4 right-4 rounded-xl bg-black/40 px-4 py-3 text-xs uppercase tracking-[0.3em] text-white/80">
-              {business.ciudad} · Desde{" "}
-              {new Date(business.creadoEn).toLocaleDateString("es-MX", {
-                month: "short",
-                year: "numeric",
-              })}
-            </figcaption>
-          </figure>
         </div>
       </section>
 
@@ -542,6 +485,9 @@ export default function BusinessPage() {
         <div className="flex flex-wrap gap-2">
           <PrimaryAction href="/business/products/new">
             + Agregar producto
+          </PrimaryAction>
+          <PrimaryAction href={`/business/categories/${selectedBusiness}/new`}>
+            + Agregar categoría
           </PrimaryAction>
           <PrimaryAction variant="outline">Importar catálogo</PrimaryAction>
           <PrimaryAction variant="soft" onClick={() => handleBulkDiscount()}>
@@ -673,34 +619,32 @@ export default function BusinessPage() {
           title="Resumen por categoría"
           description="Mantén equilibrada la oferta de cada sección."
         >
-          {Object.keys(categorySummary).length === 0 ? (
-            <EmptyState message="Sin categorías registradas todavía." />
-          ) : (
-            <ul className="space-y-3 text-sm">
-              {Object.entries(categorySummary).map(([category, info]) => (
-                <li
-                  key={category}
-                  className="flex items-center justify-between rounded-2xl bg-white/90 px-4 py-3 shadow-sm ring-1 ring-emerald-200/50 dark:bg-white/5 dark:ring-white/10"
-                >
-                  <div>
-                    <p className="font-semibold text-emerald-700 dark:text-emerald-300">
-                      {category}
-                    </p>
-                    <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
-                      {info.count} productos · {info.destacados} destacados
-                    </p>
-                  </div>
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
-                    {(
-                      (info.destacados / Math.max(info.count, 1)) *
-                      100
-                    ).toFixed(0)}
-                    % destacados
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
+          {categorySummary.length === 0 ? (
+  <EmptyState message="Sin categorías registradas todavía." />
+) : (
+  <ul className="space-y-3 text-sm">
+    {categorySummary.map((cat) => (
+      <li
+        key={cat.name}
+        className="flex items-center justify-between rounded-2xl bg-white/90 px-4 py-3 shadow-sm ring-1 ring-emerald-200/50 dark:bg-white/5 dark:ring-white/10"
+      >
+        <div>
+          <p className="font-semibold text-emerald-700 dark:text-emerald-300">
+            {cat.name}
+          </p>
+          <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
+            {cat.productos} productos · {cat.destacados} destacados
+          </p>
+        </div>
+
+        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
+          0% destacados
+        </span>
+      </li>
+    ))}
+  </ul>
+)}
+
         </DashboardCard>
       </section>
 

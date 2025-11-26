@@ -7,75 +7,42 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
+    // 1️⃣ Validar token
     const auth = req.headers.get("authorization");
     if (!auth?.startsWith("Bearer ")) {
       return NextResponse.json({ error: "Token no proporcionado" }, { status: 401 });
     }
 
     const token = auth.split(" ")[1];
-    const secret = process.env.JWT_SECRET as string;
-    jwt.verify(token, secret);
+    jwt.verify(token, process.env.JWT_SECRET as string);
 
-    // 👇 ESTA ES LA SOLUCIÓN
+    // 2️⃣ Obtener ID del usuario desde la URL
     const { id: userId } = await context.params;
 
-    const [rows] = (await pool.query(
+    // 3️⃣ Obtener negocios donde ese user_id es owner
+    const [businesses] = await pool.query<any[]>(
       `
-      SELECT
-        u.id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.phone,
-        u.created_at,
-        u.updated_at,
-        u.status_id,
-
-        /* ROLES (subquery con DISTINCT) */
-        (
-          SELECT JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'id', r2.id,
-              'code', r2.code,
-              'name', r2.name
-            )
-          )
-          FROM (
-            SELECT DISTINCT r.id, r.code, r.name
-            FROM user_roles ur2
-            LEFT JOIN roles r ON r.id = ur2.role_id
-            WHERE ur2.user_id = u.id
-          ) AS r2
-        ) AS roles,
-
-        /* NEGOCIOS DONDE ES OWNER */
-        (
-          SELECT JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'id', b.id,
-              'name', b.name
-            )
-          )
-          FROM business_owners bo
-          LEFT JOIN business b ON b.id = bo.business_id
-          WHERE bo.user_id = u.id
-        ) AS businesses
-
-      FROM users u
-      WHERE u.id = ?
-      GROUP BY u.id
+      SELECT 
+        b.id,
+        b.name,
+        b.city,
+        b.district,
+        b.address,
+        b.status_id
+      FROM business_owners bo
+      INNER JOIN business b ON b.id = bo.business_id
+      WHERE bo.user_id = ?;
       `,
       [userId]
-    )) as any;
+    );
 
-    return NextResponse.json({ user: rows[0] ?? null });
+    return NextResponse.json({
+      businesses: businesses ?? [],
+    });
   } catch (error) {
-    console.error(error);
+    console.error("❌ Error GET /users/:id/businesses", error);
     return NextResponse.json(
-      {
-        error: "Error al obtener usuario owner",
-        details: error instanceof Error ? error.message : String(error),
-      },
+      { error: "Error interno", details: (error as Error).message },
       { status: 500 }
     );
   }

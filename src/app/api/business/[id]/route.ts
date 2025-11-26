@@ -21,7 +21,7 @@ function validateAuth(req: NextRequest): boolean {
 }
 
 // ============================
-// 📌 GET — Obtener negocio por ID
+// 📌 GET — Obtener negocio por ID (+ horarios)
 // ============================
 export async function GET(
   req: NextRequest,
@@ -29,35 +29,123 @@ export async function GET(
 ) {
   try {
     if (!validateAuth(req)) {
-      return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Token inválido o faltante" },
+        { status: 401 }
+      );
     }
 
     const params = await context.params;
     const id = params.id;
 
+    // ============================
+    // 1️⃣ Obtener información del negocio
+    // ============================
     const [rows]: any = await pool.query(
       `
         SELECT 
-          b.*,
+          b.id,
+          b.name,
+          b.business_category_id,
+          bc.name AS category_name,
+          b.city,
+          b.district,
+          b.address,
+          b.legal_name,
+          b.tax_id,
+          b.address_notes,
+          b.created_at,
+          b.updated_at,
+          b.status_id,
           bo.user_id AS owner_id
         FROM business b
-        LEFT JOIN business_owners bo ON bo.business_id = b.id AND bo.status_id = 1
-        WHERE b.id = ? LIMIT 1
+        LEFT JOIN business_owners bo 
+          ON bo.business_id = b.id AND bo.status_id = 1
+        LEFT JOIN business_categories bc 
+          ON bc.id = b.business_category_id
+        WHERE b.id = ?
+        LIMIT 1
       `,
       [id]
     );
 
     if (!rows?.length) {
-      return NextResponse.json({ message: "Negocio no encontrado" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Negocio no encontrado" },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ business: rows[0] }, { status: 200 });
+    const business = rows[0];
 
+    // ============================
+    // 2️⃣ Obtener horarios del negocio
+    // ============================
+    const [hours]: any = await pool.query(
+      `
+        SELECT 
+          day_of_week,
+          open_time,
+          close_time,
+          is_closed
+        FROM business_hours 
+        WHERE business_id = ?
+      `,
+      [id]
+    );
+
+    // Formato de días (0 = Lunes, 6 = Domingo o según tu DB)
+    const days = [
+      "Lunes",
+      "Martes",
+      "Miércoles",
+      "Jueves",
+      "Viernes",
+      "Sábado",
+      "Domingo",
+    ];
+
+    // ============================
+    // 3️⃣ Combinar horarios (7 días garantizados)
+    // ============================
+    const formattedHours = days.map((day, index) => {
+      const found = hours.find((h: any) => h.day_of_week === index);
+
+      if (!found) {
+        return {
+          day_of_week: index,
+          day_name: day,
+          open_time: "undefined",
+          close_time: "undefined",
+          is_closed: true,
+        };
+      }
+
+      return {
+        day_of_week: index,
+        day_name: day,
+        open_time: found.open_time ?? "undefined",
+        close_time: found.close_time ?? "undefined",
+        is_closed: !!found.is_closed,
+      };
+    });
+
+    // ============================
+    // 4️⃣ Respuesta final
+    // ============================
+    return NextResponse.json(
+      {
+        business,
+        hours: formattedHours,
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("❌ Error GET /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
+
 
 // ============================
 // 📌 PUT — Actualizar negocio
