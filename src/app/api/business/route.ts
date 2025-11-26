@@ -68,7 +68,6 @@ export async function GET(req: Request) {
     );
   }
 }
-
 export async function POST(req: Request) {
   try {
     // 1️⃣ Validar token
@@ -92,7 +91,7 @@ export async function POST(req: Request) {
       legal_name,
       tax_id,
       address_notes,
-      status_id = 1, // por defecto activo
+      status_id = 1,
     } = body;
 
     // 3️⃣ Validaciones mínimas
@@ -103,7 +102,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // 4️⃣ Insert a businesses
+    // 4️⃣ Insert en business
     const [businessResult] = await pool.query(
       `
       INSERT INTO business
@@ -125,16 +124,26 @@ export async function POST(req: Request) {
 
     const businessId = (businessResult as any).insertId;
 
-    // 5️⃣ Insertar relación en business_owners
+    // 5️⃣ Registrar dueño del negocio
     await pool.query(
       `
       INSERT INTO business_owners (business_id, user_id, invited_by, status_id, created_at, updated_at)
       VALUES (?, ?, ?, ?, NOW(), NOW());
       `,
-      [businessId, owner_id, owner_id, 1] // invited_by será el mismo owner por ahora
+      [businessId, owner_id, owner_id, 1]
     );
 
-    // 6️⃣ Retornar negocio creado
+    // 6️⃣ Asignar rol OWNER (role_id = 2) al usuario (WITH UPSERT)
+    await pool.query(
+      `
+      INSERT INTO user_roles (user_id, role_id)
+      VALUES (?, 2)
+      ON DUPLICATE KEY UPDATE role_id = 2;
+      `,
+      [owner_id]
+    );
+
+    // 7️⃣ Retornar negocio creado
     const [data] = await pool.query(`SELECT * FROM business WHERE id = ?`, [businessId]);
 
     return NextResponse.json(
