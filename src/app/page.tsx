@@ -30,8 +30,8 @@ export default function Home() {
                   Tu comida favorita, al instante
                 </h1>
                 <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
-                  Apoyando a los primeros aliados de Mazamitla y rancherías cercanas.
-                  Sabores hechos en casa, entregados con calidez rural y puntualidad moderna.
+                  Apoyando a los primeros aliados de zonas rurales y rancherías cercanas.
+                  Sabores hechos en casa, entregados con calidez de comunidad y puntualidad moderna.
                 </p>
                 <HeroActions />
                 <HeroStats />
@@ -47,7 +47,7 @@ export default function Home() {
                   ¿Por qué elegir Foody Go?
                 </h2>
                 <p className="mt-3 text-lg text-[#5F5148]">
-                  La experiencia gourmet-local que impulsa a los barrios de Jalisco
+                  La experiencia gourmet-local que conecta cocinas rurales con quienes las disfrutan
                 </p>
               </div>
               <div className="grid gap-8 md:grid-cols-3">
