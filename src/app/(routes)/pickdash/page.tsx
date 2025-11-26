@@ -10,7 +10,7 @@ import vendorImg from "@/../public/vendedor.jpg";
 import administradorImg from "@/../public/administrador.jpg";
 import adminImg from "@/../public/admi.jpg";
 
-type RoleName = "REPARTIDOR" | "VENDEDOR" | "ADMINISTRADOR" | "ADMIN";
+type RoleName = "DELIVERY" | "MANAGER" | "OWNER" | "ADMIN";
 
 type RoleCard = {
   role: RoleName;
@@ -25,7 +25,7 @@ type RoleCard = {
 
 const CARDS: RoleCard[] = [
   {
-    role: "REPARTIDOR",
+    role: "DELIVERY",
     title: "Zona de Delivery",
     description: "Logística y seguimiento de pedidos",
     href: "/delivery",
@@ -34,7 +34,7 @@ const CARDS: RoleCard[] = [
     chipLabel: "Repartidores",
   },
   {
-    role: "VENDEDOR",
+    role: "MANAGER",
     title: "Panel de Vendedor",
     description: "Gestión de catálogo y promociones",
     href: "/business/manager",
@@ -44,7 +44,7 @@ const CARDS: RoleCard[] = [
     chipLabel: "Dueño de negocio",
   },
   {
-    role: "ADMINISTRADOR",
+    role: "OWNER",
     title: "Panel Administrador",
     description: "Operación integral del negocio",
     href: "/business",
@@ -79,12 +79,13 @@ export default function RoleMenu() {
   }
 
   const roles: RoleName[] = (
+    console.log(user.roles),
     Array.isArray(user.roles) ? user.roles : [user.roles]
   ).filter(
     (role): role is RoleName =>
-      role === "REPARTIDOR" ||
-      role === "VENDEDOR" ||
-      role === "ADMINISTRADOR" ||
+      role === "DELIVERY" ||
+      role === "MANAGER" ||
+      role === "OWNER" ||
       role === "ADMIN",
   );
 
