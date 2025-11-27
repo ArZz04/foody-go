@@ -56,55 +56,78 @@ export async function PUT(
 
     // ========= ROLES ==========
     if (Array.isArray(roles)) {
-      const [oldRolesData] = await connection.query(
-        `SELECT r.code 
-         FROM roles r 
-         JOIN user_roles ur ON ur.role_id = r.id 
-         WHERE ur.user_id = ?`,
-        [userId]
+  const [oldRolesData] = await connection.query(
+    `SELECT r.code 
+     FROM roles r 
+     JOIN user_roles ur ON ur.role_id = r.id 
+     WHERE ur.user_id = ?`,
+    [userId]
+  );
+
+  const oldRoles = (oldRolesData as any[]).map(r => r.code);
+
+  const roleMap: Record<string, string> = {
+    ADMIN: "1",
+    OWNER: "2",
+    DELIVERY: "4",
+    CUSTOMER: "5",
+  };
+
+  const roleCodes = roles.map(r => roleMap[r]).filter(Boolean);
+
+  const sameRoles =
+    oldRoles.length === roleCodes.length &&
+    oldRoles.every(r => roleCodes.includes(r));
+
+  if (!sameRoles) {
+    console.log("🔁 Roles cambiaron, aplicando cambios...");
+    console.log("📌 old:", oldRoles, "➡ new:", roleCodes);
+
+    // 1. Borrar roles actuales
+    await connection.query(`DELETE FROM user_roles WHERE user_id = ?`, [userId]);
+
+    // 2. Insertar roles nuevos
+    if (roleCodes.length > 0) {
+      const placeholders = roleCodes.map(() => "?").join(",");
+      const [roleRows] = await connection.query(
+        `SELECT id FROM roles WHERE code IN (${placeholders})`,
+        roleCodes
       );
 
-      const oldRoles = (oldRolesData as any[]).map(r => r.code);
+      const roleIds = (roleRows as any[]).map(r => r.id);
 
-      // Map frontend codes -> DB codes
-      const roleMap: Record<string, string> = {
-        ADMIN: "1",
-        OWNER: "2",
-        DELIVERY: "4",
-        CUSTOMER: "5",
-      };
+      const insertValues = roleIds.map(roleId => [userId, roleId]);
+      const insertPlaceholders = insertValues.map(() => "(?, ?)").join(",");
 
-      const roleCodes = roles.map(r => roleMap[r]).filter(Boolean);
-
-      const sameRoles =
-        oldRoles.length === roleCodes.length &&
-        oldRoles.every(r => roleCodes.includes(r));
-
-      if (!sameRoles) {
-        console.log("🔁 Roles cambiaron, aplicando cambios...");
-        console.log("📌 old:", oldRoles, "➡ new:", roleCodes);
-
-        await connection.query(`DELETE FROM user_roles WHERE user_id = ?`, [userId]);
-
-        if (roleCodes.length > 0) {
-          const placeholders = roleCodes.map(() => "?").join(",");
-          const [roleRows] = await connection.query(
-            `SELECT id FROM roles WHERE code IN (${placeholders})`,
-            roleCodes
-          );
-
-          const roleIds = (roleRows as any[]).map(r => r.id);
-
-          const insertValues = roleIds.map(roleId => [userId, roleId]);
-          const insertPlaceholders = insertValues.map(() => "(?, ?)").join(",");
-
-          await connection.query(
-            `INSERT INTO user_roles (user_id, role_id) VALUES ${insertPlaceholders}`,
-            insertValues.flat()
-          );
-        }
-      }
+      await connection.query(
+        `INSERT INTO user_roles (user_id, role_id) VALUES ${insertPlaceholders}`,
+        insertValues.flat()
+      );
     }
+
+    // 3. ⬇️ NUEVA LÓGICA: activar o desactivar verificación según rol
+    const hadAdmin = oldRoles.includes("1");
+    const hasAdminNow = roleCodes.includes("1");
+
+    // Si ganó ADMIN → activar verificación
+    if (!hadAdmin && hasAdminNow) {
+      console.log("⚡ ADMIN añadido → activando is_verified");
+      await connection.query(
+        `UPDATE users SET is_verified = 1, updated_at = NOW() WHERE id = ?`,
+        [userId]
+      );
+    }
+
+    // Si perdió ADMIN → desactivar verificación
+    if (hadAdmin && !hasAdminNow) {
+      console.log("❌ ADMIN retirado → desactivando is_verified");
+      await connection.query(
+        `UPDATE users SET is_verified = 0, updated_at = NOW() WHERE id = ?`,
+        [userId]
+      );
+    }
+  }
+}
 
     await connection.commit();
 
