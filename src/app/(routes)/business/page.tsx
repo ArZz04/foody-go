@@ -158,6 +158,60 @@ useEffect(() => {
   fetchCategories();
 }, [selectedBusiness]);
 
+useEffect(() => {
+  if (!selectedBusiness) return;
+
+  async function fetchProducts() {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const res = await fetch(
+        `/api/business/products?business_id=${selectedBusiness}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Error al cargar productos:", data);
+        return;
+      }
+
+      // 🔥 Adaptamos la respuesta de la API a tu interfaz Product
+      const parsed = data.products.map((p: any) => ({
+        id: p.id.toString(),
+        nombre: p.name,
+        categoria: p.category_name ?? "Sin categoría",
+        precio: Number(p.price),
+        stock: Number(p.stock_average ?? 0),
+        costo: Number(p.cost ?? 0),
+        margen: Number(p.margin ?? 0),
+        estado:
+          p.status_id === 1
+            ? "Activo"
+            : p.status_id === 2
+            ? "Agotado"
+            : "Borrador",
+        promocion: p.promotion_id ? "Oferta" : "Ninguna",
+        destacado: false,
+        actualizadoEn: p.updated_at,
+      }));
+      console.log("PRODUCTOS CARGADOS:", parsed);
+      setProducts(parsed);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  fetchProducts();
+}, [selectedBusiness]);
+
+
 
   const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } =
     useMemo(() => {
@@ -483,7 +537,7 @@ useEffect(() => {
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <PrimaryAction href="/business/products/new">
+          <PrimaryAction href={`/business/products/${selectedBusiness}/new`}>
             + Agregar producto
           </PrimaryAction>
           <PrimaryAction href={`/business/categories/${selectedBusiness}/new`}>
