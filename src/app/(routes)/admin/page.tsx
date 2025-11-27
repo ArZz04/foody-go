@@ -4,8 +4,6 @@ import Link from "next/link";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AdminChatPanel } from "./components/AdminChatPanel";
-
 export default function AdminDashboardPage() {
   const [admins, setAdmins] = useState([]);
   const [chatFocusToken, setChatFocusToken] = useState(0);

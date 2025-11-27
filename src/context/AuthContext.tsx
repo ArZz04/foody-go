@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
-import { jwtDecode } from "jwt-decode";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: number;
@@ -25,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
   const token = localStorage.getItem("token");
@@ -118,6 +119,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("roles");
+    router.push("/"); // ← correcto
     setUser(null);
   };
 
