@@ -10,13 +10,14 @@ import {
 } from "react";
 import Link from "next/link";
 
-export default function NewProductPage({
+export default async function NewProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+  const businessId = Number(id);
 
-  const businessId = Number(params.id);
   console.log("businessId:", businessId);
   // ============================
   // 📌 Estados principales
