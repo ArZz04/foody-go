@@ -23,7 +23,7 @@ export default function Home() {
 
               <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center text-white">
                 <Badge className="mb-6 border border-white/60 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-[#2E5946]">
-                  Apoyando aliados locales
+                  Apoyando aliados localess
                 </Badge>
                 <h1 className="font-serif text-4xl leading-tight text-white md:text-6xl">
                   Tu comida favorita, al instante
