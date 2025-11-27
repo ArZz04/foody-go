@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export default function AdminDashboardPage() {
   const [admins, setAdmins] = useState([]);
+  const [username, setUsername] = useState("");
   const [chatFocusToken, setChatFocusToken] = useState(0);
   const chatSectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,48 +33,24 @@ export default function AdminDashboardPage() {
   }, []);
 
 
+    useEffect(() => {
+      const user = localStorage.getItem("user");
+
+      if (user) {
+        const parsed = JSON.parse(user);
+        setUsername(parsed.name); // ⬅️ AQUÍ está la clave
+      }
+    }, []);
+
+
   useEffect(() => {
     if (!chatFocusToken) return;
     chatSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [chatFocusToken]);
 
   const BAR_DATA = [2, 5, 7, 6, 8, 9, 11, 13, 10, 12, 9, 8];
-  const RECENT_BUSINESSES = [
-    {
-      id: 1,
-      nombre: "Cafetería Central",
-      ciudad: "Guadalajara",
-      giro: "Cafetería",
-      status: "Verificado",
-    },
-    {
-      id: 2,
-      nombre: "Tacos El Güero",
-      ciudad: "Zapopan",
-      giro: "Taquería",
-      status: "Activo",
-    },
-    {
-      id: 3,
-      nombre: "Panadería Delicias",
-      ciudad: "Tlaquepaque",
-      giro: "Panadería",
-      status: "Verificado",
-    },
-    {
-      id: 4,
-      nombre: "Helados Frosti",
-      ciudad: "Tonalá",
-      giro: "Heladería",
-      status: "Verificado",
-    },
-  ];
-  const ACTIVITY = [
-    { title: "Nuevo pedido #1234 por $250.00", time: "Hace 10 minutos" },
-    { title: "Usuario Ramiro Chávez se registró", time: "Hace 30 minutos" },
-    { title: "Negocio 'Tacos El Güero' verificado", time: "Hace 1 hora" },
-    { title: "Pedido #1233 entregado por Daniela Pérez", time: "Hace 2 horas" },
-  ];
+  const RECENT_BUSINESSES = [];
+  const ACTIVITY = [];
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-5 px-3 pb-8 pt-3 sm:space-y-6 sm:px-4 md:space-y-8 md:px-6 md:pb-12 md:pt-8 lg:space-y-10 lg:px-8">
@@ -88,7 +65,7 @@ export default function AdminDashboardPage() {
             Panel Admin
           </span>
           <h2 className="text-xl font-bold leading-tight sm:text-2xl md:text-3xl lg:text-4xl">
-            ¡Hola, Admin!
+            ¡Hola, {username}!
           </h2>
           <p className="text-sm text-white/85 sm:text-base md:max-w-2xl">
             Este es tu panel de control. Revisa el rendimiento, acciones rápidas y actividad reciente.
@@ -100,10 +77,10 @@ export default function AdminDashboardPage() {
       {/* KPI SECTION - Responsive grid: 1 col mobile, 2 col tablet, 4 col desktop */}
       <section aria-label="Indicadores clave">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4 lg:gap-6">
-          <KPI label="Ingresos (30d)" value="$128,450" delta="+12.4%" />
-          <KPI label="Pedidos hoy" value="572" delta="+4.1%" />
-          <KPI label="Negocios activos" value="24" delta="+2" />
-          <KPI label="Tasa de éxito" value="97.3%" delta="+0.6%" />
+          <KPI label="Ingresos (30d)" value="$0" delta="+12.4%" />
+          <KPI label="Pedidos hoy" value="0" delta="+4.1%" />
+          <KPI label="Negocios activos" value="0" delta="+2" />
+          <KPI label="Tasa de éxito" value="0%" delta="+0.6%" />
         </div>
       </section>
 
