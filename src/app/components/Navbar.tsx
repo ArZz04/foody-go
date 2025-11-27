@@ -37,6 +37,15 @@ export default function Navbar() {
             >
               Inicio
             </Link>
+            {user && user.roles?.length > 1 && (
+                <Link
+                  href="/pickdash"
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  Paneles
+                </Link>
+              )}
+              
           </div>
 
           {/* Auth Buttons */}
