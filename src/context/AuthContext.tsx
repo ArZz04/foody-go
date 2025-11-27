@@ -120,6 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     localStorage.removeItem("roles");
+    document.cookie = "authToken=; path=/; max-age=0; secure; samesite=lax";
     router.push("/"); // ← correcto
     setUser(null);
   };
