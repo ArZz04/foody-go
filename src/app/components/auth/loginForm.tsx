@@ -39,6 +39,7 @@ export default function LoginForm() {
           { id: data.user.id, name: data.user.name, roles: data.user.role },
           data.token,
         );
+        document.cookie = `authToken=${data.token}; path=/; max-age=32400; secure; samesite=lax`;
         // Redirigir según rol
         router.push(data.redirectTo);
       } else {
