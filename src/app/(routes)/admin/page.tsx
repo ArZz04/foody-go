@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/70 bg-white/95 text-zinc-700 dark:divide-white/10 dark:bg-white/5 dark:text-zinc-200">
-                  {RECENT_BUSINESSES.map((business) => (
+                  {/* {RECENT_BUSINESSES.map((business) => (
                     <tr key={business.id}>
                       <td className="px-3 py-2 sm:px-4 font-medium">{business.nombre}</td>
                       <td className="px-3 py-2 sm:px-4 hidden sm:table-cell">{business.ciudad}</td>
@@ -198,7 +198,7 @@ export default function AdminDashboardPage() {
                         <button className="text-xs sm:text-sm text-red-600 hover:underline">Ver</button>
                       </td>
                     </tr>
-                  ))}
+                  ))} */}
                 </tbody>
               </table>
             </div>
@@ -212,7 +212,7 @@ export default function AdminDashboardPage() {
         {/* RECENT ACTIVITY */}
         <Card title="Actividad reciente">
           <ul className="space-y-2 sm:space-y-3 text-sm">
-            {ACTIVITY.map((item, index) => (
+            {/* {ACTIVITY.map((item, index) => (
               <li
                 key={index}
                 className="flex gap-2 sm:gap-3 rounded-lg sm:rounded-[18px] border border-white/70 bg-white/95 p-2 sm:p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
@@ -225,7 +225,7 @@ export default function AdminDashboardPage() {
                   <p className="text-xs opacity-70">{item.time}</p>
                 </div>
               </li>
-            ))}
+            ))} */}
           </ul>
         </Card>
 
