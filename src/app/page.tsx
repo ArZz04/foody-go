@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { HeroStats } from "@/components/home/HeroStats";
 import { ReviewRotator } from "@/components/home/ReviewRotator";
 import { HeroActions } from "@/components/home/HeroActions";
 
@@ -34,7 +33,23 @@ export default function Home() {
                   Sabores hechos en casa, entregados con calidez de comunidad y puntualidad moderna.
                 </p>
                 <HeroActions />
-                <HeroStats />
+                <div className="mt-10 grid w-full gap-4 text-sm text-white/90 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
+                    <p className="font-semibold text-white">
+                      Pan recién horneado, directo de los hornos de la sierra
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
+                    <p className="font-semibold text-white">
+                      Cocinas rurales verificadas con recetas que no encuentras en la ciudad
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
+                    <p className="font-semibold text-white">
+                      Repartidores locales que conocen cada brecha y camino de terracería
+                    </p>
+                  </div>
+                </div>
                 <ReviewRotator />
               </div>
             </div>
