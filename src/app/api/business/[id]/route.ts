@@ -231,10 +231,10 @@ export async function PUT(
       [owner_id, businessId]
     );
 
-    // 🔹 4. Eliminar rol OWNER del dueño anterior (solo si cambió)
+    // 🔹 4. Eliminar roles OWNER + MANAGER del dueño anterior (solo si cambió)
     if (oldOwnerId && oldOwnerId !== owner_id) {
       await pool.query(
-        `DELETE FROM user_roles WHERE user_id = ? AND role_id = 2;`,
+        `DELETE FROM user_roles WHERE user_id = ? AND role_id IN (2, 3);`,
         [oldOwnerId]
       );
     }
@@ -245,6 +245,16 @@ export async function PUT(
         INSERT INTO user_roles (user_id, role_id)
         VALUES (?, 2)
         ON DUPLICATE KEY UPDATE role_id = 2;
+      `,
+      [owner_id]
+    );
+
+        // 🔹 5b. Asignar rol MANAGER al nuevo usuario (si no tiene)
+    await pool.query(
+      `
+        INSERT INTO user_roles (user_id, role_id)
+        VALUES (?, 3)
+        ON DUPLICATE KEY UPDATE role_id = 3;
       `,
       [owner_id]
     );
