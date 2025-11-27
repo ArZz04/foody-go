@@ -22,6 +22,8 @@ const CATEGORY_OPTIONS = [
 export default function NewProductPage() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState(CATEGORY_OPTIONS[0]);
+  const [categories, setCategories] = useState(CATEGORY_OPTIONS);
+  const [newCategory, setNewCategory] = useState("");
   const [price, setPrice] = useState<number>(65);
   const [description, setDescription] = useState("");
   const [stock, setStock] = useState<number>(15);
@@ -69,6 +71,20 @@ export default function NewProductPage() {
 
   function handleRemoveComplement(index: number) {
     setComplements((prev) => prev.filter((_, idx) => idx !== index));
+  }
+
+  function handleAddCategory() {
+    const value = newCategory.trim();
+    if (!value) return;
+    if (categories.includes(value)) {
+      setCategory(value);
+      setNewCategory("");
+      return;
+    }
+    const updated = [...categories, value];
+    setCategories(updated);
+    setCategory(value);
+    setNewCategory("");
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -203,10 +219,40 @@ export default function NewProductPage() {
                       onChange={(event) => setCategory(event.target.value)}
                       className={inputClass}
                     >
-                      {CATEGORY_OPTIONS.map((option) => (
+                      {categories.map((option) => (
                         <option key={option}>{option}</option>
                       ))}
                     </select>
+                    <div className="mt-3 grid gap-3 rounded-2xl border border-dashed border-[#d6e3d0] bg-white/70 px-4 py-3 text-xs text-[#3f6b45]">
+                      <label className="font-semibold text-[#2b4d38]">
+                        Agregar nueva categoría
+                      </label>
+                      <div className="flex gap-2 max-sm:flex-col">
+                        <input
+                          type="text"
+                          value={newCategory}
+                          onChange={(event) => setNewCategory(event.target.value)}
+                          placeholder="Ej. Bebidas artesanales"
+                          className={`${inputClass} max-sm:w-full sm:flex-1`}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              handleAddCategory();
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddCategory}
+                          className="rounded-xl bg-[#2f6b3f] px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-[#275a35]"
+                        >
+                          Añadir
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-[#4c6b52]">
+                        Podrás reutilizarla de inmediato en este producto.
+                      </p>
+                    </div>
                   </Field>
                   <Field label="Descripción" htmlFor="description">
                     <textarea
