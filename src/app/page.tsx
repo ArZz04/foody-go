@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ReviewRotator } from "@/components/home/ReviewRotator";
 import { HeroActions } from "@/components/home/HeroActions";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -119,9 +120,11 @@ export default function Home() {
               <p className="mt-3 text-lg text-[#5F5148]">
                 Únete a la comunidad Foody Go y descubre el sabor artesanal que tenemos cerca de casa.
               </p>
-              <Button className="mt-8 rounded-full bg-[#3E2F28] px-10 py-3 text-base text-white hover:bg-[#2e201b]">
-                Comenzar ahora
-              </Button>
+              <Link href="/auth?mode=register">
+                <Button className="mt-8 rounded-full bg-[#3E2F28] px-10 py-3 text-base text-white hover:bg-[#2e201b]">
+                  Comenzar ahora
+                </Button>
+              </Link>
             </div>
           </section>
         </main>
