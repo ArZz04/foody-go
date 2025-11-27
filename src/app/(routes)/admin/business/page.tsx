@@ -29,6 +29,7 @@ export default function AdminNegociosPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [business_category_id, setBusinessCategoryId] = useState<number | "">("");
+  const [bussiness_category_name, setBusinessCategoryName] = useState("");
   const [legal_name, setLegalName] = useState("");
   const [tax_id, setTaxId] = useState("");
   const [city, setCity] = useState("");
@@ -258,10 +259,6 @@ const getCategoryName = (id: number) =>
   // ========================
 const handleEdit = (business: BusinessFull) => {
   setSelectedBusiness(business)
-
-  console.log("📌 business_owner recibido:", business.business_owner)
-console.log("📌 user_id recibido:", business.business_owner?.user_id)
-
 
   setSelectedOwnerId(
     business.business_owner?.user_id

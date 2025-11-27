@@ -38,6 +38,8 @@ export async function GET(req: Request) {
       LEFT JOIN business_owners bo 
         ON bo.business_id = b.id 
         AND bo.status_id = 1
+      LEFT JOIN business_categories bc
+        ON bc.id = b.business_category_id
       ORDER BY b.id DESC
     `);
 
