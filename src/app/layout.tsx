@@ -8,6 +8,16 @@ export const metadata: Metadata = {
   title: "Foody Go",
   description:
     "Plataforma de entrega de alimentos a domicilio rápida y confiable",
+  icons: [
+    {
+      rel: "icon",
+      url: "/logo.png",
+    },
+    {
+      rel: "apple-touch-icon",
+      url: "/logo.png",
+    },
+  ],
 };
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
