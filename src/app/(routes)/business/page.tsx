@@ -201,7 +201,6 @@ useEffect(() => {
         destacado: false,
         actualizadoEn: p.updated_at,
       }));
-      console.log("PRODUCTOS CARGADOS:", parsed);
       setProducts(parsed);
     } catch (error) {
       console.error("Error:", error);
