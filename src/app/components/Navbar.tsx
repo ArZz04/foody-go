@@ -29,23 +29,22 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Navigation Links - Desktop */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Navigation Links */}
+          <div className="hidden items-center space-x-8 md:flex">
             <Link
               href="/"
-              className="text-white/80 hover:text-white transition-colors"
+              className="text-white/80 transition-colors hover:text-white"
             >
               Inicio
             </Link>
             {user && user.roles?.length > 1 && (
-                <Link
-                  href="/pickdash"
-                  className="text-white/80 hover:text-white transition-colors"
-                >
-                  Paneles
-                </Link>
-              )}
-              
+              <Link
+                href="/pickdash"
+                className="text-white/80 transition-colors hover:text-white"
+              >
+                Paneles
+              </Link>
+            )}
           </div>
 
           {/* Auth Buttons */}
@@ -100,6 +99,32 @@ export default function Navbar() {
               </Button>
             ) : null}
           </div>
+        </div>
+
+        {/* Mobile quick links */}
+        <div className="mt-2 flex items-center justify-between md:hidden">
+          <div className="flex items-center space-x-4 text-sm font-medium">
+            <Link
+              href="/"
+              className="text-white/80 transition-colors hover:text-white"
+            >
+              Inicio
+            </Link>
+            {user && user.roles?.length > 1 && (
+              <Link
+                href="/pickdash"
+                className="text-white/80 transition-colors hover:text-white"
+              >
+                Paneles
+              </Link>
+            )}
+          </div>
+          <Link
+            href="/carrito"
+            className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm text-white transition hover:bg-white/15"
+          >
+            Carrito
+          </Link>
         </div>
       </div>
     </nav>
