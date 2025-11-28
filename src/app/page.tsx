@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { ReviewRotator } from "@/components/home/ReviewRotator";
 import { HeroActions } from "@/components/home/HeroActions";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -23,6 +24,14 @@ export default function Home() {
               <div className="pointer-events-none absolute inset-x-0 top-0 h-20 " />
 
               <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center text-white">
+                <Image
+                  src="/logo.png"
+                  alt="Logo Foody Go"
+                  width={72}
+                  height={72}
+                  className="mb-5 h-16 w-16 rounded-full border border-white/50 bg-white/80 p-2 shadow-lg"
+                  priority
+                />
                 <Badge className="mb-6 border border-white/60 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-[#2E5946]">
                   Apoyando aliados localess
                 </Badge>
