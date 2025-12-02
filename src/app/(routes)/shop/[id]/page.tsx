@@ -11,6 +11,7 @@ type Business = {
   name: string;
   city?: string;
   category?: string;
+  category_name?: string;
 };
 
 type Product = {
@@ -171,8 +172,6 @@ export default function BusinessDetailPage() {
   const handleNextPage = () => {
     setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
-
-  console.log(business?.category_name)
 
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed">
