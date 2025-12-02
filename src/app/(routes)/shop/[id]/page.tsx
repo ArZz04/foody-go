@@ -67,9 +67,44 @@ export default function BusinessDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<(typeof NAV_TABS)[number]["key"]>("promos");
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
+  const [confirmed, setConfirmed] = useState<Record<number, boolean>>({});
+
+
+  const addToCart = (productId: number) => {
+    setQuantities(prev => ({
+      ...prev,
+      [productId]: prev[productId] ? prev[productId] + 1 : 1
+    }));
+  };
+
+  const decrement = (productId: number) => {
+    setQuantities(prev => {
+      const current = prev[productId] || 1;
+      if (current <= 1) return prev;
+      return { ...prev, [productId]: current - 1 };
+    });
+  };
+
+  const increment = (productId: number) => {
+    setQuantities(prev => ({
+      ...prev,
+      [productId]: (prev[productId] || 1) + 1
+    }));
+  };
+
+  const confirmQuantity = (productId: number) => {
+  setConfirmed(prev => ({ ...prev, [productId]: true }));
+  // Aquí después puedes disparar:
+  //  enviar al carrito real
+  //  abrir modal
+  //  llamar API
+};
+
+
 
   // Extraer categorías únicas de los productos
   const categories = useMemo(() => {
@@ -363,18 +398,77 @@ export default function BusinessDetailPage() {
                             </div>
                             
                             {/* Stock */}
-                            <div className={`text-xs font-medium ${
-                              product.is_stock_available 
-                                ? product.stock_average > product.stock_danger 
-                                  ? "text-emerald-600" 
-                                  : "text-amber-600"
-                                : "text-red-600"
-                            }`}>
-                              {product.is_stock_available 
-                                ? `Disponible: ${product.stock_average} unidades`
-                                : "Agotado"}
-                            </div>
+<div
+  className={`text-xs font-medium ${
+    product.is_stock_available
+      ? product.stock_average > product.stock_danger
+        ? "text-emerald-600"
+        : "text-amber-600"
+      : "text-red-600"
+  }`}
+>
+  {product.is_stock_available
+    ? `Disponible: ${product.stock_average} unidades`
+    : "Agotado"}
+</div>
+
+{/* Botón + selector */}
+<div className="mt-3 flex justify-center">
+  {quantities[product.id] ? (
+    /* Selector + botón confirmar */
+    <div className="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1">
+
+      {/* Botón menos */}
+      <button
+        type="button"
+        onClick={() => decrement(product.id)}
+        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+      >
+        -
+      </button>
+
+      {/* Cantidad */}
+      <span className="w-6 text-center text-sm font-semibold">
+        {quantities[product.id]}
+      </span>
+
+      {/* Botón más */}
+      <button
+        type="button"
+        onClick={() => increment(product.id)}
+        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+      >
+        +
+      </button>
+
+      {/* Botón confirmar */}
+      <button
+        type="button"
+        onClick={() => confirmQuantity(product.id)}
+        className={`
+          ml-1 flex items-center justify-center rounded-full px-2 py-1 text-white text-xs font-bold shadow
+          ${confirmed[product.id] ? "bg-emerald-600" : "bg-emerald-500 hover:bg-emerald-600"}
+        `}
+      >
+        ✓
+      </button>
+
+    </div>
+  ) : (
+    /* Botón agregar */
+    <button
+      type="button"
+      onClick={() => addToCart(product.id)}
+      className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600"
+    >
+      Agregar al carrito
+    </button>
+  )}
+</div>
+
+
                           </div>
+
                         </div>
                       ))}
                     </div>
