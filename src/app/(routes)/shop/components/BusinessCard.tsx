@@ -83,6 +83,27 @@ export default function BusinessCard({
   // Thumbnail usando el ID del negocio
   const thumbnailPath = `/thumbnails/shop/${id}.png`;
 
+  // Retiramos letras especiales y espacios para crear una nombre amigable con la fuente 
+  function normalizeName(name: string) {
+    // 1. Pasamos a minúsculas
+    let clean = name.toLowerCase();
+    // 2. Normalizamos tildes y diacríticos
+    clean = clean.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    // 3. Reemplazamos ñ -> n
+    clean = clean.replace(/ñ/g, "n");
+    // 4. Eliminamos emojis y caracteres raros (todo lo que no sea a-z, 0-9 o espacio)
+    clean = clean.replace(/[^a-z0-9 ]/g, "");
+    // 5. Eliminamos espacios extra
+    clean = clean.trim().replace(/\s+/g, " ");
+    // 6. Convertimos a Capital Case
+    clean = clean.replace(/\b\w/g, (c) => c.toUpperCase());
+
+    return clean;
+  }
+
+  const normalizedName = normalizeName(name);
+  const cityLower = city?.toLocaleLowerCase();
+
   return (
     <CardShell
       href={href}
@@ -121,7 +142,7 @@ export default function BusinessCard({
               {category ?? "Local aliado"}
             </p>
             <h2 className="font-['Outfit'] text-lg font-semibold text-[#3b2f2f] line-clamp-1">
-              {name}
+              {normalizedName}
             </h2>
           </div>
           <div className="inline-flex items-center gap-1 rounded-full bg-[#fff4df] px-2 py-0.5 text-xs font-semibold text-[#c17b2c]">
@@ -130,10 +151,7 @@ export default function BusinessCard({
           </div>
         </div>
         <p className="mt-1 font-['Nunito_Sans'] text-sm text-[#5c4c43] line-clamp-1">
-          {city ?? "Cerca de ti"}
-        </p>
-        <p className="text-xs font-['Nunito_Sans'] text-[#7c6a5c] opacity-90">
-          {storytellerText}
+          {cityLower?.replace(/\b\w/g, (c) => c.toUpperCase()) ?? "Cerca de ti"}
         </p>
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-4 text-xs text-[#5c4c43]">
@@ -145,22 +163,8 @@ export default function BusinessCard({
             <Clock3 className="h-4 w-4 text-[#c29a6a]" />
             {etaMinutes ? `${etaMinutes} min` : "Horario extendido"}
           </span>
-          <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-[#6d8b74]">
-            Hecho con amor ❤️
-          </span>
         </div>
 
-        <div className="pointer-events-none absolute inset-0 rounded-[26px] opacity-0 transition group-hover:opacity-100">
-          <div className="absolute inset-0 rounded-[26px] bg-gradient-to-t from-black/35 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-5 text-sm font-semibold text-white">
-            <span className="rounded-full bg-white/20 px-4 py-1 backdrop-blur">
-              Ver más ☕
-            </span>
-            <span className="text-xs text-white/80">
-              Sabores que cuentan historias
-            </span>
-          </div>
-        </div>
       </div>
     </CardShell>
   );

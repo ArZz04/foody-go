@@ -33,6 +33,8 @@ export default function BusinessPage() {
   const [businessInfo, setBusinessInfo] = useState<any>(null);
   const [businessHours, setBusinessHours] = useState<any[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<number | null>(null);
+  const [loadingToggle, setLoadingToggle] = useState(false);
+
   
     useEffect(() => {
   async function fetchBusinesses() {
@@ -119,6 +121,7 @@ useEffect(() => {
         statusId: data.business.status_id,
       });
       setBusinessHours(data.hours || []);
+      loadBusinessStatus(data.business.id);
     } catch (err) {
       console.error(err);
     }
@@ -210,6 +213,41 @@ useEffect(() => {
   fetchProducts();
 }, [selectedBusiness]);
 
+async function toggleBusiness(id: number) {
+  setLoadingToggle(true);
+
+  const res = await fetch(`/api/business/${id}/toggle`, {
+    method: "PUT",
+  });
+
+  const data = await res.json();
+
+  // Actualiza el estado en pantalla
+  setBusinessInfo(prev => ({
+    ...prev,
+    is_open_now: data.new_status
+  }));
+
+  setLoadingToggle(false);
+}
+
+
+async function loadBusinessStatus(id: number) {
+  setLoadingToggle(true);
+
+  const res = await fetch(`/api/business/${id}/toggle`, {
+    method: "GET"
+  });
+
+  const data = await res.json();
+
+  // Guarda el estado en tu businessInfo
+  setBusinessInfo(prev => ({
+    ...prev,
+    is_open_now: data.is_open_now
+  }));
+  setLoadingToggle(false);
+}
 
 
   const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } =
@@ -524,6 +562,25 @@ useEffect(() => {
             </div>
           </div>
         </div>
+        <button
+          onClick={() => toggleBusiness(businessInfo?.id)}
+          disabled={loadingToggle}
+          className={`
+            px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap mt-4 transition-all border
+            ${loadingToggle || !businessInfo
+              ? "bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed"
+              : businessInfo.is_open_now === 1
+                ? "bg-red-600 text-white border-red-700 hover:bg-red-700"
+                : "bg-green-600 text-white border-green-700 hover:bg-green-700"
+            }
+          `}
+        >
+          {loadingToggle || !businessInfo
+            ? "Cargando..."
+            : businessInfo.is_open_now === 1
+              ? "Cerrar negocio"
+              : "Abrir negocio"}
+        </button>
       </section>
 
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">

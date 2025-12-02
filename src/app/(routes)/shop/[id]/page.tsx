@@ -135,33 +135,41 @@ export default function BusinessDetailPage() {
   const [activeSection, setActiveSection] = useState("");
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
-  useEffect(() => {
-    if (Number.isNaN(negocioId)) {
-      setError("Negocio no válido.");
-      setLoading(false);
-      return;
-    }
+useEffect(() => {
+  if (Number.isNaN(negocioId)) {
+    setError("Negocio no válido.");
+    setLoading(false);
+    return;
+  }
 
-    async function fetchData() {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch("/api/prueba/negocios");
-        const data = (await res.json()) as NegociosResponse;
-        const found =
-          data.negocios?.find((item) => Number(item.id) === negocioId) ?? null;
-        setNegocio(found);
-        setProductos(data.productos ?? []);
-      } catch (err) {
-        console.error(err);
+  async function fetchData() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const res = await fetch(`/api/shop/business/${negocioId}`);
+
+      if (!res.ok) {
         setError("No pudimos cargar el menú del negocio.");
-      } finally {
-        setLoading(false);
+        return;
       }
-    }
 
-    fetchData();
-  }, [negocioId]);
+      const data = await res.json();
+
+      setNegocio(data.negocio ?? null);
+
+      // Si luego quieres productos, aquí no existen
+      setProductos([]); 
+    } catch (err) {
+      console.error(err);
+      setError("No pudimos cargar el menú del negocio.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchData();
+}, [negocioId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
