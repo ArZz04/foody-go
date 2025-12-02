@@ -71,15 +71,6 @@ export default function BusinessCard({
     return options[Math.floor(Math.random() * options.length)];
   }, [badge]);
 
-  const storytellerText = useMemo(() => {
-    const base = category?.toLowerCase?.() ?? "aliado";
-    if (base.includes("cafe")) return "Tostado lento, servido con historias";
-    if (base.includes("pan")) return "Masa madre y horno de adobe";
-    if (base.includes("taco")) return "Tortillas calientes y salsas vivas";
-    if (base.includes("huerto")) return "De la tierra directo a tu mesa";
-    return "Hecho con amor local";
-  }, [category]);
-
   // Thumbnail usando el ID del negocio
   const thumbnailPath = `/thumbnails/shop/${id}.png`;
 

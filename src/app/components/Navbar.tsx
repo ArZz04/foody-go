@@ -19,7 +19,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center space-x-2">
               <div className="relative w-12 h-12 sm:w-16 sm:h-16">
                 <Image
-                  src="/logo.png"
+                  src="/logo-white.png"
                   alt="Logo"
                   fill
                   className="object-contain"

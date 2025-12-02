@@ -111,6 +111,7 @@ useEffect(() => {
 
   fetchData();
 }, []);
+
   useEffect(() => {
     let result = business;
 
