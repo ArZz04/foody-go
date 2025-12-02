@@ -3,30 +3,70 @@ import pool from "@/lib/db";
 import jwt from "jsonwebtoken";
 
 // ============================
-// 📌 GET — Obtener negocios (público)
+// 📌 GET — Obtener negocios
 // ============================
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const [rows] = await pool.query(
-      `
-        SELECT 
-          id,
-          name,
-          business_category_id,
-          city,
-          district,
-          address
-        FROM business
-        ORDER BY id ASC
-      `,
+    const auth = req.headers.get("authorization");
+    if (!auth?.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Token no proporcionado" },
+        { status: 401 }
+      );
+    }
+
+    const token = auth.split(" ")[1];
+    jwt.verify(token, process.env.JWT_SECRET as string);
+
+    // Query principal
+    const [rows] = await pool.query(`
+      SELECT 
+        b.id,
+        b.name,
+        b.business_category_id,
+        b.city,
+        b.district,
+        b.address,
+        b.legal_name,
+        b.tax_id,
+        b.address_notes,
+        b.status_id,
+        b.created_at,
+        b.updated_at,
+        bo.user_id AS owner_id
+      FROM business b
+      LEFT JOIN business_owners bo 
+        ON bo.business_id = b.id 
+        AND bo.status_id = 1
+      LEFT JOIN business_categories bc
+        ON bc.id = b.business_category_id
+      ORDER BY b.id DESC
+    `);
+
+
+    const negocios = (rows as any[]).map(b => ({
+      ...b,
+      business_owner: { user_id: b.owner_id ?? null }
+    }));
+
+
+    if (!negocios || negocios.length === 0) {
+      return NextResponse.json(
+        { message: "No hay negocios registrados", negocios: [] },
+        { status: 200 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "OK", negocios },
+      { status: 200 }
     );
 
-    return NextResponse.json(rows);
   } catch (error) {
-    console.error("Error al cargar negocios:", error);
+    console.error("❌ Error al obtener negocios:", error);
     return NextResponse.json(
-      { message: "Error al cargar negocios" },
-      { status: 500 },
+      { error: "Error interno", details: (error as Error).message },
+      { status: 500 }
     );
   }
 }
