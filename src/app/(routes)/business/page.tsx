@@ -23,6 +23,23 @@ interface Product {
   actualizadoEn: string;
 }
 
+interface BusinessInfo {
+  id: number;
+  name: string;
+  categoryId: number;
+  category_name: string;
+  city: string | null;
+  district: string | null;
+  address: string | null;
+  legal_name: string | null;
+  tax_id: string | null;
+  address_notes: string | null;
+  created_at: string;
+  updated_at: string;
+  statusId: number;
+  is_open_now?: number; // se agrega dinámicamente en toggle/load
+}
+
 const peso = new Intl.NumberFormat("es-MX", {
   style: "currency",
   currency: "MXN",
@@ -30,7 +47,7 @@ const peso = new Intl.NumberFormat("es-MX", {
 
 export default function BusinessPage() {
   const [businesses, setBusinesses] = useState([]);
-  const [businessInfo, setBusinessInfo] = useState<any>(null);
+  const [businessInfo, setBusinessInfo] = useState<BusinessInfo | null>(null);
   const [businessHours, setBusinessHours] = useState<any[]>([]);
   const [selectedBusiness, setSelectedBusiness] = useState<number | null>(null);
   const [loadingToggle, setLoadingToggle] = useState(false);
@@ -223,10 +240,9 @@ async function toggleBusiness(id: number) {
   const data = await res.json();
 
   // Actualiza el estado en pantalla
-  setBusinessInfo(prev => ({
-    ...prev,
-    is_open_now: data.new_status
-  }));
+  setBusinessInfo(prev =>
+  prev ? { ...prev, is_open_now: data.new_status } : prev
+);
 
   setLoadingToggle(false);
 }
@@ -242,10 +258,9 @@ async function loadBusinessStatus(id: number) {
   const data = await res.json();
 
   // Guarda el estado en tu businessInfo
-  setBusinessInfo(prev => ({
-    ...prev,
-    is_open_now: data.is_open_now
-  }));
+  setBusinessInfo(prev =>
+  prev ? { ...prev, is_open_now: data.is_open_now } : prev
+);
   setLoadingToggle(false);
 }
 
@@ -563,7 +578,7 @@ async function loadBusinessStatus(id: number) {
           </div>
         </div>
         <button
-          onClick={() => toggleBusiness(businessInfo?.id)}
+          onClick={() => toggleBusiness(businessInfo!.id)}
           disabled={loadingToggle}
           className={`
             px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap mt-4 transition-all border
