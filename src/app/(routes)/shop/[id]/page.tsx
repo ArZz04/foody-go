@@ -100,8 +100,6 @@ export default function BusinessDetailPage() {
     return unique;
   }, [products]);
 
-
-
   // Filtrar productos por categoría y búsqueda
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -113,7 +111,6 @@ export default function BusinessDetailPage() {
       );
     }
 
-    
     // Filtrar por búsqueda
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -175,6 +172,8 @@ export default function BusinessDetailPage() {
     setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
 
+  console.log(business?.category_name)
+
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed">
       <div className="min-h-screen bg-gradient-to-b from-[#0b1d12]/45 via-[#0b1d12]/25 to-transparent backdrop-blur-[1px]">
@@ -224,7 +223,7 @@ export default function BusinessDetailPage() {
                         {business.city ?? "Ubicación no disponible"}
                       </span>
                       <span className="inline-flex items-center rounded-full bg-black/50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white/95 backdrop-blur-sm">
-                        {business.category ?? "Especialidad"}
+                        {business?.category_name ?? "Especialidad"}
                       </span>
                     </div>
                   </div>
