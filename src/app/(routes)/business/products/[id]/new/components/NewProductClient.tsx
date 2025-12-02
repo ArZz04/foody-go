@@ -118,96 +118,88 @@ useEffect(() => {
     return; // imagen deshabilitada por ahora
   }
 
-  // ============================
-  // 📌 Validación mínima para permitir submit
-  // ============================
+// ============================
+// 📌 Validación mínima para permitir submit
+// ============================
 
-  const canSubmit = useMemo(() => {
-    return (
-      name.trim().length > 0 &&
-      descriptionShort.trim().length > 0 &&
-      categoryId !== null &&
-      price > 0
-    );
-  }, [name, descriptionShort, categoryId, price]);
+const canSubmit = useMemo(() => {
+  return (
+    name.trim().length > 0 &&
+    categoryId !== null &&
+    price > 0
+  );
+}, [name, categoryId, price]);
 
-  // ============================
-  // 📌 Envío a API
-  // ============================
+// ============================
+// 📌 Envío a API
+// ============================
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  event.preventDefault();
 
-    try {
-      const payload = {
-  product: {
-    business_id: businessId,
+  // Generar SKU automático más corto y legible
+  const skuValue = sku.trim() || `PROD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
 
-    sku: sku || null,
-    barcode: barcode || null,
-
-    name,
-    description_long: descriptionLong || null,
-    description_short: descriptionShort || null,
-
-    product_category_id: categoryId,
-    product_subcategory_id: subcategoryId || null,
-
-    price,
-    discount_price: discountPrice || null,
-    currency: currency || "MXN",
-
-    sale_format: saleFormat || "UNIDAD",
-    price_per_unit: pricePerUnit || null,
-
-    tax_included: taxIncluded ? 1 : 0,
-    tax_rate: taxRate || 0,
-    commission_rate: commissionRate || 0,
-
-    is_stock_available: isStockAvailable ? 1 : 0,
-
-    max_per_order: maxPerOrder || null,
-    min_per_order: minPerOrder || null,
-
-    promotion_id: promotionId || null,
-
-    thumbnail_url: null, // imagen deshabilitada
-
-    stock_average: stockAverage || null,
-    stock_danger: stockDanger || null,
-
-    created_at: new Date(),
-    updated_at: new Date(),
-    expires_at: expiresAt || null,
-
-    status_id: statusId
-  },
-};
-
-        const token = typeof window !== "undefined" 
-        ? localStorage.getItem("token")
-        : null;
-
-      const res = await fetch("/api/business/products", {
-        method: "POST",
-        headers: {
-          "Authorization": token ? `Bearer ${token}` : "",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        alert("❌ Error al guardar: " + JSON.stringify(data));
-        return;
+  try {
+    const payload = {
+      product: {
+        business_id: businessId,
+        sku: skuValue,
+        barcode: barcode || null,
+        name,
+        description_long: descriptionLong || null,
+        description_short: descriptionShort || null,
+        product_category_id: categoryId,
+        product_subcategory_id: subcategoryId || null,
+        price,
+        discount_price: discountPrice || null,
+        currency: currency || "MXN",
+        sale_format: saleFormat || "UNIDAD",
+        price_per_unit: pricePerUnit || null,
+        tax_included: taxIncluded ? 1 : 0,
+        tax_rate: taxRate || 0,
+        commission_rate: commissionRate || 0,
+        is_stock_available: isStockAvailable ? 1 : 0,
+        max_per_order: maxPerOrder || null,
+        min_per_order: minPerOrder || null,
+        promotion_id: promotionId || null,
+        thumbnail_url: null,
+        stock_average: stockAverage || 0,  // ← 0 en lugar de null
+        stock_danger: stockDanger || 0,    // ← 0 en lugar de null
+        created_at: new Date(),
+        updated_at: new Date(),
+        expires_at: expiresAt || null,
+        status_id: statusId
       }
+    };
 
-      alert("✅ Producto creado correctamente.");
-    } catch (err) {
-      console.error(err);
-      alert("❌ Error inesperado.");
+    const token = typeof window !== "undefined" 
+      ? localStorage.getItem("token")
+      : null;
+
+    const res = await fetch("/api/business/products", {
+      method: "POST",
+      headers: {
+        "Authorization": token ? `Bearer ${token}` : "",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert("❌ Error al guardar: " + JSON.stringify(data));
+      return;
     }
+
+    alert("✅ Producto creado correctamente.");
+    // Opcional: redirigir al panel
+    // window.location.href = `/business`;
+    
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error inesperado.");
   }
+}
 
   // ============================
   // 📌 Layout del formulario (empieza aquí)
@@ -220,52 +212,65 @@ useEffect(() => {
           {/* ============================
               🏆 Header Principal
               ============================ */}
-          <section className="relative overflow-hidden rounded-lg border border-[#dbe7c7] bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-xl sm:p-5 md:rounded-2xl md:p-6">
-            {/* Elementos decorativos responsivos */}
-            <div
-              aria-hidden
-              className="absolute -left-8 -top-12 h-32 w-32 rounded-full bg-[#b9f6ca]/20 blur-lg sm:-left-10 sm:-top-14 sm:h-40 sm:w-40 sm:blur-xl md:-left-12 md:-top-16 md:h-48 md:w-48 md:blur-2xl"
-            />
-            <div
-              aria-hidden
-              className="absolute -right-6 top-4 h-28 w-28 rounded-full bg-[#ccd5ae]/30 blur-lg sm:-right-8 sm:top-6 sm:h-36 sm:w-36 md:-right-10 md:top-8 md:h-40 md:w-40 md:blur-xl"
-            />
-            
-            <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-2 sm:space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/business`}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#ccd5ae]/70 bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold text-[#f6fff5] transition hover:bg-white/20 sm:px-3 sm:py-1 sm:text-xs"
-                  >
-                    ← Panel
-                  </Link>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#f2fbe0] sm:px-3 sm:py-1 sm:text-xs sm:tracking-[0.3em]">
-                    Nuevo producto
-                  </span>
-                </div>
-                <div className="space-y-1">
-                  <h1 className="text-lg font-semibold leading-tight text-[#f9fffa] sm:text-xl md:text-2xl">
-                    Agregar producto al catálogo
-                  </h1>
-                  <p className="text-xs text-[#f0fff4]/90 sm:text-sm">
-                    Completa la ficha del producto para publicarlo en el menú del negocio.
-                  </p>
-                </div>
-                <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-1.5 text-xs backdrop-blur sm:gap-2 sm:rounded-xl sm:px-4 sm:py-2">
-                  <div className="size-6 rounded-full bg-white text-center text-xs font-bold text-[#1b4332] shadow-inner sm:size-7 sm:text-sm">
-                    FG
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[#f9fffa]">FoodyGo</p>
-                    <p className="text-[9px] text-[#cbe8d4] sm:text-[10px]">
-                      Panel de administrador
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
+         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-3xl sm:p-6 md:p-8 lg:p-10">
+  {/* Elementos de fondo decorativos - totalmente responsivos */}
+  <div
+    aria-hidden="true"
+    className="absolute -left-10 top-8 size-32 rounded-full bg-white/10 blur-xl sm:-left-16 sm:size-48 sm:blur-2xl md:-left-20 md:top-10 md:size-56 lg:-left-28 lg:size-64 lg:blur-3xl"
+  />
+  <div
+    aria-hidden="true"
+    className="absolute -right-8 -top-12 size-32 rounded-full bg-white/15 blur-xl sm:-right-12 sm:-top-16 sm:size-48 sm:blur-2xl md:-right-16 md:-top-20 md:size-56 lg:-right-24 lg:-top-24 lg:size-64 lg:blur-3xl"
+  />
+  
+  <div className="relative grid gap-6 md:gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
+    {/* Columna izquierda: Contenido principal */}
+    <div className="space-y-4 md:space-y-6 lg:order-1">
+      {/* Breadcrumb + Etiqueta */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/business"
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm transition hover:bg-white/10"
+        >
+          ← Panel
+        </Link>
+
+        <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
+          Nuevo producto
+        </span>
+      </div>
+
+      {/* Títulos */}
+      <div className="space-y-3 md:space-y-4">
+        <h1 className="text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl">
+          Agregar producto al catálogo
+        </h1>
+        
+        <p className="text-sm text-white/90 sm:text-base md:text-lg lg:max-w-2xl">
+          Completa la ficha del producto para publicarlo en el menú del negocio.
+        </p>
+      </div>
+      
+      {/* Badge del sistema */}
+      <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-emerald-800 shadow-inner">
+            FG
+          </div>
+          <div className="space-y-1">
+            <span className="text-white/80">SISTEMA</span>
+            <p className="text-sm normal-case tracking-normal text-white">
+              FoodyGo · Panel de administrador
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {/* Columna derecha: Espacio para contenido adicional */}
+    
+  </div>
+</section>
 
           {/* ============================
               📋 Formulario Principal - Layout compacto
@@ -311,7 +316,6 @@ useEffect(() => {
                     <FieldCompact
                       label="Descripción corta"
                       htmlFor="descriptionShort"
-                      required
                     >
                       <input
                         id="descriptionShort"
@@ -330,6 +334,7 @@ useEffect(() => {
                       <FieldCompact
                         label="SKU"
                         htmlFor="sku"
+                        required
                       >
                         <input
                           id="sku"
@@ -393,13 +398,14 @@ useEffect(() => {
                   
                   <div className="grid gap-3">
                     <div className="grid gap-2 sm:grid-cols-2">
+                      {/* Precio (MXN) */}
                       <FieldCompact
                         label="Precio (MXN)"
                         htmlFor="price"
                         required
                       >
                         <div className="relative">
-                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
                             $
                           </span>
                           <input
@@ -409,20 +415,19 @@ useEffect(() => {
                             step="0.01"
                             required
                             value={price}
-                            onChange={(event) =>
-                              setPrice(Number(event.target.value))
-                            }
-                            className={`${inputClass} pl-7`}
+                            onChange={(event) => setPrice(Number(event.target.value))}
+                            className={`${inputClass} pl-8 sm:pl-8`}
                           />
                         </div>
                       </FieldCompact>
 
+                      {/* Precio oferta */}
                       <FieldCompact
                         label="Precio oferta"
                         htmlFor="discountPrice"
                       >
                         <div className="relative">
-                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
                             $
                           </span>
                           <input
@@ -439,7 +444,7 @@ useEffect(() => {
                               )
                             }
                             placeholder="Opcional"
-                            className={`${inputClass} pl-7`}
+                            className={`${inputClass} pl-8 sm:pl-8`}
                           />
                         </div>
                       </FieldCompact>
@@ -468,7 +473,7 @@ useEffect(() => {
                         htmlFor="pricePerUnit"
                       >
                         <div className="relative">
-                          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#4c956c]/70">
                             $
                           </span>
                           <input
@@ -485,7 +490,7 @@ useEffect(() => {
                               )
                             }
                             placeholder="Opcional"
-                            className={`${inputClass} pl-7`}
+                            className={`${inputClass} pl-8 sm:pl-8`}
                           />
                         </div>
                       </FieldCompact>
@@ -803,6 +808,13 @@ useEffect(() => {
                         style: "currency",
                         currency: "MXN",
                       }).format(price || 0)}
+                    </span>
+                  </li>
+
+                  <li className="flex items-center justify-between rounded-lg bg-[#ecfadc] px-3 py-2 sm:rounded-xl">
+                    <span className="font-medium text-[#2f5238]">SKU</span>
+                    <span className="text-right font-mono text-xs">
+                      {sku || <span className="text-amber-600 italic">(auto-generado)</span>}
                     </span>
                   </li>
 
