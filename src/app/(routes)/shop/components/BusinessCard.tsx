@@ -7,9 +7,10 @@ import type { ReactNode } from "react";
 import { useMemo } from "react";
 
 interface BusinessCardProps {
-  nombre: string;
-  ciudad?: string;
-  giro?: string;
+  id: number | string;
+  name: string;
+  city?: string;
+  category?: string;
   rating?: number;
   imagen?: string;
   badge?: string;
@@ -51,12 +52,13 @@ const CardShell = ({
   );
 };
 
+
 export default function BusinessCard({
-  nombre,
-  ciudad,
-  giro,
+  id,
+  name,
+  city,
+  category,
   rating = 4.5,
-  imagen = "/coffe.png",
   badge,
   etaMinutes,
   deliveryFee,
@@ -70,13 +72,16 @@ export default function BusinessCard({
   }, [badge]);
 
   const storytellerText = useMemo(() => {
-    const base = giro?.toLowerCase?.() ?? "aliado";
+    const base = category?.toLowerCase?.() ?? "aliado";
     if (base.includes("cafe")) return "Tostado lento, servido con historias";
     if (base.includes("pan")) return "Masa madre y horno de adobe";
     if (base.includes("taco")) return "Tortillas calientes y salsas vivas";
     if (base.includes("huerto")) return "De la tierra directo a tu mesa";
     return "Hecho con amor local";
-  }, [giro]);
+  }, [category]);
+
+  // Thumbnail usando el ID del negocio
+  const thumbnailPath = `/thumbnails/shop/${id}.png`;
 
   return (
     <CardShell
@@ -85,7 +90,7 @@ export default function BusinessCard({
       className="group relative flex flex-col rounded-[26px] border border-[#eadfce] bg-gradient-to-br from-[#fdf7ef] via-[#faf2e6] to-[#f6ebdc] p-3 text-left shadow-[0_20px_40px_rgba(85,64,45,0.08)] transition hover:-translate-y-1 hover:border-[#d9c6ad] hover:shadow-[0_25px_50px_rgba(85,64,45,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c29a6a]"
     >
       <div className="relative h-36 w-full overflow-hidden rounded-[22px]">
-        <Image src={imagen} alt={nombre} fill className="object-cover" />
+        <Image src={thumbnailPath} alt={name} fill className="object-cover" />
         <div className="absolute inset-0 bg-black/15" />
         {dynamicBadge ? (
           <span className="absolute left-3 top-3 rounded-full bg-[#fef6ea]/90 px-3 py-1 text-xs font-semibold text-[#a46b3d] shadow">
@@ -113,10 +118,10 @@ export default function BusinessCard({
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[#b38c63]">
-              {giro ?? "Local aliado"}
+              {category ?? "Local aliado"}
             </p>
             <h2 className="font-['Outfit'] text-lg font-semibold text-[#3b2f2f] line-clamp-1">
-              {nombre}
+              {name}
             </h2>
           </div>
           <div className="inline-flex items-center gap-1 rounded-full bg-[#fff4df] px-2 py-0.5 text-xs font-semibold text-[#c17b2c]">
@@ -125,7 +130,7 @@ export default function BusinessCard({
           </div>
         </div>
         <p className="mt-1 font-['Nunito_Sans'] text-sm text-[#5c4c43] line-clamp-1">
-          {ciudad ?? "Cerca de ti"}
+          {city ?? "Cerca de ti"}
         </p>
         <p className="text-xs font-['Nunito_Sans'] text-[#7c6a5c] opacity-90">
           {storytellerText}

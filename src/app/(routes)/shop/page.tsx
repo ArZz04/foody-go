@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import BusinessCard from "./components/BusinessCard";
 import FilterBar from "./components/FilterBar";
 
-type Negocio = {
+type Business = {
   id: number | string;
-  nombre: string;
-  ciudad?: string;
-  giro?: string;
+  name: string;
+  city?: string;
+  category?: string; 
 };
 
 type Producto = {
@@ -19,8 +19,8 @@ type Producto = {
   giro?: string;
 };
 
-type NegociosResponse = {
-  negocios?: Negocio[];
+type BusinessResponse = {
+  negocios?: Business[];
   productos?: Producto[];
 };
 
@@ -73,37 +73,49 @@ const CATEGORY_THEMES: Record<
 };
 
 export default function ShopPage() {
-  const [negocios, setNegocios] = useState<Negocio[]>([]);
+  const [business, setBusiness] = useState<Business[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [filtroGiro, setFiltroGiro] = useState("Todos");
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
-  const [filtered, setFiltered] = useState<Negocio[]>([]);
+  const [filtered, setFiltered] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [phraseIndex, setPhraseIndex] = useState(0);
   const [ctaIndex, setCtaIndex] = useState(0);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const res = await fetch("/api/prueba/negocios");
-        const data = (await res.json()) as NegociosResponse;
-        setNegocios(data.negocios ?? []);
-        setProductos(data.productos ?? []);
-        setFiltered(data.negocios ?? []);
-      } catch (err) {
-        console.error("Error al obtener datos:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+useEffect(() => {
+  async function fetchData() {
+    try {
+      const res = await fetch("/api/shop/business");
+      const data = await res.json();
 
+      const businesses: Business[] = (data.negocios ?? []).map((n: any) => ({
+        id: n.id,
+        name: n.name ?? n.nombre,
+        city: n.city ?? n.ciudad,
+        category:
+          n.category ??
+          n.category_name ??
+          n.giro ??
+          n.business_category_name,
+      }));
+
+      setBusiness(businesses);
+      setFiltered(businesses);
+
+    } catch (err) {
+      console.error("Error al obtener datos:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchData();
+}, []);
   useEffect(() => {
-    let result = negocios;
+    let result = business;
 
     if (filtroGiro !== "Todos") {
-      result = result.filter((n) => n.giro === filtroGiro);
+      result = result.filter((n) => n.category === filtroGiro);
     }
 
     if (filtroCategoria !== "Todos" && filtroGiro !== "Todos") {
@@ -111,11 +123,11 @@ export default function ShopPage() {
         (p) => p.giro === filtroGiro && p.categoria === filtroCategoria,
       );
       const girosPermitidos = new Set(prods.map((p) => p.giro));
-      result = result.filter((n) => girosPermitidos.has(n.giro));
+      result = result.filter((n) => girosPermitidos.has(n.category));
     }
 
     setFiltered(result);
-  }, [filtroGiro, filtroCategoria, negocios, productos]);
+  }, [filtroGiro, filtroCategoria, business, productos]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -125,7 +137,7 @@ export default function ShopPage() {
     return () => clearInterval(id);
   }, []);
 
-  const giros = ["Todos", ...uniqueStrings(negocios.map((n) => n.giro))];
+  const giros = ["Todos", ...uniqueStrings(business.map((n) => n.category))];
   const categorias =
     filtroGiro === "Todos"
       ? []
@@ -138,7 +150,7 @@ export default function ShopPage() {
           ),
         ];
 
-  const openCount = filtered.length || negocios.length;
+  const openCount = filtered.length || business.length;
   const visitedProgress = Math.min(
     openCount,
     Math.max(3, Math.round(openCount / 4)),
@@ -248,19 +260,20 @@ export default function ShopPage() {
                 />
               ))}
             </div>
-          ) : filtered.length > 0 ? (
+          ) : filtered.length > 0 ?  (
             <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {filtered.map((negocio, index) => (
+              {filtered.map((business, index) => (
                 <BusinessCard
-                  key={`${negocio.id ?? "negocio"}-${index}`}
-                  nombre={negocio.nombre}
-                  ciudad={negocio.ciudad}
-                  giro={negocio.giro}
+                  key={`${business.id ?? "business"}-${index}`}
+                  id={business.id ?? index}
+                  name={business.name}
+                  city={business.city}
+                  category={business.category}
                   rating={Math.random() * 0.8 + 4.2}
                   etaMinutes={18 + ((index + 3) % 20)}
                   deliveryFee={index % 3 === 0 ? 0 : 1.9 + (index % 4)}
                   badge={BADGE_POOL[index % BADGE_POOL.length]}
-                  href={`/shop/${negocio.id ?? index}`}
+                  href={`/shop/${business.id ?? index}`}
                 />
               ))}
             </div>
