@@ -37,7 +37,7 @@ interface BusinessInfo {
   created_at: string;
   updated_at: string;
   statusId: number;
-  is_open_now?: number; // se agrega dinámicamente en toggle/load
+  is_open_now?: number;
 }
 
 const peso = new Intl.NumberFormat("es-MX", {
@@ -52,218 +52,210 @@ export default function BusinessPage() {
   const [selectedBusiness, setSelectedBusiness] = useState<number | null>(null);
   const [loadingToggle, setLoadingToggle] = useState(false);
 
-  
-    useEffect(() => {
-  async function fetchBusinesses() {
-    try {
-      const token = localStorage.getItem("token");
+  useEffect(() => {
+    async function fetchBusinesses() {
+      try {
+        const token = localStorage.getItem("token");
 
-      const payload = token ? JSON.parse(atob(token.split(".")[1])) : null;
-      const userId = payload?.id;
+        const payload = token ? JSON.parse(atob(token.split(".")[1])) : null;
+        const userId = payload?.id;
 
-      if (!token) {
-        console.error("No hay token en localStorage");
-        return;
+        if (!token) {
+          console.error("No hay token en localStorage");
+          return;
+        }
+
+        const res = await fetch(`/api/users/owner/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error("Error al cargar negocios");
+        }
+
+        const data = await res.json();
+
+        if (!data.businesses) {
+          console.error("La API no retornó 'businesses'");
+          return;
+        }
+
+        const parsedBusinesses = data.businesses.map((b: any) => ({
+          id: b.id,
+          nombre: b.name,
+          ciudad: b.city,
+          categoria: "General",
+        }));
+
+        setBusinesses(parsedBusinesses);
+
+        if (parsedBusinesses.length > 0) {
+          setSelectedBusiness(parsedBusinesses[0].id);
+        }
+      } catch (error) {
+        console.error(error);
       }
-
-      const res = await fetch(`/api/users/owner/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Error al cargar negocios");
-      }
-
-      const data = await res.json();
-
-      if (!data.businesses) {
-        console.error("La API no retornó 'businesses'");
-        return;
-      }
-
-      // ✅ mapear al formato esperado por el frontend
-      const parsedBusinesses = data.businesses.map((b: any) => ({
-        id: b.id,
-        nombre: b.name,
-        ciudad: b.city,
-        categoria: "General", // o "Sin categoría", lo que tú quieras
-      }));
-
-      setBusinesses(parsedBusinesses);
-
-      if (parsedBusinesses.length > 0) {
-        setSelectedBusiness(parsedBusinesses[0].id);
-      }
-    } catch (error) {
-      console.error(error);
     }
-  }
 
-  fetchBusinesses();
-}, []);
+    fetchBusinesses();
+  }, []);
 
-useEffect(() => {
-  if (!selectedBusiness) return;
+  useEffect(() => {
+    if (!selectedBusiness) return;
 
-  async function fetchBusinessInfo() {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+    async function fetchBusinessInfo() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      const res = await fetch(`/api/business/${selectedBusiness}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        const res = await fetch(`/api/business/${selectedBusiness}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      if (!res.ok) throw new Error("Error al cargar el negocio");
+        if (!res.ok) throw new Error("Error al cargar el negocio");
 
-      const data = await res.json();
+        const data = await res.json();
 
-      setBusinessInfo({
-        id: data.business.id,
-        name: data.business.name,
-        categoryId: data.business.business_category_id,
-        category_name: data.business.category_name,
-        city: data.business.city,
-        district: data.business.district,
-        address: data.business.address,
-        legal_name: data.business.legal_name,
-        tax_id: data.business.tax_id,
-        address_notes: data.business.address_notes,
-        created_at: data.business.created_at,
-        updated_at: data.business.updated_at,
-        statusId: data.business.status_id,
-      });
-      setBusinessHours(data.hours || []);
-      loadBusinessStatus(data.business.id);
-    } catch (err) {
-      console.error(err);
+        setBusinessInfo({
+          id: data.business.id,
+          name: data.business.name,
+          categoryId: data.business.business_category_id,
+          category_name: data.business.category_name,
+          city: data.business.city,
+          district: data.business.district,
+          address: data.business.address,
+          legal_name: data.business.legal_name,
+          tax_id: data.business.tax_id,
+          address_notes: data.business.address_notes,
+          created_at: data.business.created_at,
+          updated_at: data.business.updated_at,
+          statusId: data.business.status_id,
+        });
+        setBusinessHours(data.hours || []);
+        loadBusinessStatus(data.business.id);
+      } catch (err) {
+        console.error(err);
+      }
     }
-  }
 
-  fetchBusinessInfo();
-}, [selectedBusiness]);
-
+    fetchBusinessInfo();
+  }, [selectedBusiness]);
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
-  if (!selectedBusiness) return;
+    if (!selectedBusiness) return;
 
-  async function fetchCategories() {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+    async function fetchCategories() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      const res = await fetch(`/api/categories/${selectedBusiness}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setCategories(data.categories || []);
-      }
-    } catch (error) {
-      console.error("Error cargando categorías:", error);
-    }
-  }
-
-  fetchCategories();
-}, [selectedBusiness]);
-
-useEffect(() => {
-  if (!selectedBusiness) return;
-
-  async function fetchProducts() {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const res = await fetch(
-        `/api/business/products?business_id=${selectedBusiness}`,
-        {
+        const res = await fetch(`/api/categories/${selectedBusiness}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          setCategories(data.categories || []);
         }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("Error al cargar productos:", data);
-        return;
+      } catch (error) {
+        console.error("Error cargando categorías:", error);
       }
-
-      // 🔥 Adaptamos la respuesta de la API a tu interfaz Product
-      const parsed = data.products.map((p: any) => ({
-        id: p.id.toString(),
-        nombre: p.name,
-        categoria: p.category_name ?? "Sin categoría",
-        precio: Number(p.price),
-        stock: Number(p.stock_average ?? 0),
-        costo: Number(p.cost ?? 0),
-        margen: Number(p.margin ?? 0),
-        estado:
-          p.status_id === 1
-            ? "Activo"
-            : p.status_id === 2
-            ? "Agotado"
-            : "Borrador",
-        promocion: p.promotion_id ? "Oferta" : "Ninguna",
-        destacado: false,
-        actualizadoEn: p.updated_at,
-      }));
-      setProducts(parsed);
-    } catch (error) {
-      console.error("Error:", error);
     }
+
+    fetchCategories();
+  }, [selectedBusiness]);
+
+  useEffect(() => {
+    if (!selectedBusiness) return;
+
+    async function fetchProducts() {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await fetch(
+          `/api/business/products?business_id=${selectedBusiness}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          console.error("Error al cargar productos:", data);
+          return;
+        }
+
+        const parsed = data.products.map((p: any) => ({
+          id: p.id.toString(),
+          nombre: p.name,
+          categoria: p.category_name ?? "Sin categoría",
+          precio: Number(p.price),
+          stock: Number(p.stock_average ?? 0),
+          costo: Number(p.cost ?? 0),
+          margen: Number(p.margin ?? 0),
+          estado:
+            p.status_id === 1
+              ? "Activo"
+              : p.status_id === 2
+              ? "Agotado"
+              : "Borrador",
+          promocion: p.promotion_id ? "Oferta" : "Ninguna",
+          destacado: false,
+          actualizadoEn: p.updated_at,
+        }));
+        setProducts(parsed);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
+    fetchProducts();
+  }, [selectedBusiness]);
+
+  async function toggleBusiness(id: number) {
+    setLoadingToggle(true);
+
+    const res = await fetch(`/api/business/${id}/toggle`, {
+      method: "PUT",
+    });
+
+    const data = await res.json();
+
+    setBusinessInfo(prev =>
+      prev ? { ...prev, is_open_now: data.new_status } : prev
+    );
+
+    setLoadingToggle(false);
   }
 
-  fetchProducts();
-}, [selectedBusiness]);
+  async function loadBusinessStatus(id: number) {
+    setLoadingToggle(true);
 
-async function toggleBusiness(id: number) {
-  setLoadingToggle(true);
+    const res = await fetch(`/api/business/${id}/toggle`, {
+      method: "GET"
+    });
 
-  const res = await fetch(`/api/business/${id}/toggle`, {
-    method: "PUT",
-  });
+    const data = await res.json();
 
-  const data = await res.json();
-
-  // Actualiza el estado en pantalla
-  setBusinessInfo(prev =>
-  prev ? { ...prev, is_open_now: data.new_status } : prev
-);
-
-  setLoadingToggle(false);
-}
-
-
-async function loadBusinessStatus(id: number) {
-  setLoadingToggle(true);
-
-  const res = await fetch(`/api/business/${id}/toggle`, {
-    method: "GET"
-  });
-
-  const data = await res.json();
-
-  // Guarda el estado en tu businessInfo
-  setBusinessInfo(prev =>
-  prev ? { ...prev, is_open_now: data.is_open_now } : prev
-);
-  setLoadingToggle(false);
-}
-
+    setBusinessInfo(prev =>
+      prev ? { ...prev, is_open_now: data.is_open_now } : prev
+    );
+    setLoadingToggle(false);
+  }
 
   const { totalProducts, activeProducts, lowStockProducts, productsOnPromo } =
     useMemo(() => {
@@ -284,13 +276,12 @@ async function loadBusinessStatus(id: number) {
     }, [products]);
 
   const categorySummary = useMemo(() => {
-  return categories.map((c) => ({
-    name: c.name,
-    productos: 0,     // luego puedes reemplazar esto si agregas productos
-    destacados: 0,    // si agregas "featured" en categorías
-  }));
-}, [categories]);
-
+    return categories.map((c) => ({
+      name: c.name,
+      productos: 0,
+      destacados: 0,
+    }));
+  }, [categories]);
 
   const promoProducts = useMemo(
     () =>
@@ -380,7 +371,7 @@ async function loadBusinessStatus(id: number) {
     const isActive = product.estado === "Activo";
     const confirmed = window.confirm(
       isActive
-        ? "¿Deseass desactivar este producto? Podrás activarlo de nuevo cuando lo necesites."
+        ? "¿Deseas desactivar este producto? Podrás activarlo de nuevo cuando lo necesites."
         : "¿Deseas activar este producto para que vuelva a estar disponible?",
     );
 
@@ -495,44 +486,41 @@ async function loadBusinessStatus(id: number) {
     );
   }
 
-
   return (
-    <main className="mx-auto max-w-7xl space-y-10 px-4 py-10 sm:px-6 lg:px-8">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-6 text-white shadow-xl sm:p-10">
+    <main className="mx-auto max-w-7xl space-y-6 px-3 py-6 sm:space-y-8 sm:px-4 sm:py-8 md:space-y-10 md:px-6 md:py-10 lg:px-8">
+      {/* Sección Hero con información del negocio */}
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-3xl sm:p-6 md:p-8 lg:p-10">
+        {/* Elementos de fondo decorativos - totalmente responsivos */}
         <div
-          aria-hidden
-          className="absolute -left-28 top-10 size-64 rounded-full bg-white/15 blur-3xl"
+          aria-hidden="true"
+          className="absolute -left-10 top-8 size-32 rounded-full bg-white/10 blur-xl sm:-left-16 sm:size-48 sm:blur-2xl md:-left-20 md:top-10 md:size-56 lg:-left-28 lg:size-64 lg:blur-3xl"
         />
         <div
-          aria-hidden
-          className="absolute -right-24 -top-24 size-64 rounded-full bg-white/20 blur-3xl"
+          aria-hidden="true"
+          className="absolute -right-8 -top-12 size-32 rounded-full bg-white/15 blur-xl sm:-right-12 sm:-top-16 sm:size-48 sm:blur-2xl md:-right-16 md:-top-20 md:size-56 lg:-right-24 lg:-top-24 lg:size-64 lg:blur-3xl"
         />
-        <div className="relative grid gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
-          {/* PEQUEÑO TABS PARA ELEGIR NEGOCIO DEPENDIENTO LOS QUE RETORNE EL API EN /api/users/owner/:id */}
-
-          <BusinessTabs
-            businesses={businesses}
-            selectedId={selectedBusiness}
-            onSelect={(id) => setSelectedBusiness(id)}
-          />
-          <div className="space-y-6">
+        
+        <div className="relative grid gap-6 md:gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
+          {/* Columna izquierda: Información del negocio */}
+          <div className="space-y-4 md:space-y-6 lg:order-1">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
               Negocio
             </div>
-            <div className="space-y-4">
-              <h1 className="text-3xl font-semibold md:text-4xl lg:text-5xl">
+            
+            <div className="space-y-3 md:space-y-4">
+              <h1 className="text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl">
                 {businessInfo?.name ?? "Cargando..."}
               </h1>
 
-              <p className="max-w-2xl text-sm text-white/90 md:text-base lg:text-lg">
+              <p className="text-sm text-white/90 sm:text-base md:text-lg lg:max-w-2xl">
                 {businessInfo
                   ? `${businessInfo.category_name} en ${businessInfo.city}. Gestiona el catálogo,
                     precios y promociones de este negocio desde un único panel operativo.`
                   : "Cargando descripción..."}
               </p>
-
             </div>
-            <dl className="grid gap-4 text-sm md:grid-cols-3">
+            
+            <dl className="grid gap-3 text-sm sm:grid-cols-2 md:grid-cols-3 md:gap-4">
               <StatItem
                 label="Productos activos"
                 value={`${activeProducts}/${totalProducts}`}
@@ -543,21 +531,23 @@ async function loadBusinessStatus(id: number) {
                 helper="Descuentos, combos y happy hour"
               />
               <StatItem
-                label="Criticidad de inventario"
+                label="Inventario crítico"
                 value={lowStockProducts.toString()}
-                helper="Revisa niveles menores a 10 unidades"
+                helper="Stock menores a 10 unidades"
               />
             </dl>
-            <div className="grid gap-3 rounded-2xl bg-white/15 p-4 text-xs uppercase tracking-[0.2em]">
+            
+            <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
               <div className="space-y-1 text-white/80">
                 <span>FISCAL</span>
-                  <p className="text-sm normal-case tracking-normal text-white">
-                      {businessInfo?.legal_name ?? "—"} · RFC {businessInfo?.tax_id ?? "—"}
-                    </p>
+                <p className="text-sm normal-case tracking-normal text-white">
+                  {businessInfo?.legal_name ?? "—"} · RFC {businessInfo?.tax_id ?? "—"}
+                </p>
               </div>
+              
               <div className="space-y-1 text-white/80">
                 <span>Horario</span>
-                {businessHours?.map((h) => (
+                {businessHours?.slice(0, 2).map((h) => (
                   <p key={h.day_of_week} className="text-sm normal-case tracking-normal text-white">
                     {h.is_closed
                       ? `${h.day_name}: Cerrado`
@@ -566,6 +556,11 @@ async function loadBusinessStatus(id: number) {
                         : `${h.day_name}: ${h.open_time} – ${h.close_time} hrs`}
                   </p>
                 ))}
+                {businessHours?.length > 2 && (
+                  <p className="text-sm normal-case tracking-normal text-white/70">
+                    +{businessHours.length - 2} días más
+                  </p>
+                )}
               </div>
 
               <Link
@@ -575,35 +570,48 @@ async function loadBusinessStatus(id: number) {
                 Editar Horarios <span aria-hidden>→</span>
               </Link>
             </div>
+            
+            {/* Botón para abrir/cerrar negocio - responsive */}
+            <button
+              onClick={() => businessInfo && toggleBusiness(businessInfo.id)}
+              disabled={loadingToggle || !businessInfo}
+              className={`
+                w-full rounded-xl px-4 py-2.5 text-sm font-medium transition-all border
+                sm:w-auto sm:text-base
+                ${loadingToggle || !businessInfo
+                  ? "bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed"
+                  : businessInfo.is_open_now === 1
+                    ? "bg-red-600 text-white border-red-700 hover:bg-red-700"
+                    : "bg-green-600 text-white border-green-700 hover:bg-green-700"
+                }
+              `}
+            >
+              {loadingToggle || !businessInfo
+                ? "Cargando..."
+                : businessInfo.is_open_now === 1
+                  ? "Cerrar negocio"
+                  : "Abrir negocio"}
+            </button>
+          </div>
+          
+          {/* Columna derecha: Tabs para seleccionar negocio */}
+          <div className="lg:order-2">
+            <BusinessTabs
+              businesses={businesses}
+              selectedId={selectedBusiness}
+              onSelect={(id) => setSelectedBusiness(id)}
+            />
           </div>
         </div>
-        <button
-          onClick={() => toggleBusiness(businessInfo!.id)}
-          disabled={loadingToggle}
-          className={`
-            px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap mt-4 transition-all border
-            ${loadingToggle || !businessInfo
-              ? "bg-gray-300 text-gray-600 border-gray-400 cursor-not-allowed"
-              : businessInfo.is_open_now === 1
-                ? "bg-red-600 text-white border-red-700 hover:bg-red-700"
-                : "bg-green-600 text-white border-green-700 hover:bg-green-700"
-            }
-          `}
-        >
-          {loadingToggle || !businessInfo
-            ? "Cargando..."
-            : businessInfo.is_open_now === 1
-              ? "Cerrar negocio"
-              : "Abrir negocio"}
-        </button>
       </section>
 
+      {/* Sección de Acciones Rápidas */}
       <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-white drop-shadow-[0_1px_6px_rgba(31,48,41,0.45)]">
+          <h2 className="text-xl font-semibold text-white drop-shadow sm:text-2xl">
             Acciones rápidas
           </h2>
-          <p className="text-sm text-[#f4f8f0] drop-shadow-[0_1px_4px_rgba(31,48,41,0.35)]">
+          <p className="text-sm text-[#f4f8f0] sm:text-base">
             Ejecuta tareas clave en tu catálogo sin salir del panel principal.
           </p>
         </div>
@@ -614,17 +622,17 @@ async function loadBusinessStatus(id: number) {
           <PrimaryAction href={`/business/categories/${selectedBusiness}/new`}>
             + Agregar categoría
           </PrimaryAction>
-          <PrimaryAction variant="outline">Importar catálogo</PrimaryAction>
+          <PrimaryAction variant="outline" className="hidden sm:inline-flex">
+            Importar catálogo
+          </PrimaryAction>
           <PrimaryAction variant="soft" onClick={() => handleBulkDiscount()}>
-            Aplicar rebaja masiva
+            Aplicar rebaja
           </PrimaryAction>
         </div>
       </section>
 
-      <section
-        aria-label="Indicadores principales"
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-      >
+      {/* KPI Cards - 1 col móvil, 2 col tablet, 4 col desktop */}
+      <section aria-label="Indicadores principales" className="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
         <KpiCard
           label="Productos totales"
           value={totalProducts.toString()}
@@ -650,7 +658,9 @@ async function loadBusinessStatus(id: number) {
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[2fr,1fr]">
+      {/* Tabla de productos y Resumen por categoría - Responsive */}
+      <section className="grid gap-6 lg:grid-cols-1 xl:grid-cols-[2fr,1fr]">
+        {/* Tabla de productos */}
         <DashboardCard
           title="Inventario actual"
           description="Edita precios, stock y estado desde un solo lugar."
@@ -658,77 +668,62 @@ async function loadBusinessStatus(id: number) {
           {products.length === 0 ? (
             <EmptyState message="Aún no hay productos registrados para este negocio. Agrega el primero para comenzar." />
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-emerald-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
+            <div className="overflow-x-auto rounded-xl border border-emerald-200/60 bg-white shadow-sm">
               <table className="min-w-full divide-y divide-emerald-100/70 text-sm">
                 <thead className="bg-emerald-50/80 text-left text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600">
                   <tr>
-                    <th className="px-4 py-3">Producto</th>
-                    <th className="px-4 py-3">Precio</th>
-                    <th className="px-4 py-3">Stock</th>
-                    <th className="px-4 py-3">Margen</th>
-                    <th className="px-4 py-3">Oferta</th>
-                    <th className="px-4 py-3">Actualizado</th>
-                    <th className="px-4 py-3 text-center">Acciones</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3">Producto</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3 hidden md:table-cell">Precio</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3">Stock</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3 hidden lg:table-cell">Margen</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3 hidden sm:table-cell">Oferta</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3 hidden xl:table-cell">Actualizado</th>
+                    <th className="px-3 py-2 sm:px-4 sm:py-3 text-center">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-100 bg-white text-emerald-900 dark:bg-transparent dark:text-emerald-100">
-                  {products.map((product) => (
-                    <tr
-                      key={product.id}
-                      className="transition hover:bg-emerald-50/50 dark:hover:bg-white/10"
-                    >
-                      <td className="px-4 py-3">
+                <tbody className="divide-y divide-emerald-100 bg-white text-emerald-900">
+                  {products.slice(0, 5).map((product) => (
+                    <tr key={product.id} className="transition hover:bg-emerald-50/50">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3">
                         <div className="flex flex-col">
-                          <span className="font-semibold">
+                          <span className="font-semibold line-clamp-1">
                             {product.nombre}
                           </span>
-                          <span className="text-xs text-emerald-900/60 dark:text-emerald-200/70">
+                          <span className="text-xs text-emerald-900/60">
                             {product.categoria} · {product.estado}
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-semibold">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3 font-semibold hidden md:table-cell">
                         {peso.format(product.precio)}
                       </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={
-                            product.stock <= 10
-                              ? "font-semibold text-rose-600 dark:text-rose-300"
-                              : ""
-                          }
-                        >
+                      <td className="px-3 py-2 sm:px-4 sm:py-3">
+                        <span className={product.stock <= 10 ? "font-semibold text-rose-600" : ""}>
                           {product.stock}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-emerald-900/60 dark:text-emerald-200/70">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs text-emerald-900/60 hidden lg:table-cell">
                         {peso.format(product.costo)} · {product.margen}%
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3 hidden sm:table-cell">
                         <PromoBadge promotion={product.promocion} />
                       </td>
-                      <td className="px-4 py-3 text-xs text-emerald-900/60 dark:text-emerald-200/70">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3 text-xs text-emerald-900/60 hidden xl:table-cell">
                         {formatDate(product.actualizadoEn)}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center justify-center gap-2">
+                      <td className="px-3 py-2 sm:px-4 sm:py-3">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-2">
                           <TableAction
                             onClick={() => handleEditPrice(product.id)}
+                            className="text-xs sm:text-xs"
                           >
                             Editar precio
                           </TableAction>
                           <TableAction
                             onClick={() => handleUpdateStock(product.id)}
+                            className="text-xs sm:text-xs"
                           >
                             Actualizar stock
-                          </TableAction>
-                          <TableAction
-                            variant="ghost"
-                            onClick={() => handleToggleStatus(product.id)}
-                          >
-                            {product.estado === "Activo"
-                              ? "Desactivar"
-                              : "Activar"}
                           </TableAction>
                         </div>
                       </td>
@@ -736,44 +731,65 @@ async function loadBusinessStatus(id: number) {
                   ))}
                 </tbody>
               </table>
+              {products.length > 5 && (
+                <div className="border-t border-emerald-100/70 bg-emerald-50/50 px-4 py-3 text-center">
+                  <Link 
+                    href={`/business/products/${selectedBusiness}`}
+                    className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Ver todos los productos ({products.length}) →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
         </DashboardCard>
 
+        {/* Resumen por categoría */}
         <DashboardCard
           title="Resumen por categoría"
           description="Mantén equilibrada la oferta de cada sección."
         >
           {categorySummary.length === 0 ? (
-  <EmptyState message="Sin categorías registradas todavía." />
-) : (
-  <ul className="space-y-3 text-sm">
-    {categorySummary.map((cat) => (
-      <li
-        key={cat.name}
-        className="flex items-center justify-between rounded-2xl bg-white/90 px-4 py-3 shadow-sm ring-1 ring-emerald-200/50 dark:bg-white/5 dark:ring-white/10"
-      >
-        <div>
-          <p className="font-semibold text-emerald-700 dark:text-emerald-300">
-            {cat.name}
-          </p>
-          <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
-            {cat.productos} productos · {cat.destacados} destacados
-          </p>
-        </div>
-
-        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
-          0% destacados
-        </span>
-      </li>
-    ))}
-  </ul>
-)}
-
+            <EmptyState message="Sin categorías registradas todavía." />
+          ) : (
+            <ul className="space-y-3 text-sm">
+              {categorySummary.slice(0, 4).map((cat) => (
+                <li
+                  key={cat.name}
+                  className="flex items-center justify-between rounded-xl bg-white/90 px-3 py-2.5 shadow-sm ring-1 ring-emerald-200/50 sm:rounded-2xl sm:px-4 sm:py-3"
+                >
+                  <div>
+                    <p className="font-semibold text-emerald-700 line-clamp-1">
+                      {cat.name}
+                    </p>
+                    <p className="text-xs text-emerald-900/70">
+                      {cat.productos} productos · {cat.destacados} destacados
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-xs font-semibold text-emerald-700 sm:px-3">
+                    0% destacados
+                  </span>
+                </li>
+              ))}
+              {categorySummary.length > 4 && (
+                <li className="text-center">
+                  <Link 
+                    href={`/business/categories/${selectedBusiness}`}
+                    className="text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+                  >
+                    Ver todas las categorías ({categorySummary.length}) →
+                  </Link>
+                </li>
+              )}
+            </ul>
+          )}
         </DashboardCard>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.4fr,1fr]">
+      {/* Promociones y Alertas de Stock */}
+      <section className="grid gap-6 lg:grid-cols-1 xl:grid-cols-[1.4fr,1fr]">
+        {/* Promociones activas */}
         <DashboardCard
           title="Promociones activas"
           description="Ajusta descuentos y vigencia de campañas."
@@ -785,20 +801,21 @@ async function loadBusinessStatus(id: number) {
               {promoProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-emerald-500/10 px-4 py-3 shadow-sm ring-1 ring-emerald-200/60 dark:bg-white/5 dark:ring-white/10"
+                  className="flex flex-col gap-2 rounded-xl bg-emerald-500/10 px-3 py-2.5 shadow-sm ring-1 ring-emerald-200/60 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:rounded-2xl sm:px-4 sm:py-3"
                 >
-                  <div>
-                    <p className="font-semibold text-emerald-800 dark:text-emerald-200">
+                  <div className="flex-1">
+                    <p className="font-semibold text-emerald-800 line-clamp-1">
                       {product.nombre}
                     </p>
-                    <p className="text-xs text-emerald-900/70 dark:text-emerald-200/70">
-                      {product.promocion} · Precio actual{" "}
-                      {peso.format(product.precio)}
+                    <p className="text-xs text-emerald-900/70">
+                      {product.promocion} · Precio actual {peso.format(product.precio)}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <TableAction>Editar promo</TableAction>
-                    <TableAction variant="ghost">Finalizar</TableAction>
+                  <div className="flex gap-2">
+                    <TableAction className="text-xs">Editar</TableAction>
+                    <TableAction variant="ghost" className="text-xs">
+                      Finalizar
+                    </TableAction>
                   </div>
                 </div>
               ))}
@@ -806,6 +823,7 @@ async function loadBusinessStatus(id: number) {
           )}
         </DashboardCard>
 
+        {/* Alertas de stock */}
         <DashboardCard
           title="Alertas de stock"
           description="Revisa y actualiza los productos con inventario crítico."
@@ -817,18 +835,20 @@ async function loadBusinessStatus(id: number) {
               {lowStockList.map((product) => (
                 <li
                   key={product.id}
-                  className="rounded-2xl bg-white/90 px-4 py-3 shadow-sm ring-1 ring-rose-200/60 dark:bg-white/5 dark:ring-white/10"
+                  className="rounded-xl bg-white/90 px-3 py-2.5 shadow-sm ring-1 ring-rose-200/60 sm:rounded-2xl sm:px-4 sm:py-3"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-rose-600 dark:text-rose-300">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                      <p className="font-semibold text-rose-600 line-clamp-1">
                         {product.nombre}
                       </p>
-                      <p className="text-xs text-rose-900/60 dark:text-rose-200/70">
+                      <p className="text-xs text-rose-900/60">
                         Stock actual {product.stock} · Margen {product.margen}%
                       </p>
                     </div>
-                    <TableAction>Reabastecer</TableAction>
+                    <TableAction className="text-xs whitespace-nowrap">
+                      Reabastecer
+                    </TableAction>
                   </div>
                 </li>
               ))}
@@ -854,8 +874,8 @@ function StatItem({
       <dt className="text-xs uppercase tracking-[0.3em] text-white/70">
         {label}
       </dt>
-      <dd className="mt-1 text-lg font-semibold">{value}</dd>
-      {helper ? <p className="text-xs text-white/70">{helper}</p> : null}
+      <dd className="mt-1 text-base font-semibold sm:text-lg">{value}</dd>
+      {helper ? <p className="text-xs text-white/70 line-clamp-1">{helper}</p> : null}
     </div>
   );
 }
@@ -865,30 +885,32 @@ function PrimaryAction({
   variant = "solid",
   href,
   onClick,
+  className = "",
 }: {
   children: ReactNode;
   variant?: "solid" | "outline" | "soft";
   href?: string;
   onClick?: () => void;
+  className?: string;
 }) {
-  const base =
-    "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#b7ccb8]";
+  const base = "inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:px-4 sm:py-2.5";
   const styles =
     variant === "solid"
       ? "bg-white text-[#264c36] shadow-lg hover:bg-[#f7f6ef]"
       : variant === "outline"
         ? "border border-[#cddccf] bg-white text-[#264c36] hover:bg-[#f7f6ef]"
         : "bg-white/80 text-[#264c36] hover:bg-white";
+  
   if (href) {
     return (
-      <Link href={href} className={`${base} ${styles}`}>
+      <Link href={href} className={`${base} ${styles} ${className}`}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type="button" onClick={onClick} className={`${base} ${styles}`}>
+    <button type="button" onClick={onClick} className={`${base} ${styles} ${className}`}>
       {children}
     </button>
   );
@@ -913,14 +935,16 @@ function KpiCard({
         : "from-emerald-200/90 to-emerald-400/80 text-emerald-700";
 
   return (
-    <div className={`rounded-[18px] bg-gradient-to-br ${palette} p-0.5`}>
-      <div className="rounded-[16px] bg-white/95 px-4 py-5 shadow-sm ring-1 ring-white/70 dark:bg-zinc-900/80">
-        <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/50">
+    <div className={`rounded-[16px] bg-gradient-to-br ${palette} p-0.5 sm:rounded-[18px]`}>
+      <div className="rounded-[15px] bg-white/95 px-3 py-4 shadow-sm ring-1 ring-white/70 sm:rounded-[16px] sm:px-4 sm:py-5">
+        <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/50 line-clamp-1">
           {label}
         </p>
-        <p className="mt-2 text-3xl font-semibold">{value}</p>
+        <p className="mt-1 text-2xl font-semibold sm:mt-2 sm:text-3xl">{value}</p>
         {helper ? (
-          <p className="mt-1 text-xs text-emerald-900/60">{helper}</p>
+          <p className="mt-1 text-xs text-emerald-900/60 line-clamp-1 sm:line-clamp-2">
+            {helper}
+          </p>
         ) : null}
       </div>
     </div>
@@ -937,13 +961,13 @@ function DashboardCard({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-3xl bg-white/95 p-6 shadow-lg ring-1 ring-emerald-200/60 backdrop-blur-sm dark:bg-white/10 dark:ring-white/10">
-      <header className="mb-4 space-y-1">
-        <h2 className="text-xl font-semibold text-emerald-800 dark:text-emerald-200">
+    <section className="rounded-xl bg-white/95 p-4 shadow-lg ring-1 ring-emerald-200/60 backdrop-blur-sm sm:rounded-2xl sm:p-6">
+      <header className="mb-3 space-y-1 sm:mb-4">
+        <h2 className="text-lg font-semibold text-emerald-800 sm:text-xl">
           {title}
         </h2>
         {description ? (
-          <p className="text-sm text-emerald-900/70 dark:text-emerald-200/70">
+          <p className="text-sm text-emerald-900/70 line-clamp-2">
             {description}
           </p>
         ) : null}
@@ -956,7 +980,7 @@ function DashboardCard({
 function PromoBadge({ promotion }: { promotion: PromotionType }) {
   if (promotion === "Ninguna") {
     return (
-      <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">
+      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 sm:gap-2 sm:px-3 sm:py-1">
         — Sin promo
       </span>
     );
@@ -976,17 +1000,17 @@ function PromoBadge({ promotion }: { promotion: PromotionType }) {
 
     return (
       <span
-        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${palette}`}
+        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold sm:gap-2 sm:px-3 sm:py-1 ${palette}`}
       >
-        <span className="size-2 rounded-full bg-current" aria-hidden />
+        <span className="size-1.5 rounded-full bg-current sm:size-2" aria-hidden />
         {promotion}
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700">
-      <span className="size-2 rounded-full bg-current" aria-hidden />
+    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-700 sm:gap-2 sm:px-3 sm:py-1">
+      <span className="size-1.5 rounded-full bg-current sm:size-2" aria-hidden />
       {promotion}
     </span>
   );
@@ -996,20 +1020,21 @@ function TableAction({
   children,
   variant = "solid",
   onClick,
+  className = "",
 }: {
   children: ReactNode;
   variant?: "solid" | "ghost";
   onClick?: () => void;
+  className?: string;
 }) {
-  const base =
-    "inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500";
+  const base = "inline-flex items-center justify-center rounded-lg px-2 py-1 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:px-3 sm:py-1.5";
   const styles =
     variant === "solid"
       ? "bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/20"
       : "text-emerald-700 hover:text-emerald-500";
 
   return (
-    <button type="button" onClick={onClick} className={`${base} ${styles}`}>
+    <button type="button" onClick={onClick} className={`${base} ${styles} ${className}`}>
       {children}
     </button>
   );
@@ -1017,7 +1042,7 @@ function TableAction({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-emerald-200/60 bg-white/60 px-4 py-6 text-center text-sm text-emerald-700 dark:border-white/20 dark:bg-white/5 dark:text-emerald-200">
+    <div className="rounded-xl border border-dashed border-emerald-200/60 bg-white/60 px-3 py-4 text-center text-sm text-emerald-700 sm:rounded-2xl sm:px-4 sm:py-6">
       {message}
     </div>
   );
