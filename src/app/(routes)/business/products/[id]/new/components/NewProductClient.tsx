@@ -213,64 +213,64 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
               🏆 Header Principal
               ============================ */}
          <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-3xl sm:p-6 md:p-8 lg:p-10">
-  {/* Elementos de fondo decorativos - totalmente responsivos */}
-  <div
-    aria-hidden="true"
-    className="absolute -left-10 top-8 size-32 rounded-full bg-white/10 blur-xl sm:-left-16 sm:size-48 sm:blur-2xl md:-left-20 md:top-10 md:size-56 lg:-left-28 lg:size-64 lg:blur-3xl"
-  />
-  <div
-    aria-hidden="true"
-    className="absolute -right-8 -top-12 size-32 rounded-full bg-white/15 blur-xl sm:-right-12 sm:-top-16 sm:size-48 sm:blur-2xl md:-right-16 md:-top-20 md:size-56 lg:-right-24 lg:-top-24 lg:size-64 lg:blur-3xl"
-  />
-  
-  <div className="relative grid gap-6 md:gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
-    {/* Columna izquierda: Contenido principal */}
-    <div className="space-y-4 md:space-y-6 lg:order-1">
-      {/* Breadcrumb + Etiqueta */}
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href="/business"
-          className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm transition hover:bg-white/10"
-        >
-          ← Panel
-        </Link>
+            {/* Elementos de fondo decorativos - totalmente responsivos */}
+            <div
+              aria-hidden="true"
+              className="absolute -left-10 top-8 size-32 rounded-full bg-white/10 blur-xl sm:-left-16 sm:size-48 sm:blur-2xl md:-left-20 md:top-10 md:size-56 lg:-left-28 lg:size-64 lg:blur-3xl"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute -right-8 -top-12 size-32 rounded-full bg-white/15 blur-xl sm:-right-12 sm:-top-16 sm:size-48 sm:blur-2xl md:-right-16 md:-top-20 md:size-56 lg:-right-24 lg:-top-24 lg:size-64 lg:blur-3xl"
+            />
+            
+            <div className="relative grid gap-6 md:gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
+              {/* Columna izquierda: Contenido principal */}
+              <div className="space-y-4 md:space-y-6 lg:order-1">
+                {/* Breadcrumb + Etiqueta */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href="/business"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium text-white/90 backdrop-blur-sm transition hover:bg-white/10"
+                  >
+                    ← Panel
+                  </Link>
 
-        <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
-          Nuevo producto
-        </span>
-      </div>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs uppercase tracking-[0.3em]">
+                    Nuevo producto
+                  </span>
+                </div>
 
-      {/* Títulos */}
-      <div className="space-y-3 md:space-y-4">
-        <h1 className="text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl">
-          Agregar producto al catálogo
-        </h1>
-        
-        <p className="text-sm text-white/90 sm:text-base md:text-lg lg:max-w-2xl">
-          Completa la ficha del producto para publicarlo en el menú del negocio.
-        </p>
-      </div>
-      
-      {/* Badge del sistema */}
-      <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-emerald-800 shadow-inner">
-            FG
-          </div>
-          <div className="space-y-1">
-            <span className="text-white/80">SISTEMA</span>
-            <p className="text-sm normal-case tracking-normal text-white">
-              FoodyGo · Panel de administrador
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    {/* Columna derecha: Espacio para contenido adicional */}
-    
-  </div>
-</section>
+                {/* Títulos */}
+                <div className="space-y-3 md:space-y-4">
+                  <h1 className="text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl">
+                    Agregar producto al catálogo
+                  </h1>
+                  
+                  <p className="text-sm text-white/90 sm:text-base md:text-lg lg:max-w-2xl">
+                    Completa la ficha del producto para publicarlo en el menú del negocio.
+                  </p>
+                </div>
+                
+                {/* Badge del sistema */}
+                <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-emerald-800 shadow-inner">
+                      FG
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-white/80">SISTEMA</span>
+                      <p className="text-sm normal-case tracking-normal text-white">
+                        FoodyGo · Panel de administrador
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Columna derecha: Espacio para contenido adicional */}
+              
+            </div>
+          </section>
 
           {/* ============================
               📋 Formulario Principal - Layout compacto
