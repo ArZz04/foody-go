@@ -72,36 +72,35 @@ export default function BusinessDetailPage() {
 
   // Extraer categorías únicas de los productos
   const categories = useMemo(() => {
-    const uniqueCategories: Array<{id: string, name: string, count: number}> = [
+    const unique = [
       { id: "all", name: "Todos los productos", count: products.length }
     ];
-    
-    const categoryMap = new Map<string, {name: string, count: number}>();
-    
+
+    const categoryMap = new Map<number, { name: string, count: number }>();
+
     products.forEach(product => {
-      const categoryId = product.category_id?.toString() || "uncategorized";
-      const categoryName = product.category_name || "Sin categoría";
-      
-      if (categoryMap.has(categoryId)) {
-        categoryMap.get(categoryId)!.count += 1;
+      const categoryId = product.product_category_id;
+      const categoryName = product.category_name ?? "Sin categoría";
+
+      if (!categoryMap.has(categoryId)) {
+        categoryMap.set(categoryId, { name: categoryName, count: 1 });
       } else {
-        categoryMap.set(categoryId, {
-          name: categoryName,
-          count: 1
-        });
+        categoryMap.get(categoryId)!.count += 1;
       }
     });
-    
+
     categoryMap.forEach((value, key) => {
-      uniqueCategories.push({
-        id: key,
+      unique.push({
+        id: key.toString(),
         name: value.name,
         count: value.count
       });
     });
-    
-    return uniqueCategories;
+
+    return unique;
   }, [products]);
+
+
 
   // Filtrar productos por categoría y búsqueda
   const filteredProducts = useMemo(() => {
@@ -109,10 +108,11 @@ export default function BusinessDetailPage() {
     
     // Filtrar por categoría
     if (activeCategory !== "all") {
-      filtered = filtered.filter(product => 
-        product.category_id?.toString() === activeCategory
+      filtered = filtered.filter(
+        product => product.product_category_id.toString() === activeCategory
       );
     }
+
     
     // Filtrar por búsqueda
     if (searchQuery.trim()) {
@@ -245,7 +245,7 @@ export default function BusinessDetailPage() {
                     />
                   </div>
                 </div>
-                <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
+                {/* <div className="mt-4 flex gap-2 overflow-x-auto pb-2">
                   {NAV_TABS.map((tab) => (
                     <button
                       key={tab.key}
@@ -260,7 +260,7 @@ export default function BusinessDetailPage() {
                       {tab.label}
                     </button>
                   ))}
-                </div>
+                </div> */}
               </section>
 
               {/* Pestañas de categorías */}
