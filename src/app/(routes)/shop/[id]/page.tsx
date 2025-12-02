@@ -13,6 +13,41 @@ type Business = {
   category?: string;
 };
 
+type Product = {
+  id: number;
+  business_id: number;
+  sku: string;
+  barcode: string | null;
+  name: string;
+  description_long: string | null;
+  description_short: string | null;
+  product_category_id: number;
+  product_subcategory_id: number | null;
+  price: number;
+  discount_price: number | null;
+  currency: string;
+  sale_format: string | null;
+  price_per_unit: number | null;
+  tax_included: boolean;
+  tax_rate: number | null;
+  commission_rate: number | null;
+  is_stock_available: boolean;
+  max_per_order: number | null;
+  min_per_order: number | null;
+  promotion_id: number | null;
+  thumbnail_url: string | null;
+  stock_average: number;
+  stock_danger: number;
+  created_at: string | Date;
+  updated_at: string | Date;
+  expires_at: string | Date | null;
+  status_id: number;
+  
+  // Campos opcionales que pueden venir del JOIN
+  category_name?: string;
+  business_name?: string;
+};
+
 const NAV_TABS = [
   { key: "promos", label: "Promociones" },
   { key: "favoritos", label: "Favoritos" },
@@ -23,6 +58,7 @@ export default function BusinessDetailPage() {
   const params = useParams<{ id: string }>();
   const businessId = Number(params?.id ?? NaN);
   const [business, setBusiness] = useState<Business | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<(typeof NAV_TABS)[number]["key"]>("promos");
@@ -41,8 +77,10 @@ export default function BusinessDetailPage() {
         const res = await fetch(`/api/shop/business/${businessId}`);
         if (!res.ok) throw new Error("No pudimos cargar el negocio.");
         const data = await res.json();
+
         setBusiness(data.business ?? null);
-        console.log(business)
+        setProducts(data.products ?? []);
+
       } catch (err) {
         console.error(err);
         setError("No pudimos cargar el menú del negocio.");
@@ -51,8 +89,6 @@ export default function BusinessDetailPage() {
       }
     })();
   }, [businessId]);
-
-  console.log(business?.id)
 
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed">
@@ -151,7 +187,28 @@ export default function BusinessDetailPage() {
 
               {/* Contenido principal */}
               <section className="rounded-[28px] border border-white/70 bg-white/95 p-6 text-sm text-slate-500 shadow-lg">
-                Aún no hay productos asociados a este giro.
+                {products.length === 0 ? (
+                  <div className="rounded-[28px] border border-yellow-100 bg-yellow-50/70 p-6 text-sm text-yellow-700 shadow-md">
+                    No hay productos disponibles en este momento.
+                  </div>) : (
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                    {products.map((product) => (
+                      <div key={product.id} className="flex flex-col items-center gap-2 rounded-lg border border-slate-200 p-4 shadow-sm">
+                        <div className="relative h-24 w-24 overflow-hidden rounded-md bg-slate-100">
+                          <Image
+                            src={product.thumbnail_url || "/items/thumbnails/generic-item.png"}
+                            alt={product.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <h3 className="text-center text-sm font-medium text-slate-700">
+                          {product.name}
+                        </h3>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </section>
             </>
           ) : (
