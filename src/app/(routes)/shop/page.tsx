@@ -13,7 +13,7 @@ type Business = {
   category?: string; 
 };
 
-type Producto = {
+type Product = {
   id: number | string;
   categoria?: string;
   giro?: string;
@@ -21,7 +21,7 @@ type Producto = {
 
 type BusinessResponse = {
   negocios?: Business[];
-  productos?: Producto[];
+  productos?: Product[];
 };
 
 const isString = (value: unknown): value is string =>
@@ -74,7 +74,7 @@ const CATEGORY_THEMES: Record<
 
 export default function ShopPage() {
   const [business, setBusiness] = useState<Business[]>([]);
-  const [productos, setProductos] = useState<Producto[]>([]);
+  const [productos, setProductos] = useState<Product[]>([]);
   const [filtroGiro, setFiltroGiro] = useState("Todos");
   const [filtroCategoria, setFiltroCategoria] = useState("Todos");
   const [filtered, setFiltered] = useState<Business[]>([]);
