@@ -54,7 +54,7 @@ export async function GET(
 
     const b = (rows as any[])[0];
 
-    const negocio = {
+    const business = {
       id: b.id,
       name: b.name,
       category_id: b.business_category_id,
@@ -69,7 +69,7 @@ export async function GET(
     };
 
     return NextResponse.json(
-      { message: "OK", negocio },
+      { message: "OK", business },
       { status: 200 }
     );
 

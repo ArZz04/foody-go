@@ -20,11 +20,11 @@ import { MenuItemRow } from "@/components/menu/MenuItemRow";
 import { SectionHeader } from "@/components/menu/SectionHeader";
 import { getSectionTheme } from "@/components/menu/sectionThemes";
 
-type Negocio = {
+type Business = {
   id: number | string;
-  nombre: string;
-  ciudad?: string;
-  giro?: string;
+  name: string;
+  city?: string;
+  category?: string; 
 };
 
 type Producto = {
@@ -36,7 +36,7 @@ type Producto = {
 };
 
 type NegociosResponse = {
-  negocios?: Negocio[];
+  negocios?: Business[];
   productos?: Producto[];
 };
 
@@ -113,8 +113,8 @@ const CART_STORAGE_KEY = "foody:cart";
 export default function BusinessDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const negocioId = Number(params?.id ?? NaN);
-  const [negocio, setNegocio] = useState<Negocio | null>(null);
+  const businessId = Number(params?.id ?? NaN);
+  const [business, setBusiness] = useState<Business | null>(null);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -136,7 +136,7 @@ export default function BusinessDetailPage() {
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
 useEffect(() => {
-  if (Number.isNaN(negocioId)) {
+  if (Number.isNaN(businessId)) {
     setError("Negocio no válido.");
     setLoading(false);
     return;
@@ -147,7 +147,7 @@ useEffect(() => {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`/api/shop/business/${negocioId}`);
+      const res = await fetch(`/api/shop/business/${businessId}`);
 
       if (!res.ok) {
         setError("No pudimos cargar el menú del negocio.");
@@ -156,9 +156,10 @@ useEffect(() => {
 
       const data = await res.json();
 
-      setNegocio(data.negocio ?? null);
+      setBusiness(data.business);
 
       // Si luego quieres productos, aquí no existen
+      console.log(business);
       setProductos([]); 
     } catch (err) {
       console.error(err);
@@ -169,7 +170,7 @@ useEffect(() => {
   }
 
   fetchData();
-}, [negocioId]);
+}, [businessId]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -190,9 +191,9 @@ useEffect(() => {
   }, [cart]);
 
   const menu = useMemo(() => {
-    if (!negocio) return [];
-    return productos.filter((producto) => producto.giro === negocio.giro);
-  }, [negocio, productos]);
+    if (!business) return [];
+    return productos.filter((producto) => producto.giro === business.category);
+  }, [business, productos]);
 
   const promotions: PromotionCard[] = useMemo(() => {
     return menu.slice(0, 4).map((item, index) => {
@@ -311,13 +312,13 @@ useEffect(() => {
       PRODUCT_IMAGES[
         selectedProduct.categoria ?? selectedProduct.giro ?? ""
       ] ?? "/coffe.png";
-    const negocioCity = negocio?.ciudad;
+    const businessCity = business?.city;
 
     const newItem: CartItem = {
       id: `${selectedProduct.id}-${Date.now()}`,
       nombre: selectedProduct.nombre,
-      negocio: negocio?.nombre ?? "Negocio local",
-      ciudad: negocioCity,
+      negocio: business?.name ?? "Negocio local",
+      ciudad: businessCity,
       image: imageSrc,
       extras: [...extrasChosen, ...salsaChosen],
       tags: selectedProduct.categoria ? [selectedProduct.categoria] : [],
@@ -342,12 +343,12 @@ useEffect(() => {
   const addPromotionDirect = (product: Producto, promoPrice: number) => {
     const imageSrc =
       PRODUCT_IMAGES[product.categoria ?? product.giro ?? ""] ?? "/coffe.png";
-    const negocioCity = negocio?.ciudad;
+    const businessCity = business?.city;
     const promoItem: CartItem = {
       id: `${product.id}-promo-${Date.now()}`,
       nombre: `${product.nombre} (Promo)`,
-      negocio: negocio?.nombre ?? "Negocio local",
-      ciudad: negocioCity,
+      negocio: business?.name ?? "Negocio local",
+      ciudad: businessCity,
       image: imageSrc,
       extras: [],
       tags: [product.categoria ?? "Promo"],
@@ -379,7 +380,7 @@ useEffect(() => {
             <div className="rounded-[32px] border border-red-100 bg-red-50/60 p-6 text-sm text-red-600">
               {error}
             </div>
-          ) : negocio ? (
+          ) : business ? (
             <>
               <section className="rounded-[32px] border border-white/60 bg-white/90 p-6 shadow-sm">
                 <div className="flex flex-wrap items-center gap-3">
@@ -414,6 +415,8 @@ useEffect(() => {
                     </button>
                   ))}
                 </div>
+
+            
                 {activeTab === "promos" ? (
                   <div className="mt-5 grid gap-4 sm:grid-cols-2">
                     {promotions.map((promoRaw) => {
@@ -427,7 +430,7 @@ useEffect(() => {
                           nombre: promoRaw.nombre,
                           categoria: undefined,
                           precio: promoRaw.price,
-                          giro: negocio?.giro,
+                          giro: business?.category,
                         } satisfies Producto);
                       return (
                         <div
@@ -487,15 +490,15 @@ useEffect(() => {
                   Menú
                 </p>
                 <h1 className="mt-2 text-3xl font-semibold text-slate-900">
-                  {negocio.nombre}
+                  {business.name}
                 </h1>
                 <div className="mt-3 flex flex-wrap items-center gap-4 text-sm text-slate-500">
                   <span className="inline-flex items-center gap-1">
                     <MapPin className="h-4 w-4 text-emerald-500" />
-                    {negocio.ciudad ?? "Ubicación no disponible"}
+                    {business.city ?? "Ubicación no disponible"}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600">
-                    {negocio.giro ?? "Especialidad"}
+                    {business.category ?? "Especialidad"}
                   </span>
                 </div>
               </header>
