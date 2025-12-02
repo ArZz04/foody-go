@@ -480,57 +480,93 @@ export default function BusinessDetailPage() {
                           Mostrando {((currentPage - 1) * ITEMS_PER_PAGE) + 1} - {Math.min(currentPage * ITEMS_PER_PAGE, filteredProducts.length)} de {filteredProducts.length} productos
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={handlePreviousPage}
-                            disabled={currentPage === 1}
-                            className="flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <ChevronLeft className="h-4 w-4" />
-                            Anterior
-                          </button>
-                          
-                          <div className="flex items-center gap-1">
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                              let pageNum;
-                              if (totalPages <= 5) {
-                                pageNum = i + 1;
-                              } else if (currentPage <= 3) {
-                                pageNum = i + 1;
-                              } else if (currentPage >= totalPages - 2) {
-                                pageNum = totalPages - 4 + i;
-                              } else {
-                                pageNum = currentPage - 2 + i;
-                              }
-                              
-                              return (
-                                <button
-                                  key={pageNum}
-                                  type="button"
-                                  onClick={() => setCurrentPage(pageNum)}
-                                  className={`h-10 w-10 rounded-lg text-sm font-medium transition ${
-                                    currentPage === pageNum
-                                      ? "bg-emerald-500 text-white"
-                                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                                  }`}
-                                >
-                                  {pageNum}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          
-                          <button
-                            type="button"
-                            onClick={handleNextPage}
-                            disabled={currentPage === totalPages}
-                            className="flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            Siguiente
-                            <ChevronRight className="h-4 w-4" />
-                          </button>
-                        </div>
+                        <div className="mt-8 w-full flex flex-col items-center gap-4">
+
+
+  {/* Contenedor responsive */}
+  <div className="flex w-full items-center justify-center gap-2">
+
+    {/* Botón Anterior */}
+    <button
+      type="button"
+      onClick={handlePreviousPage}
+      disabled={currentPage === 1}
+      className={`
+        flex items-center justify-center 
+        rounded-full border border-slate-300 bg-white
+        text-slate-700 transition 
+        hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed
+
+        /* Tamaño responsive */
+        h-10 w-10 text-sm
+        md:px-4 md:w-auto md:rounded-lg md:h-auto md:py-2 md:gap-1
+      `}
+    >
+      <ChevronLeft className="h-4 w-4" />
+      <span className="hidden md:inline">Anterior</span>
+    </button>
+
+    {/* Números de página - scrollable en móvil */}
+    <div className="flex items-center gap-1 overflow-x-auto max-w-[200px] md:max-w-none px-1">
+      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+        let pageNum;
+        if (totalPages <= 5) {
+          pageNum = i + 1;
+        } else if (currentPage <= 3) {
+          pageNum = i + 1;
+        } else if (currentPage >= totalPages - 2) {
+          pageNum = totalPages - 4 + i;
+        } else {
+          pageNum = currentPage - 2 + i;
+        }
+
+        return (
+          <button
+            key={pageNum}
+            type="button"
+            onClick={() => setCurrentPage(pageNum)}
+            className={`
+              flex-shrink-0
+              rounded-lg text-sm font-medium transition
+
+              /* tamaños */
+              h-10 w-10 md:h-10 md:w-10
+
+              ${currentPage === pageNum
+                ? "bg-emerald-500 text-white"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+              }
+            `}
+          >
+            {pageNum}
+          </button>
+        );
+      })}
+    </div>
+
+    {/* Botón Siguiente */}
+    <button
+      type="button"
+      onClick={handleNextPage}
+      disabled={currentPage === totalPages}
+      className={`
+        flex items-center justify-center 
+        rounded-full border border-slate-300 bg-white
+        text-slate-700 transition 
+        hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed
+
+        /* Tamaño responsive */
+        h-10 w-10 text-sm
+        md:px-4 md:w-auto md:rounded-lg md:h-auto md:py-2 md:gap-1
+      `}
+    >
+      <span className="hidden md:inline">Siguiente</span>
+      <ChevronRight className="h-4 w-4" />
+    </button>
+
+  </div>
+</div>
+
                       </div>
                     )}
                   </>
