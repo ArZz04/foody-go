@@ -126,7 +126,7 @@ export default function CarritoPage() {
             asChild
             className="rounded-full bg-emerald-600 px-6 py-3 text-white hover:bg-emerald-700"
           >
-            <Link href="/tiendas">Ver tiendas</Link>
+            <Link href="/shop">Ver tiendas</Link>
           </Button>
         </div>
       </div>
