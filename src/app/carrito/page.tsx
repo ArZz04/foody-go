@@ -103,7 +103,7 @@ export default function CarritoPage() {
           </div>
           <p className="text-xs text-emerald-800/60">
             ¿Buscas algo rico? Explora las{" "}
-            <Link href="/tiendas" className="underline">
+            <Link href="/shop" className="underline">
               tiendas disponibles
             </Link>
             .
