@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowLeft, Loader2, MapPin, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 
 type Business = {
   id: number | string;
@@ -173,6 +173,36 @@ export default function BusinessDetailPage() {
     setCurrentPage(1);
   }, [activeCategory, searchQuery]);
 
+  const fetchBusinessData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch(`/api/shop/business/${businessId}`, {
+        cache: "no-store"
+      });
+      if (!res.ok) throw new Error("No pudimos cargar el negocio.");
+      const data = await res.json();
+
+      setBusiness(data.business ?? null);
+      setProducts(data.products ?? []);
+
+    } catch (error) {
+      console.error("Error en shop page:", error);
+
+      const stack =
+        typeof error === "object" &&
+        error !== null &&
+        "stack" in error
+          ? (error as any).stack
+          : null;
+
+      if (stack) console.error(stack);
+      setError("No pudimos cargar el menú del negocio.");
+    } finally {
+      setLoading(false);
+    }
+  }, [businessId]);
+
   useEffect(() => {
     if (Number.isNaN(businessId)) {
       setError("Negocio no válido.");
@@ -180,25 +210,8 @@ export default function BusinessDetailPage() {
       return;
     }
 
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await fetch(`/api/shop/business/${businessId}`);
-        if (!res.ok) throw new Error("No pudimos cargar el negocio.");
-        const data = await res.json();
-
-        setBusiness(data.business ?? null);
-        setProducts(data.products ?? []);
-
-      } catch (err) {
-        console.error(err);
-        setError("No pudimos cargar el menú del negocio.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [businessId]);
+    fetchBusinessData();
+  }, [businessId, fetchBusinessData]);
 
   const handlePreviousPage = () => {
     setCurrentPage(prev => Math.max(1, prev - 1));
@@ -207,6 +220,8 @@ export default function BusinessDetailPage() {
   const handleNextPage = () => {
     setCurrentPage(prev => Math.min(totalPages, prev + 1));
   };
+
+  const skeletonCards = Array.from({ length: 8 });
 
   return (
     <div className="min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed">
@@ -221,13 +236,56 @@ export default function BusinessDetailPage() {
           </Link>
 
           {loading ? (
-            <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-[28px] border border-white/70 bg-white/90 p-6 text-slate-400 shadow-lg">
-              <Loader2 className="h-6 w-6 animate-spin" />
-              Cargando menú…
-            </div>
+            <>
+              {/* Skeleton header */}
+              <section className="relative h-64 overflow-hidden rounded-[32px] border border-white/60 bg-white/60 shadow-2xl sm:h-80">
+                <div className="absolute inset-0 animate-pulse bg-slate-200" />
+              </section>
+
+              {/* Skeleton search */}
+              <section className="rounded-[28px] border border-white/70 bg-white/95 p-6 shadow-lg">
+                <div className="h-12 w-full animate-pulse rounded-2xl bg-slate-200" />
+              </section>
+
+              {/* Skeleton categories */}
+              <section className="rounded-[28px] border border-white/70 bg-white/95 p-4 shadow-lg">
+                <div className="flex flex-wrap gap-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-9 w-24 animate-pulse rounded-full bg-slate-200"
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* Skeleton products */}
+              <section className="rounded-[28px] border border-white/70 bg-white/95 p-6 shadow-lg">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
+                  {skeletonCards.map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-3 shadow-sm"
+                    >
+                      <div className="h-28 w-full animate-pulse rounded-lg bg-slate-200 sm:h-36" />
+                      <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                      <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+                      <div className="h-8 w-full animate-pulse rounded-full bg-slate-200" />
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </>
           ) : error ? (
-            <div className="rounded-[28px] border border-red-100 bg-red-50/70 p-6 text-sm text-red-600 shadow-md">
-              {error}
+            <div className="flex flex-col gap-4 rounded-[28px] border border-red-100 bg-red-50/70 p-6 text-sm text-red-700 shadow-md">
+              <span className="font-semibold">{error}</span>
+              <button
+                type="button"
+                onClick={fetchBusinessData}
+                className="inline-flex w-fit items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-red-700"
+              >
+                Reintentar
+              </button>
             </div>
           ) : business ? (
             <>
@@ -327,7 +385,16 @@ export default function BusinessDetailPage() {
 
               {/* Contenido principal - Productos */}
               <section className="rounded-[28px] border border-white/70 bg-white/95 p-6 text-sm text-slate-500 shadow-lg">
-                {paginatedProducts.length === 0 ? (
+                {products.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-3 rounded-[28px] border border-emerald-100 bg-emerald-50/70 p-8 text-center">
+                    <div className="text-lg font-semibold text-emerald-700">
+                      Aún no hay productos publicados.
+                    </div>
+                    <p className="text-sm text-emerald-800/70">
+                      Cuando el negocio añada productos, los verás aquí.
+                    </p>
+                  </div>
+                ) : filteredProducts.length === 0 ? (
                   <div className="flex flex-col items-center justify-center gap-4 rounded-[28px] border border-yellow-100 bg-yellow-50/70 p-8 text-center">
                     <div className="text-lg font-medium text-yellow-700">
                       {searchQuery ? "No se encontraron productos con esa búsqueda." : "No hay productos disponibles en esta categoría."}
@@ -345,14 +412,15 @@ export default function BusinessDetailPage() {
                 ) : (
                   <>
                     {/* Grid de productos */}
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
                       {paginatedProducts.map((product) => (
                         <div 
                           key={product.id} 
-                          className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-slate-300"
+                          className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 bg-white p-2.5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md hover:border-slate-300 sm:gap-2.5 sm:rounded-2xl sm:p-4"
                         >
                           {/* Imagen del producto */}
-                          <div className="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100">
+                          <div className="relative w-full overflow-hidden rounded-lg bg-slate-100 sm:rounded-xl">
+                            <div className="relative aspect-[5/4] w-full max-h-24 sm:aspect-[4/3] sm:max-h-none sm:h-40">
                             <Image
                               src={product.thumbnail_url || "/items/thumbnails/generic-item.png"}
                               alt={product.name}
@@ -366,32 +434,33 @@ export default function BusinessDetailPage() {
                               </div>
                             )}
                           </div>
+                          </div>
                           
                           {/* Información del producto */}
-                          <div className="flex w-full flex-col gap-2">
-                            <h3 className="text-center text-sm font-semibold text-slate-800 line-clamp-2">
+                          <div className="flex w-full flex-col gap-1.5">
+                            <h3 className="text-center text-[13px] font-semibold text-slate-800 line-clamp-2 sm:text-base">
                               {product.name}
                             </h3>
                             
                             {product.category_name && (
-                              <span className="self-center rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
+                              <span className="self-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] text-slate-600 sm:px-2.5 sm:text-[11px]">
                                 {product.category_name}
                               </span>
                             )}
                             
                             {/* Precio */}
-                            <div className="flex items-center justify-center gap-2">
+                            <div className="flex items-center justify-center gap-2 text-sm sm:text-lg">
                               {product.discount_price ? (
                                 <>
-                                  <span className="text-lg font-bold text-emerald-600">
+                                  <span className="font-bold text-emerald-600">
                                     ${product.discount_price.toFixed(2)}
                                   </span>
-                                  <span className="text-sm text-slate-400 line-through">
+                                  <span className="text-xs text-slate-400 line-through sm:text-sm">
                                     ${product.price.toFixed(2)}
                                   </span>
                                 </>
                               ) : (
-                                <span className="text-lg font-bold text-slate-800">
+                                <span className="font-bold text-slate-800">
                                   ${product.price.toFixed(2)}
                                 </span>
                               )}
@@ -399,7 +468,7 @@ export default function BusinessDetailPage() {
                             
                             {/* Stock */}
 <div
-  className={`text-xs font-medium ${
+  className={`inline-flex self-center rounded-full bg-slate-50 px-2 py-0.5 text-[10px] font-semibold sm:px-2.5 sm:text-xs ${
     product.is_stock_available
       ? product.stock_average > product.stock_danger
         ? "text-emerald-600"
@@ -413,22 +482,22 @@ export default function BusinessDetailPage() {
 </div>
 
 {/* Botón + selector */}
-<div className="mt-3 flex justify-center">
+<div className="mt-2 flex w-full justify-between gap-2">
   {quantities[product.id] ? (
     /* Selector + botón confirmar */
-    <div className="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1">
+    <div className="flex flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
 
       {/* Botón menos */}
       <button
         type="button"
         onClick={() => decrement(product.id)}
-        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+        className="rounded-full bg-slate-200 px-2 py-1 text-xs font-semibold hover:bg-slate-300"
       >
         -
       </button>
 
       {/* Cantidad */}
-      <span className="w-6 text-center text-sm font-semibold">
+      <span className="w-6 text-center text-xs font-semibold">
         {quantities[product.id]}
       </span>
 
@@ -436,7 +505,7 @@ export default function BusinessDetailPage() {
       <button
         type="button"
         onClick={() => increment(product.id)}
-        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+        className="rounded-full bg-slate-200 px-2 py-1 text-xs font-semibold hover:bg-slate-300"
       >
         +
       </button>
@@ -446,7 +515,7 @@ export default function BusinessDetailPage() {
         type="button"
         onClick={() => confirmQuantity(product.id)}
         className={`
-          ml-1 flex items-center justify-center rounded-full px-2 py-1 text-white text-xs font-bold shadow
+          ml-1 flex h-8 w-8 items-center justify-center rounded-full text-white text-xs font-bold shadow
           ${confirmed[product.id] ? "bg-emerald-600" : "bg-emerald-500 hover:bg-emerald-600"}
         `}
       >
@@ -456,14 +525,15 @@ export default function BusinessDetailPage() {
     </div>
   ) : (
     /* Botón agregar */
-    <button
-      type="button"
-      onClick={() => addToCart(product.id)}
-      className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600"
-    >
-      Agregar al carrito
-    </button>
-  )}
+      <button
+        type="button"
+        onClick={() => addToCart(product.id)}
+        disabled={!product.is_stock_available || product.stock_average <= 0}
+        className="ml-auto flex h-8 items-center justify-center rounded-full bg-emerald-500 px-3 text-xs font-semibold text-white shadow transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 sm:h-9 sm:px-4 sm:text-sm"
+      >
+        {product.is_stock_available && product.stock_average > 0 ? "Agregar" : "Agotado"}
+      </button>
+    )}
 </div>
 
 

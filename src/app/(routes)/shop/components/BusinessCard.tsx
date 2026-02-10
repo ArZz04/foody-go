@@ -99,19 +99,27 @@ export default function BusinessCard({
     <CardShell
       href={href}
       onClick={onClick}
-      className="group relative flex flex-col rounded-[26px] border border-[#eadfce] bg-gradient-to-br from-[#fdf7ef] via-[#faf2e6] to-[#f6ebdc] p-3 text-left shadow-[0_20px_40px_rgba(85,64,45,0.08)] transition hover:-translate-y-1 hover:border-[#d9c6ad] hover:shadow-[0_25px_50px_rgba(85,64,45,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c29a6a]"
+      className="group relative flex flex-col rounded-[24px] border border-[#eadfce] bg-gradient-to-br from-[#fdf7ef] via-[#faf2e6] to-[#f6ebdc] p-2.5 text-left shadow-[0_16px_34px_rgba(85,64,45,0.08)] transition hover:-translate-y-1 hover:border-[#d9c6ad] hover:shadow-[0_24px_46px_rgba(85,64,45,0.16)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#c29a6a] sm:rounded-[26px] sm:p-3"
     >
-      <div className="relative h-36 w-full overflow-hidden rounded-[22px]">
-        <Image src={thumbnailPath} alt={name} fill className="object-cover" />
-        <div className="absolute inset-0 bg-black/15" />
+      <div className="relative w-full overflow-hidden rounded-[20px] bg-[#f4e8d9] sm:rounded-[22px]">
+        <div className="relative aspect-[4/3] w-full">
+          <Image
+            src={thumbnailPath}
+            alt={name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 50vw, 25vw"
+          />
+          <div className="absolute inset-0 bg-black/10" />
+        </div>
         {dynamicBadge ? (
-          <span className="absolute left-3 top-3 rounded-full bg-[#fef6ea]/90 px-3 py-1 text-xs font-semibold text-[#a46b3d] shadow">
+          <span className="absolute left-2.5 top-2.5 rounded-full bg-[#fef6ea]/95 px-2.5 py-1 text-[11px] font-semibold text-[#a46b3d] shadow sm:left-3 sm:top-3 sm:px-3 sm:text-xs">
             {dynamicBadge}
           </span>
         ) : null}
         <button
           type="button"
-          className="absolute right-3 top-3 rounded-full bg-black/25 p-1 text-white transition hover:bg-white/80 hover:text-[#9b7e58]"
+          className="absolute right-2.5 top-2.5 rounded-full bg-black/25 p-1.5 text-white transition hover:bg-white/80 hover:text-[#9b7e58] sm:right-3 sm:top-3"
           aria-label="Guardar favorito"
           onClick={(event) => {
             event.preventDefault();
@@ -120,39 +128,35 @@ export default function BusinessCard({
           <Heart className="h-4 w-4" fill="currentColor" />
         </button>
         {etaMinutes ? (
-          <span className="absolute bottom-3 right-3 rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold text-[#6d533b] shadow">
+          <span className="absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-[#6d533b] shadow sm:text-xs">
             {etaMinutes} min
           </span>
         ) : null}
       </div>
 
-      <div className="mt-4 flex flex-1 flex-col px-1">
+      <div className="mt-3 flex flex-1 flex-col px-0.5 sm:mt-4 sm:px-1">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <p className="text-[0.65rem] uppercase tracking-[0.35em] text-[#b38c63]">
+            <p className="text-[0.6rem] uppercase tracking-[0.32em] text-[#b38c63] sm:text-[0.65rem]">
               {category ?? "Local aliado"}
             </p>
-            <h2 className="font-['Outfit'] text-lg font-semibold text-[#3b2f2f] line-clamp-1">
+            <h2 className="font-['Outfit'] text-base font-semibold text-[#3b2f2f] line-clamp-1 sm:text-lg">
               {normalizedName}
             </h2>
           </div>
-          <div className="inline-flex items-center gap-1 rounded-full bg-[#fff4df] px-2 py-0.5 text-xs font-semibold text-[#c17b2c]">
+          <div className="inline-flex items-center gap-1 rounded-full bg-[#fff4df] px-2 py-0.5 text-[11px] font-semibold text-[#c17b2c] sm:text-xs">
             <Star className="h-3.5 w-3.5 fill-[#f6c76d] text-[#f6c76d]" />
             {rating.toFixed(1)}
           </div>
         </div>
-        <p className="mt-1 font-['Nunito_Sans'] text-sm text-[#5c4c43] line-clamp-1">
+        <p className="mt-0.5 font-['Nunito_Sans'] text-xs text-[#5c4c43] line-clamp-1 sm:mt-1 sm:text-sm">
           {cityLower?.replace(/\b\w/g, (c) => c.toUpperCase()) ?? "Cerca de ti"}
         </p>
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-4 text-xs text-[#5c4c43]">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 font-medium text-[#3b2f2f]">
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-3 text-[11px] text-[#5c4c43] sm:pt-4 sm:text-xs">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/85 px-3 py-1 font-medium text-[#3b2f2f] sm:px-3.5">
             <Bike className="h-4 w-4 text-[#6d8b74]" />
             {formatFee(deliveryFee)}
-          </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-[#3b2f2f]">
-            <Clock3 className="h-4 w-4 text-[#c29a6a]" />
-            {etaMinutes ? `${etaMinutes} min` : "Horario extendido"}
           </span>
         </div>
 

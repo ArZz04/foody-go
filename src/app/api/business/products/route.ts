@@ -1,6 +1,21 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
 import jwt from "jsonwebtoken";
+import mysql from "mysql2/promise";
+import fs from "fs";
+
+function getSSL() {
+  const caPath = process.env.DB_CA;
+  if (!caPath) return undefined;
+  return { ca: fs.readFileSync(caPath, "utf8") };
+}
+
+async function getConn() {
+  return mysql.createConnection({
+    uri: process.env.DATABASE_URL,
+    ssl: getSSL(),
+  });
+}
 
 /**
  * GET /api/business/products?business_id=7
@@ -304,4 +319,79 @@ function toMySQLDate(date: Date) {
     ":" +
     pad(date.getSeconds())
   );
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const body = await req.json();
+    const { id, price, stock_average, stock_danger } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: "Falta id" }, { status: 400 });
+    }
+
+    const fields: string[] = [];
+    const values: any[] = [];
+
+    // ✅ PRICE
+    if (price !== undefined) {
+      const p = Number(price);
+      if (Number.isNaN(p) || p < 0) {
+        return NextResponse.json({ error: "price inválido" }, { status: 400 });
+      }
+      fields.push("price = ?");
+      values.push(p);
+    }
+
+    // ✅ STOCK AVERAGE
+    if (stock_average !== undefined) {
+      const s = Number(stock_average);
+      if (Number.isNaN(s) || s < 0) {
+        return NextResponse.json({ error: "stock_average inválido" }, { status: 400 });
+      }
+
+      fields.push("stock_average = ?");
+      values.push(s);
+
+      // opcional: mantener sincronizado el flag
+      fields.push("is_stock_available = ?");
+      values.push(s > 0 ? 1 : 0);
+    }
+
+    // ✅ STOCK DANGER
+    if (stock_danger !== undefined) {
+      const sd = Number(stock_danger);
+      if (Number.isNaN(sd) || sd < 0) {
+        return NextResponse.json({ error: "stock_danger inválido" }, { status: 400 });
+      }
+      fields.push("stock_danger = ?");
+      values.push(sd);
+    }
+
+    if (!fields.length) {
+      return NextResponse.json({ error: "Nada que actualizar" }, { status: 400 });
+    }
+
+    // recomendado
+    fields.push("updated_at = NOW()");
+
+    values.push(id);
+
+    const [result]: any = await pool.query(
+      `UPDATE products SET ${fields.join(", ")} WHERE id = ?`,
+      values
+    );
+
+    if (!result.affectedRows) {
+      return NextResponse.json(
+        { error: `No se encontró producto con id=${id}` },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: "OK", affectedRows: result.affectedRows });
+  } catch (error) {
+    console.error("❌ Error en PATCH /products:", error);
+    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  }
 }

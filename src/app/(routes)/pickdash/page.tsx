@@ -96,9 +96,9 @@ export default function RoleMenu() {
       className="min-h-screen bg-fixed bg-cover bg-center"
       style={{ backgroundImage: "url('/portada.jpg')" }}
     >
-      <div className="min-h-screen bg-[linear-gradient(180deg,rgba(16,24,19,0.75)_0%,rgba(235,240,231,0.94)_40%,rgba(248,246,238,0.98)_100%)]">
-        <section className="mx-auto flex min-h-screen max-w-6xl flex-col gap-12 px-4 py-16 text-gray-900 sm:px-6 lg:px-8">
-          <header className="space-y-4 text-white">
+      <div className="min-h-screen bg-[linear-gradient(180deg,rgba(16,24,19,0.78)_0%,rgba(235,240,231,0.94)_40%,rgba(248,246,238,0.98)_100%)]">
+        <section className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 pb-10 pt-12 text-gray-900 sm:gap-12 sm:px-6 lg:px-10 lg:pt-16">
+          <header className="space-y-3 text-white sm:space-y-4">
             <p className="text-xs uppercase tracking-[0.35em] text-white/60">
               Centro de acceso
             </p>
@@ -109,7 +109,7 @@ export default function RoleMenu() {
               </span>
             </h1>
             {roles.length > 0 && (
-              <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.25em] text-white/70">
+              <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.25em] text-white/75">
                 {roles.map((role) => (
                   <span
                     key={role}
@@ -123,7 +123,7 @@ export default function RoleMenu() {
           </header>
 
           {visibleCards.length > 0 ? (
-            <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="grid flex-1 grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 sm:gap-6">
               {visibleCards.map((card) => (
                 <Card key={card.role} {...card} />
               ))}
@@ -151,7 +151,7 @@ function Card({
   return (
     <Link
       href={href}
-      className="group relative block overflow-hidden rounded-[28px] border border-white/30 shadow-2xl transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-300"
+      className="group relative block overflow-hidden rounded-[28px] border border-white/30 bg-white/5 shadow-2xl transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2"
     >
       <Image
         src={image}
@@ -166,19 +166,21 @@ function Card({
           className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${accent}`}
         />
       ) : null}
-      <div className="relative flex h-full flex-col items-center justify-between gap-6 p-6 text-white text-center">
-        <div className="space-y-4">
+      <div className="relative flex h-full flex-col justify-between gap-5 p-5 text-white sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+        <div className="space-y-3">
           <span
             className={`inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] ${chip}`}
           >
             {chipLabel}
           </span>
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
-            <p className="text-sm text-white/80">{description}</p>
+            <h2 className="text-lg font-semibold leading-tight sm:text-xl">
+              {title}
+            </h2>
+            <p className="text-sm text-white/85 sm:text-base">{description}</p>
           </div>
         </div>
-        <div className="flex w-full items-center justify-between text-sm font-semibold text-white/90">
+        <div className="flex w-full items-center justify-between text-sm font-semibold text-white/90 sm:w-auto sm:flex-col sm:items-end sm:gap-2 sm:text-xs">
           <span className="inline-flex items-center gap-2">
             Entrar
             <span

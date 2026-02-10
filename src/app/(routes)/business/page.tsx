@@ -289,37 +289,48 @@ export default function BusinessPage() {
     [products],
   );
 
-  function handleEditPrice(productId: string) {
-    const product = products.find((item) => item.id === productId);
-    if (!product) {
-      return;
-    }
+  async function handleUpdatePrice(productId: string) {
+  const product = products.find((item) => item.id === productId);
+  if (!product) return;
 
-    const raw = window.prompt(
-      "Ingresa el nuevo precio (MXN):",
-      product.precio.toString(),
-    );
-    if (raw === null) {
-      return;
-    }
+  const raw = window.prompt(
+    "Ingresa el nuevo precio:",
+    String(product.precio ?? "")
+  );
+  if (raw === null) return;
 
-    const normalized = raw.replace(",", ".").trim();
-    if (normalized.length === 0) {
-      return;
-    }
+  const normalized = raw.replace(",", ".").trim();
+  if (normalized.length === 0) return;
 
-    const nextPrice = Number.parseFloat(normalized);
-    if (!Number.isFinite(nextPrice) || nextPrice < 0) {
-      window.alert("Introduce un número válido mayor o igual a 0.");
-      return;
+  const nextPrice = Number.parseFloat(normalized);
+  if (!Number.isFinite(nextPrice) || nextPrice < 0) {
+    window.alert("Introduce un precio válido mayor o igual a 0.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/business/products", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: productId, price: nextPrice }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data?.error || `Error HTTP ${res.status}`);
     }
 
     setProducts((prev) =>
       prev.map((item) =>
-        item.id === productId ? { ...item, precio: nextPrice } : item,
-      ),
+        item.id === productId ? { ...item, precio: nextPrice } : item
+      )
     );
+  } catch (error) {
+    console.error("Error al actualizar price:", error);
+    window.alert("No se pudo actualizar el precio. Intenta nuevamente.");
   }
+}
+
 
   const lowStockList = useMemo(
     () =>
@@ -330,7 +341,8 @@ export default function BusinessPage() {
     [products],
   );
 
-  function handleUpdateStock(productId: string) {
+
+  async function handleUpdateStock(productId: string) {
     const product = products.find((item) => item.id === productId);
     if (!product) {
       return;
@@ -355,11 +367,22 @@ export default function BusinessPage() {
       return;
     }
 
-    setProducts((prev) =>
-      prev.map((item) =>
-        item.id === productId ? { ...item, stock: nextStock } : item,
-      ),
-    );
+    try {
+      await fetch("/api/business/products", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: productId, stock_average: nextStock }),
+      });
+
+      setProducts((prev) =>
+        prev.map((item) =>
+          item.id === productId ? { ...item, stock: nextStock } : item,
+        ),
+      );
+    } catch (error) {
+      console.error("Error al actualizar stock:", error);
+      window.alert("No se pudo actualizar el stock. Intenta nuevamente.");
+    }
   }
 
   function handleToggleStatus(productId: string) {
@@ -714,7 +737,7 @@ export default function BusinessPage() {
                       <td className="px-3 py-2 sm:px-4 sm:py-3">
                         <div className="flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-2">
                           <TableAction
-                            onClick={() => handleEditPrice(product.id)}
+                            onClick={() => handleUpdatePrice(product.id)}
                             className="text-xs sm:text-xs"
                           >
                             Editar precio

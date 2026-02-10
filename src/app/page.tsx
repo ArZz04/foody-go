@@ -10,14 +10,13 @@ export default function Home() {
   return (
     <div className="relative min-h-screen">
 
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat blur-[2px]"
-        style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
-      />
-
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80" />
+      {/* CSS Gradient Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,#f7f1e8_0%,#f2e7d9_45%,#fffaf3_100%)]" />
+        <div className="absolute inset-[-20%] bg-[radial-gradient(60%_50%_at_20%_20%,rgba(255,216,181,0.35),transparent)] blur-3xl opacity-80" />
+        <div className="absolute inset-[-20%] bg-[radial-gradient(55%_45%_at_80%_15%,rgba(217,241,228,0.32),transparent)] blur-3xl opacity-80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/12 to-black/20" />
+      </div>
 
       {/* Content */}
       <main className="relative z-10 pb-16">
@@ -108,18 +107,18 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-3 md:gap-8">
 
               {/* Card 1 */}
               <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
-                <CardContent className="p-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                <CardContent className="p-5 text-center sm:p-8">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#F3ECE4] text-xl sm:mb-4 sm:h-16 sm:w-16 sm:text-2xl">
                     ⚡
                   </div>
-                  <h3 className="text-xl font-semibold text-[#3E2F28]">
+                  <h3 className="text-lg font-semibold text-[#3E2F28] sm:text-xl">
                     Súper rápido
                   </h3>
-                  <p className="mt-3 text-sm text-[#5F5148]">
+                  <p className="mt-2 text-sm text-[#5F5148] sm:mt-3 sm:text-base">
                     Aliados confirmando pedidos en minutos y rutas optimizadas para tu zona.
                   </p>
                 </CardContent>
@@ -127,14 +126,14 @@ export default function Home() {
 
               {/* Card 2 */}
               <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
-                <CardContent className="p-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                <CardContent className="p-5 text-center sm:p-8">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#F3ECE4] text-xl sm:mb-4 sm:h-16 sm:w-16 sm:text-2xl">
                     🍕
                   </div>
-                  <h3 className="text-xl font-semibold text-[#3E2F28]">
+                  <h3 className="text-lg font-semibold text-[#3E2F28] sm:text-xl">
                     Variedad local
                   </h3>
-                  <p className="mt-3 text-sm text-[#5F5148]">
+                  <p className="mt-2 text-sm text-[#5F5148] sm:mt-3 sm:text-base">
                     Cafeterías, panaderías y taquerías familiares reunidas en un mismo lugar.
                   </p>
                 </CardContent>
@@ -142,14 +141,14 @@ export default function Home() {
 
               {/* Card 3 */}
               <Card className="rounded-[28px] border-[#E2D9D0] bg-white/90 shadow-[0_20px_45px_rgba(0,0,0,0.08)]">
-                <CardContent className="p-8 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#F3ECE4] text-2xl">
+                <CardContent className="p-5 text-center sm:p-8">
+                  <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#F3ECE4] text-xl sm:mb-4 sm:h-16 sm:w-16 sm:text-2xl">
                     💳
                   </div>
-                  <h3 className="text-xl font-semibold text-[#3E2F28]">
+                  <h3 className="text-lg font-semibold text-[#3E2F28] sm:text-xl">
                     Pago seguro
                   </h3>
-                  <p className="mt-3 text-sm text-[#5F5148]">
+                  <p className="mt-2 text-sm text-[#5F5148] sm:mt-3 sm:text-base">
                     Métodos de pago confiables y soporte cercano para aliados y comensales.
                   </p>
                 </CardContent>
