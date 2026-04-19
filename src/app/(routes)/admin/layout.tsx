@@ -20,23 +20,23 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <div className="absolute inset-0 bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed" />
         <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px] dark:bg-zinc-950/85" />
         
-        <div className="absolute -left-40 top-[-18rem] h-[32rem] w-[32rem] rounded-full bg-gradient-to-br from-rose-200/60 via-red-200/50 to-red-300/10 blur-3xl sm:-left-20 sm:top-[-22rem] md:-left-32 lg:-left-40" />
-        <div className="absolute inset-x-8 top-16 h-40 rounded-3xl bg-gradient-to-r from-red-100/50 via-transparent to-rose-100/40 blur-2xl sm:inset-x-16 sm:top-24 md:inset-x-24 md:top-32 md:h-52" />
-        <div className="absolute -right-20 bottom-[-14rem] h-[28rem] w-[28rem] rounded-full bg-gradient-to-br from-red-200/50 via-rose-300/30 to-transparent blur-3xl md:-right-32 lg:-right-40" />
+        <div className="absolute -left-40 top-[-18rem] h-[32rem] w-[32rem] rounded-full bg-gradient-to-br from-orange-200/60 via-orange-200/50 to-orange-300/10 blur-3xl sm:-left-20 sm:top-[-22rem] md:-left-32 lg:-left-40" />
+        <div className="absolute inset-x-8 top-16 h-40 rounded-3xl bg-gradient-to-r from-orange-100/50 via-transparent to-orange-100/40 blur-2xl sm:inset-x-16 sm:top-24 md:inset-x-24 md:top-32 md:h-52" />
+        <div className="absolute -right-20 bottom-[-14rem] h-[28rem] w-[28rem] rounded-full bg-gradient-to-br from-orange-200/50 via-orange-300/30 to-transparent blur-3xl md:-right-32 lg:-right-40" />
       </div>
 
       <div className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[280px_1fr]">
         {/* Sidebar - Hidden on mobile, visible on tablet+ */}
         <aside className="hidden border-b border-white/25 bg-white/20 p-4 shadow-lg ring-1 ring-white/40 backdrop-blur-3xl md:flex md:flex-col md:border-b-0 md:border-r md:p-5 lg:p-6 dark:border-white/10 dark:bg-white/5 dark:ring-white/10">
-          <div className="rounded-2xl bg-gradient-to-br from-rose-500/50 to-red-500/50 p-[1px] shadow-lg">
+          <div className="rounded-2xl bg-gradient-to-br from-orange-500/50 to-orange-500/50 p-[1px] shadow-lg">
             <Link
               href="/admin"
-              className="flex items-center gap-2 rounded-[14px] bg-white/55 px-3 py-2 text-left text-xs font-semibold text-red-600 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-md md:gap-3 md:px-4 md:py-3 md:text-sm dark:bg-zinc-900/70 dark:text-red-200"
+              className="flex items-center gap-2 rounded-[14px] bg-white/55 px-3 py-2 text-left text-xs font-semibold text-orange-600 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/70 hover:shadow-md md:gap-3 md:px-4 md:py-3 md:text-sm dark:bg-zinc-900/70 dark:text-orange-200"
             >
               <span className="text-lg md:text-xl">🚀</span>
               <div className="leading-tight">
-                <span className="block text-[10px] uppercase tracking-[0.2em] text-red-400 md:text-xs md:tracking-[0.3em]">
-                  Foody Go
+                <span className="block text-[10px] uppercase tracking-[0.2em] text-orange-400 md:text-xs md:tracking-[0.3em]">
+                  Gogi Eats
                 </span>
                 <span className="text-xs md:text-sm">Panel Admin</span>
               </div>
@@ -67,7 +67,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <div className="flex items-center gap-2 sm:gap-3">
                 <MobileNav links={NAV_LINKS} />
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-red-400 sm:text-xs sm:tracking-[0.3em]">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-orange-400 sm:text-xs sm:tracking-[0.3em]">
                     Panel
                   </p>
                   <h1 className="text-base font-bold text-zinc-700 sm:text-lg md:text-xl dark:text-zinc-100">

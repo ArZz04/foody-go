@@ -30,7 +30,7 @@ export function CourierInfoCard({ courier }: CourierInfoCardProps) {
               Incorporación
             </dt>
             <dd>
-              {new Date(courier.inicioEnFoodyGo).toLocaleDateString("es-MX", {
+              {new Date(courier.inicioEnGogiEats).toLocaleDateString("es-MX", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",

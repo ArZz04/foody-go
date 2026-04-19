@@ -18,7 +18,7 @@ interface NotificationsCardProps {
 export function NotificationsCard({ notifications }: NotificationsCardProps) {
   return (
     <Card className="overflow-hidden rounded-[26px] border border-white/20 bg-white/10 text-[#1f2d27] shadow-xl backdrop-blur-lg">
-      <CardHeader className="border-b border-white/10 bg-gradient-to-r from-emerald-400/30 via-emerald-600/25 to-emerald-900/25 pb-6 text-white">
+      <CardHeader className="border-b border-white/10 bg-gradient-to-r from-orange-400/30 via-orange-600/25 to-orange-900/25 pb-6 text-white">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <Bell className="h-5 w-5" />
           Notificaciones
@@ -29,7 +29,7 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
       </CardHeader>
       <CardContent className="space-y-4 pt-6">
         {notifications.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-emerald-300/60 bg-emerald-50/60 p-6 text-center text-sm text-emerald-800/80 shadow-inner">
+          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-orange-300/60 bg-orange-50/60 p-6 text-center text-sm text-orange-800/80 shadow-inner">
             <CheckCircle2 className="h-5 w-5" />
             Sin notificaciones pendientes.
           </div>
@@ -42,27 +42,27 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
               >
                 <span
                   className={`mt-1 h-2 w-2 rounded-full ${
-                    notification.unread ? "bg-emerald-500" : "bg-slate-300"
+                    notification.unread ? "bg-orange-500" : "bg-slate-300"
                   }`}
                 />
                 <div className="flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold text-emerald-900">
+                    <p className="text-sm font-semibold text-orange-900">
                       {notification.title}
                     </p>
                     {notification.unread ? (
                       <Badge
                         variant="outline"
-                        className="border-emerald-200/70 bg-emerald-50/60 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-700"
+                        className="border-orange-200/70 bg-orange-50/60 text-[10px] font-semibold uppercase tracking-[0.2em] text-orange-700"
                       >
                         Nuevo
                       </Badge>
                     ) : null}
                   </div>
-                  <p className="text-xs text-emerald-800/70">
+                  <p className="text-xs text-orange-800/70">
                     {notification.message}
                   </p>
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-emerald-900/50">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-orange-900/50">
                     {notification.timestamp}
                   </p>
                 </div>
@@ -70,8 +70,8 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
             ))}
           </ul>
         )}
-        <div className="grid gap-3 border-t border-dashed border-white/30 pt-4 text-sm text-emerald-900/80">
-          <button className="flex items-center justify-center gap-2 rounded-xl border border-emerald-400/60 bg-white/70 px-4 py-2 font-semibold text-emerald-700 shadow hover:bg-white">
+        <div className="grid gap-3 border-t border-dashed border-white/30 pt-4 text-sm text-orange-900/80">
+          <button className="flex items-center justify-center gap-2 rounded-xl border border-orange-400/60 bg-white/70 px-4 py-2 font-semibold text-orange-700 shadow hover:bg-white">
             <MessageCircle className="h-4 w-4" />
             Abrir chat con soporte
           </button>
@@ -79,7 +79,7 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
             <AlertTriangle className="h-4 w-4" />
             Incidencia en entrega
           </button>
-          <p className="text-xs text-emerald-900/60">
+          <p className="text-xs text-orange-900/60">
             Activa las notificaciones push para recibir nuevas órdenes y mensajes del administrador al instante.
           </p>
         </div>

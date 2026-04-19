@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { NavbarWrapper } from "./components/NavbarWrapper";
 import Providers from "./providers";
-import Navbar from "./components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Foody Go",
+  title: "Gogi Eats",
   description:
-    "Plataforma de entrega de alimentos a domicilio rápida y confiable",
+    "Plataforma naranja y cercana para pedir comida local a domicilio",
   icons: [
     {
       rel: "icon",
-      url: "/logo.png",
+      url: "/LOGO-NEW2.jpg",
     },
     {
       rel: "apple-touch-icon",
-      url: "/logo.png",
+      url: "/LOGO-NEW2.jpg",
     },
   ],
 };
@@ -30,11 +30,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${inter.className} min-h-screen bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-black/60 bg-blend-multiply md:bg-fixed`}
+        className={`${inter.className} min-h-screen bg-[linear-gradient(135deg,#fff7ed_0%,#ffffff_45%,#ffedd5_100%)] text-foreground`}
       >
         <Providers>
           <div className="flex min-h-screen flex-col">
-            <Navbar />
+            <NavbarWrapper />
             {children}
           </div>
         </Providers>

@@ -254,13 +254,13 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                 {/* Badge del sistema */}
                 <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-emerald-800 shadow-inner">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-orange-800 shadow-inner">
                       FG
                     </div>
                     <div className="space-y-1">
                       <span className="text-white/80">SISTEMA</span>
                       <p className="text-sm normal-case tracking-normal text-white">
-                        FoodyGo · Panel de administrador
+                        GogiEats · Panel de administrador
                       </p>
                     </div>
                   </div>

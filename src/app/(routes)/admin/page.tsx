@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <div className="rounded-xl sm:rounded-[22px] border border-white/70 bg-white/95 p-3 sm:p-4 shadow-md ring-1 ring-white/60 dark:border-white/10 dark:bg-white/10 dark:ring-white/10">
-                <p className="text-xs sm:text-sm font-medium text-emerald-600">Tiempo promedio de entrega</p>
+                <p className="text-xs sm:text-sm font-medium text-orange-600">Tiempo promedio de entrega</p>
                 <p className="mt-1 text-2xl sm:text-3xl font-bold">28 min</p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   Meta: 30 min
@@ -190,7 +190,7 @@ export default function AdminDashboardPage() {
                       <td className="px-3 py-2 sm:px-4 hidden sm:table-cell">{business.ciudad}</td>
                       <td className="px-3 py-2 sm:px-4 hidden md:table-cell">{business.giro}</td>
                       <td className="px-3 py-2 sm:px-4">
-                        <span className="inline-flex rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-600">
+                        <span className="inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-600">
                           {business.status}
                         </span>
                       </td>
@@ -243,8 +243,8 @@ export default function AdminDashboardPage() {
           <Card title="Salud del sistema">
             <div className="flex items-center gap-3 sm:gap-4">
               <div className="relative size-14 sm:size-16 flex-shrink-0">
-                <div className="absolute inset-0 rounded-full border-8 border-emerald-500/80" />
-                <div className="absolute inset-1 rounded-full bg-emerald-100/40 dark:bg-emerald-500/10" />
+                <div className="absolute inset-0 rounded-full border-8 border-orange-500/80" />
+                <div className="absolute inset-1 rounded-full bg-orange-100/40 dark:bg-orange-500/10" />
               </div>
               <div className="text-xs sm:text-sm">
                 <p className="font-medium">99.96% uptime</p>
@@ -278,8 +278,8 @@ function KPI({
           {value}
         </div>
         {delta ? (
-          <span className="mt-2 sm:mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-100/80 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
-            <span className="size-1.5 rounded-full bg-emerald-500 dark:bg-emerald-300" />
+          <span className="mt-2 sm:mt-3 inline-flex items-center gap-1 rounded-full bg-orange-100/80 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-orange-600 dark:bg-orange-500/10 dark:text-orange-300">
+            <span className="size-1.5 rounded-full bg-orange-500 dark:bg-orange-300" />
             {delta}
           </span>
         ) : null}

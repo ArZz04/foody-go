@@ -28,17 +28,17 @@ export function DesktopMenu({ links }: { links: AdminNavLink[] }) {
             href={link.href}
             className={clsx(
               "flex gap-3 rounded-2xl border px-3.5 py-3 transition-all",
-              "border-lime-200/60 bg-white/70 text-left text-sm text-stone-500 shadow-sm ring-1 ring-emerald-50/80 hover:-translate-y-0.5 hover:border-lime-300 hover:text-emerald-900 hover:shadow-md",
+              "border-orange-200/60 bg-white/70 text-left text-sm text-stone-500 shadow-sm ring-1 ring-orange-50/80 hover:-translate-y-0.5 hover:border-orange-300 hover:text-orange-900 hover:shadow-md",
               active &&
-                "border-lime-400/80 bg-gradient-to-r from-lime-50 to-emerald-50 text-emerald-900 ring-lime-200 shadow-lg",
+                "border-orange-400/80 bg-gradient-to-r from-orange-50 to-orange-50 text-orange-900 ring-orange-200 shadow-lg",
             )}
           >
             {link.icon ? (
               <span
                 aria-hidden
                 className={clsx(
-                  "flex h-10 w-10 items-center justify-center rounded-2xl bg-lime-100 text-xl text-emerald-700 shadow-inner",
-                  active && "bg-emerald-100 text-emerald-900",
+                  "flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-100 text-xl text-orange-700 shadow-inner",
+                  active && "bg-orange-100 text-orange-900",
                 )}
               >
                 {link.icon}
@@ -82,7 +82,7 @@ export function MobileMenu({ links }: { links: AdminNavLink[] }) {
       <button
         type="button"
         aria-label="Abrir menú"
-        className="inline-flex items-center gap-2 rounded-2xl border border-lime-200/70 bg-white/80 px-4 py-2 text-sm font-medium text-emerald-800 shadow-sm ring-1 ring-emerald-50 transition hover:-translate-y-0.5 hover:shadow-md lg:hidden"
+        className="inline-flex items-center gap-2 rounded-2xl border border-orange-200/70 bg-white/80 px-4 py-2 text-sm font-medium text-orange-800 shadow-sm ring-1 ring-orange-50 transition hover:-translate-y-0.5 hover:shadow-md lg:hidden"
         onClick={() => setOpen(true)}
       >
         <span className="text-lg">☰</span>
@@ -112,17 +112,17 @@ export function MobileMenu({ links }: { links: AdminNavLink[] }) {
             aria-modal="true"
             aria-label="Navegación del panel rural"
             className={clsx(
-              "absolute left-0 top-0 z-10 h-full w-[85vw] max-w-xs border-r border-lime-100/80 bg-gradient-to-b from-white/95 to-lime-50/90 p-5 text-stone-600 shadow-2xl transition-transform duration-300 ease-out",
+              "absolute left-0 top-0 z-10 h-full w-[85vw] max-w-xs border-r border-orange-100/80 bg-gradient-to-b from-white/95 to-orange-50/90 p-5 text-stone-600 shadow-2xl transition-transform duration-300 ease-out",
               open ? "translate-x-0" : "-translate-x-full",
             )}
           >
             <div className="flex items-center justify-between">
-              <p className="text-base font-semibold text-emerald-900">
+              <p className="text-base font-semibold text-orange-900">
                 Panel rural
               </p>
               <button
                 type="button"
-                className="rounded-full p-2 text-lg text-stone-400 transition hover:rotate-90 hover:text-emerald-700"
+                className="rounded-full p-2 text-lg text-stone-400 transition hover:rotate-90 hover:text-orange-700"
                 aria-label="Cerrar menú"
                 onClick={() => setOpen(false)}
               >
@@ -142,9 +142,9 @@ export function MobileMenu({ links }: { links: AdminNavLink[] }) {
                     href={link.href}
                     className={clsx(
                       "rounded-2xl border px-3.5 py-3 text-sm transition",
-                      "border-lime-100/70 bg-white/90 text-stone-500 shadow-sm hover:border-lime-200 hover:text-emerald-900",
+                      "border-orange-100/70 bg-white/90 text-stone-500 shadow-sm hover:border-orange-200 hover:text-orange-900",
                       active &&
-                        "border-lime-300 bg-lime-50 text-emerald-900 shadow-md",
+                        "border-orange-300 bg-orange-50 text-orange-900 shadow-md",
                     )}
                   >
                     <div className="flex items-center gap-3">

@@ -52,8 +52,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="bg-black rounded-2xl p-8 shadow-2xl">
-      <h1 className="text-white text-2xl font-semibold mb-8 text-center">
+    <div className="rounded-2xl border border-orange-100 bg-white p-8 shadow-2xl">
+      <h1 className="mb-8 text-center text-2xl font-semibold text-orange-950">
         Inicio de sesión
       </h1>
 
@@ -65,7 +65,7 @@ export default function LoginForm() {
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white text-sm">
+          <Label htmlFor="email" className="text-sm text-orange-950">
             Correo electrónico
           </Label>
           <Input
@@ -74,14 +74,14 @@ export default function LoginForm() {
             placeholder="correo@ejemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Password */}
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-white text-sm">
+          <Label htmlFor="password" className="text-sm text-orange-950">
             Contraseña
           </Label>
           <Input
@@ -90,7 +90,7 @@ export default function LoginForm() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
@@ -98,18 +98,18 @@ export default function LoginForm() {
         {/* Login Button */}
         <Button
           type="submit"
-          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg"
         >
           Iniciar sesión
         </Button>
 
         {/* Register Link */}
         <div className="text-center">
-          <span className="text-gray-400 text-sm">
+          <span className="text-sm text-stone-500">
             ¿No tienes cuenta?{" "}
             <Link
               href="/auth?mode=register"
-              className="text-emerald-400 hover:text-emerald-300"
+              className="font-semibold text-orange-600 hover:text-orange-700"
             >
               Regístrate
             </Link>

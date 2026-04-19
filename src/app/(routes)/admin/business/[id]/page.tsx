@@ -103,7 +103,7 @@ export default async function BusinessDetailPage({ params }: { params: Promise<{
             </div>
             <div>
               <dt className="text-xs uppercase tracking-[0.2em] text-zinc-400">
-                Inicio en FoodyGo
+                Inicio en GogiEats
               </dt>
               <dd>
                 {new Date(business.creadoEn).toLocaleDateString("es-MX", {
@@ -192,7 +192,7 @@ function getMonthlySummary(pedidos: BusinessOrder[]) {
 function StatusBadge({ status }: { status: BusinessStatus }) {
   const palette =
     status === "Verificado"
-      ? "bg-emerald-100 text-emerald-600"
+      ? "bg-orange-100 text-orange-600"
       : status === "Activo"
         ? "bg-sky-100 text-sky-600"
         : "bg-rose-100 text-rose-600";

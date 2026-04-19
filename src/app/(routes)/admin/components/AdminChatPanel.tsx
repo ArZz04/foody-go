@@ -203,7 +203,7 @@ export function AdminChatPanel({ focusToken }: AdminChatPanelProps) {
                   {thread.type}
                 </span>
                 {thread.unread ? (
-                  <Badge className="rounded-full bg-emerald-500/15 text-emerald-700">
+                  <Badge className="rounded-full bg-orange-500/15 text-orange-700">
                     Nuevo
                   </Badge>
                 ) : null}

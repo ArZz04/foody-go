@@ -8,88 +8,68 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen bg-white">
 
-      {/* CSS Gradient Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,#f7f1e8_0%,#f2e7d9_45%,#fffaf3_100%)]" />
-        <div className="absolute inset-[-20%] bg-[radial-gradient(60%_50%_at_20%_20%,rgba(255,216,181,0.35),transparent)] blur-3xl opacity-80" />
-        <div className="absolute inset-[-20%] bg-[radial-gradient(55%_45%_at_80%_15%,rgba(217,241,228,0.32),transparent)] blur-3xl opacity-80" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/12 to-black/20" />
-      </div>
-
-      {/* Content */}
       <main className="relative z-10 pb-16">
 
         {/* HERO SECTION */}
-        <section className="relative w-full pb-16">
-          <div className="relative overflow-hidden px-6 py-20 lg:px-16">
-            <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center text-white">
+        <section className="relative min-h-[calc(100vh-5rem)] overflow-hidden">
+          <Image
+            src="/fondo.png"
+            alt=""
+            fill
+            className="object-cover object-center"
+            priority
+          />
+          <div className="absolute inset-0 bg-white/78" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/78 to-white/45" />
 
-              <div
-                className="
-                  mb-5
-                  h-20 w-20
-                  rounded-full
-                  border border-white/40
-                  bg-white/90
-                  shadow-xl
-                  backdrop-blur-sm
-                  flex items-center justify-center
-                "
-              >
-                <Image
-                  src="/logo-rounded.png"
-                  alt="Foody Go Logo"
-                  width={68}
-                  height={68}
-                  className="p-3 object-contain"
-                  priority
-                />
-              </div>
-              {/* Badge */}
-              <Badge className="mb-6 border border-white/60 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-[#2E5946]">
+          <div className="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-10 px-6 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:px-10 xl:px-4">
+            <div className="max-w-3xl">
+              <Badge className="mb-8 rounded-full border border-orange-100 bg-orange-50 px-6 py-3 text-sm font-extrabold uppercase tracking-[0.15em] text-orange-700 shadow-sm">
                 Apoyando aliados locales
               </Badge>
 
-              {/* Heading */}
-              <h1 className="font-serif text-4xl leading-tight text-white md:text-6xl">
-                Tu comida favorita, al instante
+              <h1 className="max-w-3xl text-5xl font-black leading-[1.05] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
+                Tu comida favorita,{" "}
+                <span className="text-orange-600">al instante</span>
               </h1>
 
-              {/* Subheading */}
-              <p className="mt-4 max-w-2xl text-base text-white/85 md:text-lg">
-                Apoyando a los primeros aliados de zonas rurales y rancherías cercanas.
-                Sabores hechos en casa, entregados con calidez de comunidad y puntualidad moderna.
+              <p className="mt-7 max-w-2xl text-xl leading-9 text-slate-600 md:text-2xl">
+                Apoyando a los primeros aliados de zonas rurales y rancherías
+                cercanas, sabores hechos en casa, entregados con calidez de
+                comunidad y puntualidad moderna.
               </p>
 
-              {/* Hero Buttons */}
               <HeroActions />
 
-              {/* Highlights */}
-              <div className="mt-10 grid w-full gap-4 text-sm text-white/90 sm:grid-cols-3">
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
-                  <p className="font-semibold text-white">
-                    Pan recién horneado, directo de los hornos de la sierra
-                  </p>
+              <div className="mt-12 flex flex-col gap-2 text-slate-700">
+                <div className="flex gap-1 text-2xl text-orange-500">
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
                 </div>
-
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
-                  <p className="font-semibold text-white">
-                    Cocinas rurales verificadas con recetas que no encuentras en la ciudad
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 shadow-lg backdrop-blur">
-                  <p className="font-semibold text-white">
-                    Repartidores locales que conocen cada brecha y camino de terracería
-                  </p>
-                </div>
+                <p className="text-lg font-semibold">4.9/5 de 10k+ usuarios</p>
               </div>
+            </div>
 
-              {/* Rotator */}
+            <div className="relative">
+              <div className="absolute -inset-5 rounded-[2rem] bg-orange-500/10 blur-2xl" />
+              <div className="relative aspect-[1.55/1] overflow-hidden rounded-[2rem] border border-white/70 bg-white/40 shadow-2xl shadow-orange-900/10 ring-1 ring-orange-100">
+                <Image
+                  src="/repartidor.png"
+                  alt="Repartidor de Gogi Eats en bicicleta"
+                  fill
+                  className="object-cover object-center"
+                  priority
+                />
+              </div>
+            </div>
+
+            <div className="lg:col-span-2">
               <ReviewRotator />
-
             </div>
           </div>
         </section>
@@ -100,7 +80,7 @@ export default function Home() {
 
             <div className="mb-12 text-center">
               <h2 className="font-serif text-4xl text-[#3E2F28]">
-                ¿Por qué elegir Foody Go?
+                ¿Por qué elegir Gogi Eats?
               </h2>
               <p className="mt-3 text-lg text-[#5F5148]">
                 La experiencia gourmet-local que conecta cocinas rurales con quienes las disfrutan
@@ -168,11 +148,11 @@ export default function Home() {
             </h2>
 
             <p className="mt-3 text-lg text-[#5F5148]">
-              Únete a la comunidad Foody Go y descubre el sabor artesanal que tenemos cerca de casa.
+              Únete a la comunidad Gogi Eats y descubre el sabor artesanal que tenemos cerca de casa.
             </p>
 
             <Link href="/auth?mode=register">
-              <Button className="mt-8 rounded-full bg-[#3E2F28] px-10 py-3 text-base text-white hover:bg-[#2e201b]">
+              <Button className="mt-8 rounded-full bg-orange-600 px-10 py-3 text-base text-white hover:bg-orange-700">
                 Comenzar ahora
               </Button>
             </Link>

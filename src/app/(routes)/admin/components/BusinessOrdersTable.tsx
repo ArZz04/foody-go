@@ -130,7 +130,7 @@ export function BusinessOrdersTable({ orders }: BusinessOrdersTableProps) {
 function OrderStatusBadge({ status }: { status: BusinessOrder["estado"] }) {
   const palette =
     status === "Entregado"
-      ? "bg-emerald-100 text-emerald-600"
+      ? "bg-orange-100 text-orange-600"
       : status === "En camino"
         ? "bg-amber-100 text-amber-600"
         : "bg-rose-100 text-rose-600";

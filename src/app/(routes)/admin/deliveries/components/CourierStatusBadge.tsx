@@ -5,7 +5,7 @@ import { CourierStatus } from "@/types/Couriers";
 export function CourierStatusBadge({ status }: { status: CourierStatus }) {
   const palette =
     status === "Activo"
-      ? "bg-emerald-100 text-emerald-600"
+      ? "bg-orange-100 text-orange-600"
       : status === "En descanso"
         ? "bg-sky-100 text-sky-600"
         : "bg-rose-100 text-rose-600";

@@ -141,7 +141,7 @@ function AssignmentStatusBadge({
 }) {
   const palette =
     status === "Entregado"
-      ? "bg-emerald-100 text-emerald-600"
+      ? "bg-orange-100 text-orange-600"
       : status === "En ruta"
         ? "bg-sky-100 text-sky-600"
         : "bg-rose-100 text-rose-600";

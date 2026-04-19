@@ -26,7 +26,7 @@ export interface CourierRecord {
   estado: CourierStatus;
   vehiculo: string;
   placas: string;
-  inicioEnFoodyGo: string;
+  inicioEnGogiEats: string;
   promedioEntrega: string;
   calificacion: number;
   horario: CourierSchedule;

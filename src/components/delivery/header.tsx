@@ -1,19 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   AlertTriangle,
   CirclePower,
   LogOut,
-  MapPin,
   MessageCircle,
-  PackageSearch,
   PauseCircle,
 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface DeliveryHeaderProps {
   driverName?: string;
@@ -53,7 +49,7 @@ export function DeliveryHeader({
     setActionMessage(
       !isPaused
         ? "Pausaste las entregas por 10 minutos. Recuerda reanudar cuando estés listo."
-        : "Has reanudado tus entregas."
+        : "Has reanudado tus entregas.",
     );
   };
 
@@ -83,107 +79,114 @@ export function DeliveryHeader({
   };
 
   return (
-    <header className="relative overflow-hidden rounded-[28px] border border-white/20 bg-white/10 p-6 shadow-2xl shadow-emerald-900/10 backdrop-blur-lg">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(74,222,128,0.45)_0%,rgba(20,40,32,0.6)_55%,rgba(15,28,23,0.85)_100%)]" />
-      <div className="relative space-y-4 text-white">
-        <div className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.35em] text-emerald-100/70">
-          <span>Página repartidores</span>
-        </div>
-        <div>
-          <h1 className="text-3xl font-semibold sm:text-4xl">
-            Hola, {driverName}
-          </h1>
-          <p className="mt-2 max-w-xl text-sm text-emerald-50/80">
-            Revisa tus entregas asignadas, confirma ubicaciones y mantén tu
-            estado de servicio al día durante el turno.
+    <header className="relative overflow-hidden rounded-[24px] bg-[#006b3f] p-5 text-white shadow-2xl shadow-emerald-950/20 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(25,190,104,0.5)_0%,rgba(0,107,63,0.82)_42%,rgba(0,75,45,1)_100%)]" />
+      <div className="relative grid gap-5 lg:grid-cols-[1.25fr,1fr]">
+        <div className="space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100/75">
+            Repartidor autorizado
           </p>
+          <div>
+            <h1 className="text-2xl font-extrabold leading-tight sm:text-3xl">
+              Hola, {driverName}
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-emerald-50/85 sm:text-base">
+              Revisa entregas asignadas, confirma ubicaciones y mantén tu estado
+              de servicio al día durante el turno.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
+              <p className="text-xs font-semibold text-emerald-100/70">
+                Entregas
+              </p>
+              <p className="mt-2 text-3xl font-extrabold">{pendingOrders}</p>
+            </div>
+            <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
+              <p className="text-xs font-semibold text-emerald-100/70">Zona</p>
+              <p className="mt-2 text-base font-extrabold">{serviceArea}</p>
+              <p className="text-xs text-emerald-50/65">{lastSync}</p>
+            </div>
+            <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
+              <p className="text-xs font-semibold text-emerald-100/70">
+                Estado
+              </p>
+              <p className="mt-2 flex items-center gap-2 text-base font-extrabold">
+                <span
+                  className={cn(
+                    "h-2.5 w-2.5 rounded-full",
+                    isActive ? "bg-emerald-300" : "bg-rose-300",
+                  )}
+                />
+                {availabilityLabel}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-emerald-50/90">
-          <Badge
-            variant="secondary"
-            className="flex items-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/30 text-emerald-50 backdrop-blur"
-          >
-            <PackageSearch className="h-3.5 w-3.5" />
-            {pendingOrders} pedidos
-          </Badge>
-          <Badge
-            variant="secondary"
-            className="flex items-center gap-2 rounded-full border border-emerald-200/60 bg-white/10 text-emerald-50 backdrop-blur"
-          >
-            <MapPin className="h-3.5 w-3.5" />
-            Zona: {serviceArea}
-          </Badge>
-          <Badge
+        <div className="flex flex-col justify-end gap-3 text-sm">
+          <Button
+            type="button"
             variant="outline"
-            className="rounded-full border border-white/30 bg-white/10 text-xs uppercase tracking-[0.3em] text-emerald-50/80 backdrop-blur"
-          >
-            Última sync {lastSync}
-          </Badge>
-        </div>
-      </div>
-
-      <div className="relative mt-6 flex flex-col gap-3 text-sm text-white">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setIsActive((prev) => !prev)}
-          className={cn(
-            "flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-semibold shadow-lg transition backdrop-blur",
-            isActive
-              ? "border-emerald-400 bg-emerald-500/80 text-white hover:bg-emerald-500"
-              : "border-rose-400 bg-transparent text-rose-100 hover:bg-rose-500/20",
-          )}
-        >
-          <CirclePower className="h-4 w-4" />
-          {availabilityLabel}
-        </Button>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <Button
-            type="button"
+            onClick={() => setIsActive((prev) => !prev)}
             className={cn(
-              "flex items-center justify-center gap-2 rounded-full border border-amber-300/70 px-4 py-2 text-sm font-semibold text-white shadow-lg transition",
-              isPaused
-                ? "bg-amber-500/90 hover:bg-amber-500"
-                : "bg-amber-400/80 hover:bg-amber-400",
+              "flex h-12 items-center justify-center gap-2 rounded-2xl border-0 px-5 text-sm font-extrabold shadow-lg transition",
+              isActive
+                ? "bg-[#00c853] text-white hover:bg-[#00b84c]"
+                : "bg-rose-500 text-white hover:bg-rose-600",
             )}
-            onClick={handlePauseToggle}
           >
-            <PauseCircle className="h-4 w-4" />
-            {isPaused ? "Reanudar" : "Pausar entregas"}
+            <CirclePower className="h-4 w-4" />
+            {availabilityLabel}
           </Button>
-          <Button
-            type="button"
-            className="flex items-center justify-center gap-2 rounded-full border border-emerald-300/60 bg-emerald-500/80 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-500"
-            onClick={() => {
-              setChatOpen((prev) => !prev);
-              setReportOpen(false);
-            }}
-          >
-            <MessageCircle className="h-4 w-4" />
-            Chat con soporte
-          </Button>
-          <Button
-            type="button"
-            className="flex items-center justify-center gap-2 rounded-full border border-rose-300/70 bg-rose-500/80 px-4 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-rose-500"
-            onClick={() => {
-              setReportOpen((prev) => !prev);
-              setChatOpen(false);
-            }}
-          >
-            <AlertTriangle className="h-4 w-4" />
-            Reportar incidencia
-          </Button>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Button
+              type="button"
+              className={cn(
+                "flex h-12 items-center justify-center gap-2 rounded-2xl border-0 px-4 text-sm font-extrabold text-white shadow-lg transition",
+                isPaused
+                  ? "bg-amber-500 hover:bg-amber-600"
+                  : "bg-amber-400 hover:bg-amber-500",
+              )}
+              onClick={handlePauseToggle}
+            >
+              <PauseCircle className="h-4 w-4" />
+              {isPaused ? "Reanudar" : "Pausar entregas"}
+            </Button>
+            <Button
+              type="button"
+              className="flex h-12 items-center justify-center gap-2 rounded-2xl border-0 bg-blue-500 px-4 text-sm font-extrabold text-white shadow-lg transition hover:bg-blue-600"
+              onClick={() => {
+                setChatOpen((prev) => !prev);
+                setReportOpen(false);
+              }}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Chat con soporte
+            </Button>
+            <Button
+              type="button"
+              className="flex h-12 items-center justify-center gap-2 rounded-2xl border-0 bg-pink-500 px-4 text-sm font-extrabold text-white shadow-lg transition hover:bg-pink-600"
+              onClick={() => {
+                setReportOpen((prev) => !prev);
+                setChatOpen(false);
+              }}
+            >
+              <AlertTriangle className="h-4 w-4" />
+              Reportar incidencia
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex h-12 items-center justify-center gap-2 rounded-2xl border-0 bg-rose-600 px-5 text-sm font-extrabold text-white shadow-lg hover:bg-rose-700"
+              onClick={onLogout}
+            >
+              <LogOut className="h-4 w-4" />
+              Cerrar sesión
+            </Button>
+          </div>
         </div>
-        <Button
-          variant="destructive"
-          className="flex items-center gap-2 rounded-full border border-rose-400 bg-rose-500/80 px-5 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-rose-500"
-          onClick={onLogout}
-        >
-          <LogOut className="h-4 w-4" />
-          Cerrar sesión
-        </Button>
       </div>
 
       {actionMessage ? (
@@ -193,17 +196,17 @@ export function DeliveryHeader({
       ) : null}
 
       {chatOpen ? (
-        <div className="mt-4 rounded-2xl border border-emerald-200/60 bg-white/80 p-4 text-sm text-emerald-900 shadow-inner">
+        <div className="mt-4 rounded-2xl border border-orange-200/60 bg-white/80 p-4 text-sm text-orange-900 shadow-inner">
           <p className="font-semibold">Chat con soporte</p>
-          <p className="text-xs text-emerald-800/70">
-            Soporte Foody Go responde en menos de 3 minutos.
+          <p className="text-xs text-orange-800/70">
+            Soporte Gogi Eats responde en menos de 3 minutos.
           </p>
-          <div className="mt-3 space-y-2 rounded-xl border border-emerald-100 bg-white p-3 text-xs text-emerald-900">
-            <p className="font-semibold">Equipo Foody Go</p>
+          <div className="mt-3 space-y-2 rounded-xl border border-orange-100 bg-white p-3 text-xs text-orange-900">
+            <p className="font-semibold">Equipo Gogi Eats</p>
             <p>Hola {driverName}, ¿todo bien en tu ruta?</p>
           </div>
           <textarea
-            className="mt-3 w-full rounded-xl border border-emerald-200 bg-white p-2 text-sm text-emerald-900 outline-none focus:border-emerald-400"
+            className="mt-3 w-full rounded-xl border border-orange-200 bg-white p-2 text-sm text-orange-900 outline-none focus:border-orange-400"
             rows={2}
             placeholder="Escribe un mensaje rápido..."
             value={chatMessage}
@@ -211,7 +214,7 @@ export function DeliveryHeader({
           />
           <Button
             type="button"
-            className="mt-2 rounded-full bg-emerald-600 text-white hover:bg-emerald-700"
+            className="mt-2 rounded-full bg-orange-600 text-white hover:bg-orange-700"
             onClick={handleChatSend}
           >
             Enviar

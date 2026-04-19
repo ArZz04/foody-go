@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  Copy,
+  ExternalLink,
+  MapPin,
+  NotebookPen,
+  PhoneCall,
+} from "lucide-react";
 import { useCallback, useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,13 +18,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import {
-  Copy,
-  ExternalLink,
-  MapPin,
-  NotebookPen,
-  PhoneCall,
-} from "lucide-react";
 
 import type { DeliveryOrder } from "./types";
 
@@ -53,14 +52,14 @@ export function LocationCard({ order }: LocationCardProps) {
   )}`;
 
   return (
-    <Card className="overflow-hidden rounded-[26px] border border-emerald-700/30 bg-gradient-to-br from-[#1e6f3f] via-[#145734] to-[#0b3123] text-white shadow-2xl">
-      <CardHeader className="border-b border-white/10 bg-transparent pb-6 text-white">
+    <Card className="overflow-hidden rounded-[24px] border-0 bg-[#006b3f] text-white shadow-2xl shadow-emerald-950/15">
+      <CardHeader className="border-b border-white/10 bg-transparent pb-5 text-white">
         <div className="flex items-start gap-3">
-          <span className="mt-1 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-emerald-100 shadow-inner">
+          <span className="mt-1 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white/15 text-emerald-50 shadow-inner">
             <MapPin className="h-5 w-5" />
           </span>
           <div>
-            <CardTitle className="text-lg font-semibold">
+            <CardTitle className="text-xl font-extrabold">
               Ubicación y referencias
             </CardTitle>
             <CardDescription className="text-sm text-white/80">
@@ -70,21 +69,21 @@ export function LocationCard({ order }: LocationCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-5 pt-6 text-white/90">
-        <div className="space-y-1">
+      <CardContent className="space-y-4 p-5 text-white/90">
+        <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-white/70">
             Dirección de entrega
           </p>
-          <p className="text-sm font-semibold text-white">
+          <p className="mt-2 text-base font-extrabold text-white">
             {order.address.street}
           </p>
-          <p className="text-sm text-white/80">
+          <p className="mt-1 text-sm text-white/80">
             {order.address.neighborhood}, {order.address.city}
           </p>
         </div>
 
-        <div className="space-y-2 rounded-2xl border border-white/30 bg-white/10 p-4 shadow-inner backdrop-blur">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-50">
+        <div className="space-y-2 rounded-2xl bg-white/12 p-4 shadow-inner backdrop-blur">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-orange-50">
             <NotebookPen className="h-4 w-4" />
             Referencias
           </div>
@@ -93,7 +92,7 @@ export function LocationCard({ order }: LocationCardProps) {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-white/30 bg-white/15 p-4 shadow-lg backdrop-blur">
+        <div className="rounded-2xl bg-white/12 p-4 shadow-lg backdrop-blur">
           <p className="text-xs uppercase tracking-[0.3em] text-white/70">
             Contacto del cliente
           </p>
@@ -119,7 +118,7 @@ export function LocationCard({ order }: LocationCardProps) {
             className={cn(
               "flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-lg transition backdrop-blur",
               copiedField === "address"
-                ? "border-white bg-white/80 text-emerald-700 hover:bg-white"
+                ? "border-white bg-white/80 text-orange-700 hover:bg-white"
                 : "border-white/40 bg-white/15 text-white hover:bg-white/30",
             )}
           >
@@ -135,7 +134,7 @@ export function LocationCard({ order }: LocationCardProps) {
             className={cn(
               "flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold shadow-lg transition backdrop-blur",
               copiedField === "references"
-                ? "border-white bg-white/80 text-emerald-700 hover:bg-white"
+                ? "border-white bg-white/80 text-orange-700 hover:bg-white"
                 : "border-white/40 bg-white/15 text-white hover:bg-white/30",
             )}
           >
@@ -178,7 +177,7 @@ export function LocationCard({ order }: LocationCardProps) {
           </Button>
         </div>
 
-        <div className="rounded-2xl border border-dashed border-white/30 bg-white/15 p-4 text-xs text-white/80 shadow-inner backdrop-blur">
+        <div className="rounded-2xl border border-dashed border-white/20 bg-white/10 p-4 text-xs text-white/80 shadow-inner backdrop-blur">
           Nota: sin mapa en tiempo real. Usa la dirección, referencias y
           acciones rápidas para contactar al cliente.
         </div>

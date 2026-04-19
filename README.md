@@ -1,6 +1,6 @@
-# 🛒 Foody Go — Sistema de Marketplace y Logística Local
+# 🛒 Gogi Eats — Sistema de Marketplace y Logística Local
 
-**Foody Go** es un sistema web diseñado para mejorar la eficiencia del comercio y la entrega de productos en zonas rurales. Su objetivo principal es conectar de manera efectiva a **clientes**, **comercios** y **repartidores**, reduciendo la fragmentación e informalidad en los procesos de venta y distribución local.
+**Gogi Eats** es un sistema web diseñado para mejorar la eficiencia del comercio y la entrega de productos en zonas rurales. Su objetivo principal es conectar de manera efectiva a **clientes**, **comercios** y **repartidores**, reduciendo la fragmentación e informalidad en los procesos de venta y distribución local.
 
 ---
 
@@ -29,7 +29,7 @@
 
 El proyecto propone el **diseño de un sistema de marketplace y logística** orientado a zonas rurales como **Mazamitla**, donde los procesos de pedidos y entregas aún se gestionan de forma manual o por WhatsApp.  
 
-**Foody Go** busca:
+**Gogi Eats** busca:
 - Gestionar pedidos y transacciones de forma centralizada.  
 - Mejorar la visibilidad de pequeños negocios locales.  
 - Reducir errores, tiempos de entrega y costos logísticos.  
@@ -94,7 +94,7 @@ Diseñar y modelar un **sistema de marketplace y logística** que optimice los p
 
 - Combina **prototipado**, **gestión de riesgos** y **validación iterativa**.  
 - Ideal para entornos con incertidumbre y pruebas de campo.  
-- Permite ajustar el sistema progresivamente según retroalimentación real.
+- Permite ajustar el sistema progresivamente según retroaorangentación real.
 
 ---
 
@@ -108,7 +108,7 @@ Diseñar y modelar un **sistema de marketplace y logística** que optimice los p
 
 ## 🧠 Conclusiones
 
-El desarrollo de **Foody Go** permitió identificar los principales retos de digitalización rural.  
+El desarrollo de **Gogi Eats** permitió identificar los principales retos de digitalización rural.  
 Su enfoque integral hacia la logística y la trazabilidad lo convierte en una herramienta esencial para **modernizar la economía local** y **mejorar la experiencia del cliente**.
 
 El modelo **Espiral** resultó clave para reducir riesgos y adaptar el sistema a condiciones reales, sentando las bases para futuras fases de desarrollo más robustas.
@@ -119,8 +119,8 @@ El modelo **Espiral** resultó clave para reducir riesgos y adaptar el sistema a
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/ArZzDev/foody-go.git
-cd foody-go
+git clone https://github.com/ArZzDev/gogi-go.git
+cd gogi-go
 
 # Instalar dependencias
 npm install
@@ -136,8 +136,8 @@ Abre [http://localhost:3000](http://localhost:3000) para visualizar la aplicaci�
 ## 📘 Estructura del Proyecto
 
 ```
-📦 foody-go
-├foody-go/
+📦 gogi-go
+├gogi-go/
 ├── README.md                  # Documentación principal del proyecto
 ├── biome.json                 # Configuración de Biome (linting y formateo)
 ├── components.json            # Registro de componentes UI (shadcn/ui)
@@ -151,7 +151,8 @@ Abre [http://localhost:3000](http://localhost:3000) para visualizar la aplicaci�
 │   ├── file.svg
 │   ├── fondo-bosque.jpg
 │   ├── globe.svg
-│   ├── logo.png
+│   ├── LOGO-NEW.jpg
+│   ├── LOGO-NEW2.jpg
 │   ├── next.svg
 │   ├── repartidor.jpg
 │   ├── vercel.svg

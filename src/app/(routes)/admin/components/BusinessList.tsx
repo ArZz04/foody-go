@@ -77,7 +77,7 @@ export function BusinessList() {
         <SummaryCard
           label="Verificados"
           value={summary.verificados}
-          accent="emerald"
+          accent="orange"
         />
         <SummaryCard label="Activos" value={summary.activos} accent="sky" />
         <SummaryCard
@@ -176,11 +176,11 @@ function SummaryCard({
 }: {
   label: string;
   value: number;
-  accent?: "rose" | "emerald" | "amber" | "sky";
+  accent?: "rose" | "orange" | "amber" | "sky";
 }) {
   const palette =
-    accent === "emerald"
-      ? "from-emerald-200/80 via-emerald-300/60 to-emerald-400/40 text-emerald-700"
+    accent === "orange"
+      ? "from-orange-200/80 via-orange-300/60 to-orange-400/40 text-orange-700"
       : accent === "amber"
         ? "from-amber-200/80 via-amber-300/60 to-amber-400/40 text-amber-700"
         : accent === "sky"
@@ -202,7 +202,7 @@ function SummaryCard({
 function StatusBadge({ status }: { status: BusinessStatus }) {
   const theme =
     status === "Verificado"
-      ? "bg-emerald-100/70 text-emerald-700"
+      ? "bg-orange-100/70 text-orange-700"
       : status === "Activo"
         ? "bg-sky-100/70 text-sky-700"
         : "bg-rose-100/70 text-rose-700";

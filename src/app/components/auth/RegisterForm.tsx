@@ -58,8 +58,8 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="bg-black rounded-2xl p-8 shadow-2xl">
-      <h1 className="text-white text-2xl font-semibold mb-8 text-center">
+    <div className="rounded-2xl border border-orange-100 bg-white p-8 shadow-2xl">
+      <h1 className="mb-8 text-center text-2xl font-semibold text-orange-950">
         Registro
       </h1>
 
@@ -71,7 +71,7 @@ export default function RegisterForm() {
 
         {/* First Name */}
         <div className="space-y-2">
-          <Label htmlFor="firstName" className="text-white text-sm">
+          <Label htmlFor="firstName" className="text-sm text-orange-950">
             Nombre
           </Label>
           <Input
@@ -80,14 +80,14 @@ export default function RegisterForm() {
             placeholder="Tu nombre"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Last Name */}
         <div className="space-y-2">
-          <Label htmlFor="lastName" className="text-white text-sm">
+          <Label htmlFor="lastName" className="text-sm text-orange-950">
             Apellido
           </Label>
           <Input
@@ -96,14 +96,14 @@ export default function RegisterForm() {
             placeholder="Tu apellido"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Email */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white text-sm">
+          <Label htmlFor="email" className="text-sm text-orange-950">
             Correo electrónico
           </Label>
           <Input
@@ -112,14 +112,14 @@ export default function RegisterForm() {
             placeholder="correo@ejemplo.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Phone */}
         <div className="space-y-2">
-          <Label htmlFor="phone" className="text-white text-sm">
+          <Label htmlFor="phone" className="text-sm text-orange-950">
             Número de teléfono
           </Label>
           <Input
@@ -128,14 +128,14 @@ export default function RegisterForm() {
             placeholder="Tu número de contacto"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Password */}
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-white text-sm">
+          <Label htmlFor="password" className="text-sm text-orange-950">
             Contraseña
           </Label>
           <Input
@@ -144,14 +144,14 @@ export default function RegisterForm() {
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
 
         {/* Confirm Password */}
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword" className="text-white text-sm">
+          <Label htmlFor="confirmPassword" className="text-sm text-orange-950">
             Confirmar contraseña
           </Label>
           <Input
@@ -160,7 +160,7 @@ export default function RegisterForm() {
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-400 focus:border-emerald-500"
+            className="border-orange-200 bg-orange-50/50 text-orange-950 placeholder:text-orange-300 focus:border-orange-500"
             required
           />
         </div>
@@ -172,25 +172,25 @@ export default function RegisterForm() {
             checked={acceptTerms}
             onCheckedChange={(checked) => setAcceptTerms(checked === true)}
           />
-          <Label htmlFor="terms" className="text-gray-300 text-sm">
+          <Label htmlFor="terms" className="text-sm text-stone-500">
             Acepto Términos de uso y política de privacidad
           </Label>
         </div>
 
         <Button
           type="submit"
-          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 rounded-lg"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 rounded-lg"
           disabled={!acceptTerms}
         >
           Registrarse
         </Button>
 
         <div className="text-center">
-          <span className="text-gray-400 text-sm">
+          <span className="text-sm text-stone-500">
             ¿Ya tienes cuenta?{" "}
             <Link
               href="/auth?mode=login"
-              className="text-emerald-400 hover:text-emerald-300"
+              className="font-semibold text-orange-600 hover:text-orange-700"
             >
               Inicia sesión
             </Link>

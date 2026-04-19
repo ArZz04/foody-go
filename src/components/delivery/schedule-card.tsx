@@ -18,7 +18,7 @@ interface ScheduleCardProps {
 export function ScheduleCard({ schedule }: ScheduleCardProps) {
   return (
     <Card className="overflow-hidden rounded-[26px] border border-white/20 bg-white/10 text-[#1f2d27] shadow-xl backdrop-blur-lg">
-      <CardHeader className="border-b border-white/10 bg-gradient-to-r from-emerald-400/30 via-emerald-600/25 to-emerald-900/25 pb-6 text-white">
+      <CardHeader className="border-b border-white/10 bg-gradient-to-r from-orange-400/30 via-orange-600/25 to-orange-900/25 pb-6 text-white">
         <CardTitle className="flex items-center gap-2 text-lg font-semibold">
           <CalendarClock className="h-5 w-5" />
           Horario
@@ -29,15 +29,15 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
       </CardHeader>
       <CardContent className="space-y-5 pt-6">
         <div className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+          <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
             Turno
           </p>
-          <p className="text-sm font-semibold text-emerald-900">
+          <p className="text-sm font-semibold text-orange-900">
             {schedule.shiftLabel}
           </p>
           <Badge
             variant="outline"
-            className="rounded-full border border-emerald-200/70 bg-emerald-50/60 text-xs text-emerald-700"
+            className="rounded-full border border-orange-200/70 bg-orange-50/60 text-xs text-orange-700"
           >
             {schedule.shiftWindow}
           </Badge>
@@ -45,26 +45,26 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
 
         <div className="grid gap-4 rounded-2xl border border-white/20 bg-white/60 p-4 shadow-inner md:grid-cols-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+            <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
               Inicio
             </p>
-            <p className="mt-1 text-sm font-semibold text-emerald-900">
+            <p className="mt-1 text-sm font-semibold text-orange-900">
               {schedule.startTime ?? "—"}
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+            <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
               Fin
             </p>
-            <p className="mt-1 text-sm font-semibold text-emerald-900">
+            <p className="mt-1 text-sm font-semibold text-orange-900">
               {schedule.endTime ?? "—"}
             </p>
           </div>
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+            <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
               Horas trabajadas
             </p>
-            <p className="mt-1 text-sm font-semibold text-emerald-900">
+            <p className="mt-1 text-sm font-semibold text-orange-900">
               {schedule.hoursWorked ?? "—"}
             </p>
           </div>
@@ -72,10 +72,10 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
 
         {schedule.breakWindow ? (
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+            <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
               Pausa sugerida
             </p>
-            <p className="text-sm text-emerald-800/80">
+            <p className="text-sm text-orange-800/80">
               {schedule.breakWindow}
             </p>
           </div>
@@ -83,15 +83,15 @@ export function ScheduleCard({ schedule }: ScheduleCardProps) {
 
         <div className="rounded-2xl border border-white/40 bg-white/70 p-4 shadow-lg backdrop-blur">
           <div className="flex items-start gap-3">
-            <AlarmClock className="mt-0.5 h-4 w-4 text-emerald-600" />
+            <AlarmClock className="mt-0.5 h-4 w-4 text-orange-600" />
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-emerald-900/60">
+              <p className="text-xs uppercase tracking-[0.3em] text-orange-900/60">
                 Próximo check-in
               </p>
-              <p className="mt-2 text-sm font-semibold text-emerald-900">
+              <p className="mt-2 text-sm font-semibold text-orange-900">
                 {schedule.nextCheckIn}
               </p>
-              <p className="mt-1 text-xs text-emerald-800/70">
+              <p className="mt-1 text-xs text-orange-800/70">
                 Cobertura actual: {schedule.coverageZone}
               </p>
             </div>

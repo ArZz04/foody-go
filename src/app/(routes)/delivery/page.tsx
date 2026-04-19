@@ -1,11 +1,11 @@
 "use client";
 
-import { DeliveryHeader } from "@/components/delivery/header";
 import { CurrentDeliveriesCard } from "@/components/delivery/current-deliveries-card";
-import { LocationCard } from "@/components/delivery/location-card";
-import { ScheduleCard } from "@/components/delivery/schedule-card";
 import { EarningsCard } from "@/components/delivery/earnings-card";
+import { DeliveryHeader } from "@/components/delivery/header";
+import { LocationCard } from "@/components/delivery/location-card";
 import { NotificationsCard } from "@/components/delivery/notifications-card";
+import { ScheduleCard } from "@/components/delivery/schedule-card";
 import type {
   DeliveryEarnings,
   DeliveryNotification,
@@ -13,7 +13,6 @@ import type {
   DeliverySchedule,
 } from "@/components/delivery/types";
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
 
 const currentOrders: DeliveryOrder[] = [
   {
@@ -115,36 +114,23 @@ const recentNotifications: DeliveryNotification[] = [
 
 export default function DeliveryDashboardPage() {
   const { user, logout } = useAuth();
-  const [notifications, setNotifications] = useState(recentNotifications);
+  const notifications = recentNotifications;
   const highlightedOrder = currentOrders[0];
-  const driverName = user?.name ?? "Repartidor Foody";
-  const driverId: string = user?.id?.toString() ?? "repartidor";
+  const driverName = user?.name ?? "Repartidor Gogi";
 
   return (
-    <main
-      className="min-h-screen bg-fixed bg-cover bg-center"
-      style={{ backgroundImage: "url('/fondo-bosque.jpg')" }}
-    >
-      <div className="min-h-screen bg-[linear-gradient(180deg,rgba(17,32,26,0.78)_0%,rgba(230,238,232,0.94)_45%,rgba(245,245,240,0.98)_100%)] text-[#1f2d27]">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
+    <main className="min-h-screen bg-[#f4f6f3] text-[#17231d]">
+      <div className="min-h-screen bg-[linear-gradient(180deg,#e9f3ed_0%,#f8faf7_38%,#f4f6f3_100%)]">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
           <DeliveryHeader
             driverName={driverName}
             serviceArea="Zona Centro"
             pendingOrders={currentOrders.length}
             lastSync="Hace 3 min"
             onLogout={logout}
-            onReportIncident={(payload) => {
-              // emitFoodyEvent({ --- IGNORE ---
-              //   type: "incident",
-              //   payload: {
-              //     driverId,
-              //     ...payload,
-              //   },
-              // }); --- IGNORE ---
-            }}
           />
 
-          <div className="grid gap-6 xl:grid-cols-[1.8fr,1.2fr]">
+          <div className="grid gap-6 xl:grid-cols-[1.65fr,1fr]">
             <CurrentDeliveriesCard orders={currentOrders} />
 
             <div className="space-y-6">
@@ -159,7 +145,7 @@ export default function DeliveryDashboardPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[1fr,1.2fr]">
+          <div className="grid gap-6 lg:grid-cols-[0.95fr,1.05fr]">
             <EarningsCard earnings={earningsSummary} />
             <NotificationsCard notifications={notifications} />
           </div>

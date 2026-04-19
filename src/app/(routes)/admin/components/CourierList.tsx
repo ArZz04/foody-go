@@ -80,7 +80,7 @@ export function CourierList() {
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Repartidores totales" value={summary.total} />
-        <SummaryCard label="Activos" value={summary.activos} accent="emerald" />
+        <SummaryCard label="Activos" value={summary.activos} accent="orange" />
         <SummaryCard
           label="En descanso"
           value={summary.descanso}
@@ -164,7 +164,7 @@ function CourierRow({ courier }: { courier: CourierRecord }) {
         <CourierStatusBadge status={status} />
       </td>
       <td className="px-6 py-3 text-xs text-zinc-400">
-        {new Date(courier.inicioEnFoodyGo).toLocaleDateString("es-MX", {
+        {new Date(courier.inicioEnGogiEats).toLocaleDateString("es-MX", {
           day: "2-digit",
           month: "short",
           year: "numeric",
@@ -200,11 +200,11 @@ function SummaryCard({
 }: {
   label: string;
   value: number;
-  accent?: "rose" | "emerald" | "sky";
+  accent?: "rose" | "orange" | "sky";
 }) {
   const palette =
-    accent === "emerald"
-      ? "from-emerald-200/80 to-emerald-400/60 text-emerald-700"
+    accent === "orange"
+      ? "from-orange-200/80 to-orange-400/60 text-orange-700"
       : accent === "sky"
         ? "from-sky-200/80 to-sky-400/60 text-sky-700"
         : "from-rose-200/80 to-red-400/60 text-red-700";
@@ -224,7 +224,7 @@ function SummaryCard({
 function CourierStatusBadge({ status }: { status: CourierStatus }) {
   const palette =
     status === "Activo"
-      ? "bg-emerald-100 text-emerald-600"
+      ? "bg-orange-100 text-orange-600"
       : status === "En descanso"
         ? "bg-sky-100 text-sky-600"
         : "bg-rose-100 text-rose-600";

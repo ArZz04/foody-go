@@ -106,7 +106,7 @@ export default function AdminSettingsPage() {
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-300">
               Administra preferencias, seguridad y operaciones clave del
-              ecosistema FoodyGo.
+              ecosistema GogiEats.
             </p>
           </div>
           <Button variant="destructive" className="rounded-lg px-5">
@@ -150,7 +150,7 @@ export default function AdminSettingsPage() {
                     Yaritza Chávez
                   </h2>
                   <p className="text-sm text-zinc-500 dark:text-zinc-300">
-                    admin@foodygo.mx
+                    admin@gogieats.mx
                   </p>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function AdminSettingsPage() {
                 <Input
                   id="correo"
                   type="email"
-                  defaultValue="admin@foodygo.mx"
+                  defaultValue="admin@gogieats.mx"
                   className="rounded-lg border-red-200/60 bg-white/80 focus-visible:ring-red-400 dark:border-white/10 dark:bg-transparent"
                 />
               </div>
@@ -297,7 +297,7 @@ export default function AdminSettingsPage() {
                           {device.location} · {device.lastActive}
                         </p>
                       </div>
-                      <span className="rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-semibold text-emerald-600">
+                      <span className="rounded-full bg-orange-500/10 px-2 py-1 text-xs font-semibold text-orange-600">
                         Activo
                       </span>
                     </div>
@@ -437,7 +437,7 @@ export default function AdminSettingsPage() {
                 Soporte y ayuda
               </CardTitle>
               <CardDescription>
-                Conecta con el equipo de soporte o envía retroalimentación
+                Conecta con el equipo de soporte o envía retroaorangentación
                 rápida.
               </CardDescription>
             </div>

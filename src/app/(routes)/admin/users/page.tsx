@@ -196,7 +196,7 @@ const handleSave = async () => {
 
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
           <SummaryCard label="Usuarios Totales" value={stats.total} />
-          <SummaryCard label="Usuarios Activos" value={stats.activos} accent="emerald" />
+          <SummaryCard label="Usuarios Activos" value={stats.activos} accent="orange" />
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">

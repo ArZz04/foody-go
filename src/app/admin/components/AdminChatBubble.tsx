@@ -20,7 +20,7 @@ export function AdminChatBubble({ initialUnread = 3 }: { initialUnread?: number 
   const handleClick = () => {
     setUnread(0);
     router.push(targetHref);
-    window.dispatchEvent(new CustomEvent("foody:chat-open"));
+    window.dispatchEvent(new CustomEvent("gogi:chat-open"));
   };
 
   return (

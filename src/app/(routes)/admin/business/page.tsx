@@ -317,7 +317,7 @@ const handleEdit = (business: BusinessFull) => {
         {/* STATS */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <SummaryCard label="Negocios Totales" value={stats.total} />
-          <SummaryCard label="Negocios Activos" value={stats.activos} accent="emerald" />
+          <SummaryCard label="Negocios Activos" value={stats.activos} accent="orange" />
         </div>
 
         {/* TABLE */}

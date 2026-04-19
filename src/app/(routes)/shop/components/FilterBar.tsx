@@ -37,7 +37,7 @@ export default function FilterBar({
                 className={clsx(
                   "inline-flex items-center gap-1 rounded-2xl px-4 py-2 text-sm font-medium shadow-sm transition",
                   active
-                    ? "bg-emerald-500 text-white shadow-emerald-200"
+                    ? "bg-orange-500 text-white shadow-orange-200"
                     : "bg-white text-slate-600 shadow-slate-100 hover:bg-slate-50",
                 )}
               >

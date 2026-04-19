@@ -55,7 +55,7 @@ type OrdersContextType = {
 
 const OrdersContext = createContext<OrdersContextType | undefined>(undefined);
 
-const STORAGE_KEY = "foodygo:orders";
+const STORAGE_KEY = "gogieats:orders";
 
 function minutesAgo(value: number) {
   const date = new Date();

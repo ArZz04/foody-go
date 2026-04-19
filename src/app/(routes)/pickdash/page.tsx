@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
 import type { StaticImageData } from "next/image";
-import { useAuth } from "@/context/AuthContext";
-
+import Image from "next/image";
+import Link from "next/link";
+import adminImg from "@/../public/admi.jpg";
+import administradorImg from "@/../public/administrador.jpg";
 import deliveryImg from "@/../public/repartidor-2.jpg";
 import vendorImg from "@/../public/vendedor.jpg";
-import administradorImg from "@/../public/administrador.jpg";
-import adminImg from "@/../public/admi.jpg";
+import { useAuth } from "@/context/AuthContext";
 
 type RoleName = "DELIVERY" | "MANAGER" | "OWNER" | "ADMIN";
 
@@ -39,8 +38,8 @@ const CARDS: RoleCard[] = [
     description: "Gestión de catálogo y promociones",
     href: "/business/manager",
     image: vendorImg,
-    accent: "from-lime-500/70 via-emerald-700/75 to-emerald-900/85",
-    chip: "text-lime-100",
+    accent: "from-orange-500/70 via-orange-700/75 to-orange-900/85",
+    chip: "text-orange-100",
     chipLabel: "Dueño de negocio",
   },
   {
@@ -79,7 +78,6 @@ export default function RoleMenu() {
   }
 
   const roles: RoleName[] = (
-    console.log(user.roles),
     Array.isArray(user.roles) ? user.roles : [user.roles]
   ).filter(
     (role): role is RoleName =>
@@ -97,14 +95,14 @@ export default function RoleMenu() {
       style={{ backgroundImage: "url('/portada.jpg')" }}
     >
       <div className="min-h-screen bg-[linear-gradient(180deg,rgba(16,24,19,0.78)_0%,rgba(235,240,231,0.94)_40%,rgba(248,246,238,0.98)_100%)]">
-        <section className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 pb-10 pt-12 text-gray-900 sm:gap-12 sm:px-6 lg:px-10 lg:pt-16">
+        <section className="mx-auto flex min-h-screen max-w-7xl flex-col justify-center gap-8 px-4 py-10 text-gray-900 sm:gap-10 sm:px-6 lg:px-10">
           <header className="space-y-3 text-white sm:space-y-4">
             <p className="text-xs uppercase tracking-[0.35em] text-white/60">
               Centro de acceso
             </p>
             <h1 className="text-3xl font-semibold sm:text-4xl">
               Hola,{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-200 to-lime-200">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-200 to-orange-200">
                 {user.name}
               </span>
             </h1>
@@ -123,7 +121,7 @@ export default function RoleMenu() {
           </header>
 
           {visibleCards.length > 0 ? (
-            <div className="grid flex-1 grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
               {visibleCards.map((card) => (
                 <Card key={card.role} {...card} />
               ))}
@@ -151,7 +149,7 @@ function Card({
   return (
     <Link
       href={href}
-      className="group relative block overflow-hidden rounded-[28px] border border-white/30 bg-white/5 shadow-2xl transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2"
+      className="group relative block h-[320px] overflow-hidden rounded-[24px] border border-white/30 bg-white/5 shadow-2xl transition-transform duration-300 ease-out hover:-translate-y-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2 sm:h-[360px] lg:h-[420px]"
     >
       <Image
         src={image}
@@ -161,26 +159,29 @@ function Card({
         sizes="(max-width: 768px) 100vw, 50vw"
         priority
       />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/5 via-black/10 to-black/55" />
       {accent ? (
         <div
           className={`pointer-events-none absolute inset-0 bg-gradient-to-b ${accent}`}
         />
       ) : null}
-      <div className="relative flex h-full flex-col justify-between gap-5 p-5 text-white sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+      <div className="relative flex h-full flex-col justify-end gap-5 p-5 text-white sm:p-6">
         <div className="space-y-3">
           <span
-            className={`inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] ${chip}`}
+            className={`inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[9px] font-semibold uppercase leading-5 tracking-[0.16em] backdrop-blur-sm xl:text-[10px] ${chip}`}
           >
             {chipLabel}
           </span>
           <div className="space-y-1">
-            <h2 className="text-lg font-semibold leading-tight sm:text-xl">
+            <h2 className="text-xl font-semibold leading-tight sm:text-2xl lg:text-xl xl:text-2xl">
               {title}
             </h2>
-            <p className="text-sm text-white/85 sm:text-base">{description}</p>
+            <p className="max-w-[15rem] text-sm leading-6 text-white/85 sm:text-base">
+              {description}
+            </p>
           </div>
         </div>
-        <div className="flex w-full items-center justify-between text-sm font-semibold text-white/90 sm:w-auto sm:flex-col sm:items-end sm:gap-2 sm:text-xs">
+        <div className="flex w-full items-center justify-between text-sm font-semibold text-white/90">
           <span className="inline-flex items-center gap-2">
             Entrar
             <span
