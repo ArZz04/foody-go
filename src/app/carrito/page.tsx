@@ -75,10 +75,32 @@ export default function CarritoPage() {
   const router = useRouter();
   const { user } = useAuth();
 
+  const mapToSavedAddress = (address: any): SavedAddress => {
+    const a = address ?? {};
+    return {
+      id: a.id,
+      placeType: a.placeType ?? "",
+      placeName: a.placeName ?? "",
+      street: a.street ?? "",
+      externalNumber: a.externalNumber ?? "",
+      internalNumber: a.internalNumber ?? "",
+      fullAddress: a.fullAddress ?? `${a.street ?? ""} ${a.externalNumber ?? ""}`.trim(),
+      neighborhood: a.neighborhood ?? "",
+      city: a.city ?? "",
+      state: a.state ?? "",
+      references: a.references ?? a.reference ?? "",
+      deliveryInstructions: a.deliveryInstructions ?? "",
+      phone: a.phone ?? "",
+    };
+  };
+
   // --- Estados ---
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
   const [cartId, setCartId] = useState<number | null>(null);
-  const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(user?.address ?? null);
+  const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(() => {
+    if (!user?.address) return null;
+    return mapToSavedAddress(user.address);
+  });
   const [shipping, setShipping] = useState<ShippingByAddressResult>(DEFAULT_SHIPPING_STATE);
   
   // UI States
@@ -117,7 +139,7 @@ export default function CarritoPage() {
       }
     };
     loadCart();
-    setSavedAddress(user.address ?? null);
+    setSavedAddress(user.address ? mapToSavedAddress(user.address) : null);
   }, [user]);
 
   // --- Efecto: Calcular Envío ---
