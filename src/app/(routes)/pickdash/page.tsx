@@ -357,8 +357,7 @@ function Card({
       >
         <div className="space-y-4">
           <span
-            className={`inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[9px] font-semibold uppercase leading-5 tracking-[0.16em] backdrop-blur-sm xl:text-[10px] ${chip}`}
-          >
+            className={`inline-flex max-w-full items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[9px] font-semibold uppercase leading-5 tracking-[0.16em] backdrop-blur-sm xl:text-[10px] ${chip}`}>
             {chipLabel}
           </span>
 
