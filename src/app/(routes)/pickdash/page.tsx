@@ -176,7 +176,10 @@ export default function RoleMenu() {
           return;
         }
 
-        console.log(user.id, user.roles, payload.businessOwner);
+        // Busca la línea 179 y cámbiala por esto:
+if (user) {
+  console.log(user.id, user.roles, payload.businessOwner);
+}
         setAccessItems(
           Array.isArray(payload.access)
             ? (payload.access as Array<{
