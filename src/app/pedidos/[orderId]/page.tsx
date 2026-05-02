@@ -383,7 +383,10 @@ export default function PedidoDetallePage() {
         current
           ? {
               ...current,
-              status_name: data.status,
+              status_name:
+                typeof data?.status === "string"
+                  ? data.status
+                  : current.status_name,
               notes: [
                 ...(current.notes ?? []),
                 {
