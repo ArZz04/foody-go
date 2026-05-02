@@ -12,6 +12,20 @@ import { useAuth } from "@/context/AuthContext";
 
 type RoleName = "DELIVERY" | "MANAGER" | "OWNER" | "ADMIN";
 
+interface AccessFlags {
+  admin?: boolean;
+  businessOwner?: boolean;
+  businessManager?: boolean;
+  customer?: boolean;
+  delivery?: boolean;
+}
+
+interface AccessCenterResponse {
+  success?: boolean;
+  access?: Array<{ key: string; title: string; href: string }>;
+  accessFlags?: AccessFlags;
+}
+
 function normalizeRole(role: string): RoleName | null {
   if (role === "DELIVERY" || role === "REPARTIDOR" || role === "repartidor") {
     return "DELIVERY";
@@ -124,102 +138,78 @@ export default function RoleMenu() {
     }
 
     async function fetchAccessCenter() {
-      try {
-        const token =
-          localStorage.getItem("token") ||
-          localStorage.getItem("authToken") ||
-          localStorage.getItem("accessToken");
+  try {
+    const token =
+      localStorage.getItem("token") ||
+      localStorage.getItem("authToken") ||
+      localStorage.getItem("accessToken");
 
-        if (!token) {
-          router.push("/login");
-          return;
-        }
-
-        const endpoint = "/api/auth/access-center";
-        const response = await fetch(endpoint, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const responseText = await response.text();
-        let payload: Record<string, unknown> = {};
-
-        try {
-          payload = responseText ? JSON.parse(responseText) : {};
-        } catch {
-          payload = { raw: responseText };
-        }
-
-        if (!response.ok || payload.success === false) {
-          console.error("Error cargando accesos del usuario:", {
-            endpoint,
-            status: response.status,
-            statusText: response.statusText,
-            responseText,
-            payload,
-          });
-          setAccessState(null);
-          setAccessItems([]);
-          return;
-        }
-
-        if (!Array.isArray(payload.access)) {
-          console.error("Respuesta invalida de accesos del usuario:", {
-            endpoint,
-            status: response.status,
-            statusText: response.statusText,
-            responseText,
-            payload,
-          });
-          setAccessState(null);
-          setAccessItems([]);
-          return;
-        }
-
-        // Busca la línea 179 y cámbiala por esto:
-if (user) {
-  console.log(user.id, user.roles, payload.businessOwner);
-}
-        setAccessItems(
-          Array.isArray(payload.access)
-            ? (payload.access as Array<{
-                key: string;
-                title: string;
-                href: string;
-              }>)
-            : [],
-        );
-        setAccessState(
-          payload.accessFlags && typeof payload.accessFlags === "object"
-            ? (payload.accessFlags as {
-                admin: boolean;
-                businessOwner: boolean;
-                businessManager: boolean;
-                customer: boolean;
-                delivery: boolean;
-              })
-            : null,
-        );
-
-        if (
-          payload.accessFlags?.customer &&
-          !payload.accessFlags?.admin &&
-          !payload.accessFlags?.businessOwner &&
-          !payload.accessFlags?.businessManager &&
-          !payload.accessFlags?.delivery
-        ) {
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Error validando centro de acceso:", error);
-        setAccessState(null);
-      } finally {
-        setAccessLoading(false);
-      }
+    if (!token) {
+      router.push("/login");
+      return;
     }
 
-    fetchAccessCenter();
-  }, [router, user]);
+    const endpoint = "/api/auth/access-center";
+    const response = await fetch(endpoint, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const responseText = await response.text();
+    
+    // ✅ 1. Usar la interfaz AccessCenterResponse en lugar de Record
+    let payload: AccessCenterResponse = {};
+
+    try {
+      payload = responseText ? JSON.parse(responseText) : {};
+    } catch {
+      payload = {};
+    }
+
+    if (!response.ok || payload.success === false) {
+      console.error("Error cargando accesos:", { status: response.status, payload });
+      setAccessState(null);
+      setAccessItems([]);
+      return;
+    }
+
+    // ✅ 2. Validación de seguridad para el log
+    if (user) {
+      console.log(user.id, user.roles, payload.accessFlags?.businessOwner);
+    }
+
+    // ✅ 3. Sincronizar estados usando los datos del payload tipado
+    const newAccessItems = Array.isArray(payload.access) ? payload.access : [];
+    setAccessItems(newAccessItems);
+
+    const newAccessFlags = payload.accessFlags && typeof payload.accessFlags === "object"
+        ? (payload.accessFlags as {
+            admin: boolean;
+            businessOwner: boolean;
+            businessManager: boolean;
+            customer: boolean;
+            delivery: boolean;
+          })
+        : null;
+    
+    setAccessState(newAccessFlags);
+
+    // ✅ 4. Lógica de redirección (ahora TS reconoce todas las propiedades)
+    if (
+      payload.accessFlags?.customer &&
+      !payload.accessFlags?.admin &&
+      !payload.accessFlags?.businessOwner &&
+      !payload.accessFlags?.businessManager &&
+      !payload.accessFlags?.delivery
+    ) {
+      router.push("/");
+    }
+  } catch (error) {
+    console.error("Error validando centro de acceso:", error);
+    setAccessState(null);
+  } finally {
+    setAccessLoading(false);
+  }
+}
 
   const visibleCards = useMemo(() => {
     if (accessItems.length > 0) {
