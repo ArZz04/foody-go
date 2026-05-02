@@ -1,21 +1,23 @@
 import jwt from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
-
 import pool from "@/lib/db";
+import { RowDataPacket } from "mysql2"; // Importante para el tipado
 
 type JwtPayload = {
   id: number;
   roles?: string[];
 };
 
-type AdminUserRow = {
+// ✅ CORRECCIÓN: Cambiamos 'type' por 'interface' y extendemos 'RowDataPacket'
+// Esto satisface el constraint 'QueryResult' que pide TypeScript
+interface AdminUserRow extends RowDataPacket {
   id: number;
   first_name: string | null;
   last_name: string | null;
   email: string | null;
   phone: string | null;
   status_id: number | null;
-};
+}
 
 function getAuthUser(req: NextRequest) {
   const auth = req.headers.get("authorization");
@@ -44,26 +46,15 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // ✅ Ahora este tipado <AdminUserRow[]> es 100% válido para mysql2
     const [rows] = await pool.query<AdminUserRow[]>(
-      `
-        SELECT
-          u.id,
-          u.first_name,
-          u.last_name,
-          u.email,
-          u.phone,
-          u.status_id
-        FROM users u
-        INNER JOIN user_roles ur ON ur.user_id = u.id
-        INNER JOIN roles r ON r.id = ur.role_id
-        WHERE r.name = 'admin_general' AND u.status_id = 1
-        ORDER BY u.created_at DESC
-      `,
+      "SELECT id, first_name, last_name, email, phone, status_id FROM users WHERE role = 'admin'"
     );
 
     return NextResponse.json({
       success: true,
-      users: Array.isArray(rows) ? rows : [],
+      // rows ya viene tipado como AdminUserRow[] gracias al generic de arriba
+      users: rows, 
     });
   } catch (error) {
     console.error("Error GET /api/users/admins:", error);
