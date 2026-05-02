@@ -1,12 +1,9 @@
-import type { PoolConnection, RowDataPacket } from "mysql2/promise";
+import type { Pool, PoolConnection, RowDataPacket } from "mysql2/promise";
 
 import pool from "@/lib/db";
 
 type Queryable = {
-  query: <T extends RowDataPacket[]>(
-    sql: string,
-    values?: unknown[],
-  ) => Promise<[T, unknown]>;
+  query: (...args: unknown[]) => Promise<unknown>;
 };
 
 type UserAvatarColumnRow = RowDataPacket & {
@@ -19,9 +16,9 @@ export type UserAvatarColumns = {
 };
 
 export async function getUserAvatarColumns(
-  executor: Queryable | PoolConnection = pool,
+  executor: Queryable | PoolConnection | Pool = pool,
 ): Promise<UserAvatarColumns> {
-  const [rows] = await executor.query<UserAvatarColumnRow[]>(
+  const [rows] = (await executor.query(
     `
       SELECT column_name
       FROM information_schema.columns
@@ -29,7 +26,7 @@ export async function getUserAvatarColumns(
         AND table_name = 'users'
         AND column_name IN ('profile_image_url', 'avatar_url')
     `,
-  );
+  )) as [UserAvatarColumnRow[], unknown];
 
   const columnNames = new Set(
     rows.map((row) => String(row.column_name).toLowerCase()),
@@ -42,7 +39,7 @@ export async function getUserAvatarColumns(
 }
 
 export async function ensureUserAvatarColumn(
-  executor: Queryable | PoolConnection = pool,
+  executor: Queryable | PoolConnection | Pool = pool,
 ) {
   const currentColumns = await getUserAvatarColumns(executor);
 
