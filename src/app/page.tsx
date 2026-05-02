@@ -32,7 +32,7 @@ export default function Home() {
 
               <h1 className="max-w-3xl text-5xl font-black leading-[1.05] tracking-normal text-slate-950 sm:text-6xl lg:text-7xl">
                 Tu comida favorita,{" "}
-                <span className="text-orange-600">al instante</span>
+                <span className="text-orange-600">al instantes</span>
               </h1>
 
               <p className="mt-7 max-w-2xl text-xl leading-9 text-slate-600 md:text-2xl">
