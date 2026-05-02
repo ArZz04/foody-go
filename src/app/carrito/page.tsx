@@ -110,8 +110,6 @@ export default function CarritoPage() {
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
-  const [customerLocation, setCustomerLocation] =
-    useState<CustomerLocation | null>(null);
 =======
   const [customerLocation, setCustomerLocation] = useState<{ lat: number; lng: number } | null>(null);
 >>>>>>> Stashed changes
@@ -635,7 +633,6 @@ export default function CarritoPage() {
     0,
   );
 
-<<<<<<< Updated upstream
   const deliveryFee = useMemo(() => {
     if (!customerLocation) {
       return DEFAULT_DELIVERY_FEE;
@@ -645,10 +642,6 @@ export default function CarritoPage() {
   }, [cartItems, customerLocation]);
 
   const total = subtotal + SERVICE_FEE + deliveryFee;
-=======
-  // Nota: deliveryFee ya está definido arriba con useMemo
-  const total = subtotal + SERVICE_FEE + deliveryFee; // Agregar deliveryFee al total
->>>>>>> Stashed changes
 
   const handleDetectLocation = () => {
     if (!window?.navigator?.geolocation) {
@@ -660,13 +653,8 @@ export default function CarritoPage() {
     window.navigator.geolocation.getCurrentPosition(
       (pos) => {
         setCustomerLocation({
-<<<<<<< Updated upstream
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
-=======
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
->>>>>>> Stashed changes
         });
         setLocating(false);
       },
@@ -782,15 +770,9 @@ export default function CarritoPage() {
             <h2 className="text-lg font-semibold text-orange-900">
               Instrucciones para el repartidor
             </h2>
-<<<<<<< Updated upstream
             <p className="mt-2 text-sm text-orange-900/70">
               Agrega cualquier indicación adicional (por ejemplo: “dejar en
               recepción” o “tocar el timbre 2”).
-=======
-            <p className="mt-2 text-sm text-emerald-900/70">
-              Agrega cualquier indicación adicional (por ejemplo: "dejar en
-              recepción" o "tocar el timbre 2").
->>>>>>> Stashed changes
             </p>
             <textarea
               value={deliveryInstructions}
