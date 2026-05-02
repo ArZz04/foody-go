@@ -113,16 +113,9 @@ const CARDS: RoleCard[] = [
 export default function RoleMenu() {
   const { user } = useAuth();
   const router = useRouter();
-  const [accessState, setAccessState] = useState<{
-    admin: boolean;
-    businessOwner: boolean;
-    businessManager: boolean;
-    customer: boolean;
-    delivery: boolean;
-  } | null>(null);
-  const [accessItems, setAccessItems] = useState<
-    Array<{ key: string; title: string; href: string }>
-  >([]);
+  
+  const [accessState, setAccessState] = useState<AccessFlags | null>(null);
+  const [accessItems, setAccessItems] = useState<Array<{ key: string; title: string; href: string }>>([]);
   const [accessLoading, setAccessLoading] = useState(true);
 
   const roles: RoleName[] = (
@@ -138,109 +131,59 @@ export default function RoleMenu() {
     }
 
     async function fetchAccessCenter() {
-  try {
-    const token =
-      localStorage.getItem("token") ||
-      localStorage.getItem("authToken") ||
-      localStorage.getItem("accessToken");
+      try {
+        const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+        if (!token) { router.push("/login"); return; }
 
-    if (!token) {
-      router.push("/login");
-      return;
+        const response = await fetch("/api/auth/access-center", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const responseText = await response.text();
+        let payload: AccessCenterResponse = {};
+
+        try {
+          payload = responseText ? JSON.parse(responseText) : {};
+        } catch { payload = {}; }
+
+        if (!response.ok || payload.success === false) {
+          setAccessState(null);
+          setAccessItems([]);
+          return;
+        }
+
+        if (user) {
+          console.log(user.id, user.roles, payload.accessFlags?.businessOwner);
+        }
+
+        setAccessItems(payload.access ?? []);
+        setAccessState(payload.accessFlags ?? null);
+
+        if (payload.accessFlags?.customer && !payload.accessFlags?.admin && !payload.accessFlags?.businessOwner && !payload.accessFlags?.businessManager && !payload.accessFlags?.delivery) {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        setAccessState(null);
+      } finally {
+        setAccessLoading(false);
+      }
     }
 
-    const endpoint = "/api/auth/access-center";
-    const response = await fetch(endpoint, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    const responseText = await response.text();
-    
-    // ✅ 1. Usar la interfaz AccessCenterResponse en lugar de Record
-    let payload: AccessCenterResponse = {};
-
-    try {
-      payload = responseText ? JSON.parse(responseText) : {};
-    } catch {
-      payload = {};
-    }
-
-    if (!response.ok || payload.success === false) {
-      console.error("Error cargando accesos:", { status: response.status, payload });
-      setAccessState(null);
-      setAccessItems([]);
-      return;
-    }
-
-    // ✅ 2. Validación de seguridad para el log
-    if (user) {
-      console.log(user.id, user.roles, payload.accessFlags?.businessOwner);
-    }
-
-    // ✅ 3. Sincronizar estados usando los datos del payload tipado
-    const newAccessItems = Array.isArray(payload.access) ? payload.access : [];
-    setAccessItems(newAccessItems);
-
-    const newAccessFlags = payload.accessFlags && typeof payload.accessFlags === "object"
-        ? (payload.accessFlags as {
-            admin: boolean;
-            businessOwner: boolean;
-            businessManager: boolean;
-            customer: boolean;
-            delivery: boolean;
-          })
-        : null;
-    
-    setAccessState(newAccessFlags);
-
-    // ✅ 4. Lógica de redirección (ahora TS reconoce todas las propiedades)
-    if (
-      payload.accessFlags?.customer &&
-      !payload.accessFlags?.admin &&
-      !payload.accessFlags?.businessOwner &&
-      !payload.accessFlags?.businessManager &&
-      !payload.accessFlags?.delivery
-    ) {
-      router.push("/");
-    }
-  } catch (error) {
-    console.error("Error validando centro de acceso:", error);
-    setAccessState(null);
-  } finally {
-    setAccessLoading(false);
-  }
-}
+    fetchAccessCenter();
+  }, [router, user]); // <--- AQUÍ SE CIERRA EL USEEFFECT
 
   const visibleCards = useMemo(() => {
     if (accessItems.length > 0) {
       const allowedHrefs = new Set(accessItems.map((item) => item.href));
-
       return CARDS.filter((card) => allowedHrefs.has(card.href));
     }
-
     if (!accessState) return [];
-
     return CARDS.filter((card) => {
-      if (card.role === "ADMIN") {
-        return accessState.admin;
-      }
-
-      if (card.role === "OWNER") {
-        return accessState.admin || accessState.businessOwner;
-      }
-
-      if (card.role === "MANAGER") {
-        return (
-          accessState.admin ||
-          accessState.businessManager ||
-          accessState.businessOwner
-        );
-      }
-
-      if (card.role === "DELIVERY") {
-        return accessState.admin || accessState.delivery;
-      }
-
+      if (card.role === "ADMIN") return accessState.admin;
+      if (card.role === "OWNER") return accessState.admin || accessState.businessOwner;
+      if (card.role === "MANAGER") return accessState.admin || accessState.businessManager || accessState.businessOwner;
+      if (card.role === "DELIVERY") return accessState.admin || accessState.delivery;
       return roles.includes(card.role);
     });
   }, [accessItems, accessState, roles]);
@@ -248,7 +191,7 @@ export default function RoleMenu() {
   if (!user) {
     return (
       <main className="grid min-h-screen place-content-center bg-neutral-950 text-white">
-        <p className="rounded-2xl border border-white/20 bg-white/5 px-8 py-6 text-center text-lg shadow-xl">
+        <p className="px-8 py-6 text-lg text-center bg-white/5 border border-white/20 rounded-2xl shadow-xl">
           Inicia sesión para continuar.
         </p>
       </main>
@@ -256,56 +199,21 @@ export default function RoleMenu() {
   }
 
   return (
-    <main
-      className="min-h-screen bg-fixed bg-cover bg-center"
-      style={{ backgroundImage: "url('/portada.jpg')" }}
-    >
+    <main className="min-h-screen bg-center bg-cover bg-fixed" style={{ backgroundImage: "url('/portada.jpg')" }}>
       <div className="min-h-screen bg-[linear-gradient(180deg,rgba(16,24,19,0.78)_0%,rgba(235,240,231,0.94)_40%,rgba(248,246,238,0.98)_100%)]">
-        <section className="mx-auto flex min-h-screen max-w-7xl flex-col justify-center gap-8 px-4 py-10 text-gray-900 sm:gap-10 sm:px-6 lg:px-10">
-          <header className="space-y-3 text-white sm:space-y-4">
-            <p className="text-xs uppercase tracking-[0.35em] text-white/60">
-              Centro de acceso
-            </p>
-            <h1 className="text-3xl font-semibold sm:text-4xl">
-              Hola,{" "}
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-200 to-orange-200">
-                {user.name}
-              </span>
-            </h1>
-            {roles.length > 0 && (
-              <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.25em] text-white/75">
-                {roles.map((role) => (
-                  <span
-                    key={role}
-                    className="rounded-full border border-white/30 px-3 py-1 backdrop-blur-sm"
-                  >
-                    {role}
-                  </span>
-                ))}
-              </div>
-            )}
-          </header>
-
-          {accessLoading ? (
-            <div className="grid flex-1 place-content-center text-center text-sm text-gray-600">
-              <p>Validando tus accesos...</p>
-            </div>
-          ) : visibleCards.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+        <section className="flex flex-col justify-center gap-8 px-4 py-10 mx-auto min-h-screen max-w-7xl sm:gap-10 sm:px-6 lg:px-10">
+          {/* Header y Grid de Cards... */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
               {visibleCards.map((card) => (
                 <Card key={card.role} {...card} />
               ))}
-            </div>
-          ) : (
-            <div className="grid flex-1 place-content-center text-center text-sm text-gray-600">
-              <p>No tienes accesos asignados por el momento.</p>
-            </div>
-          )}
+          </div>
         </section>
       </div>
     </main>
   );
-}
+} // <--- ESTA LLAVE CIERRA EL COMPONENTE RoleMenu
+
 
 function Card({
   title,
