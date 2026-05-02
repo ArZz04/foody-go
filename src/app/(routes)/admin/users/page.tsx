@@ -61,8 +61,8 @@ function normalizeUser(rawUser: RawUser): DBUser {
     last_name: rawUser.last_name ?? "",
     email: rawUser.email ?? "",
     phone: rawUser.phone ?? "",
-    created_at: rawUser.created_at ?? "",
-    updated_at: rawUser.updated_at ?? "",
+    created_at: rawUser.created_at ? new Date(rawUser.created_at) : new Date(),
+    updated_at: rawUser.updated_at ? new Date(rawUser.updated_at) : new Date(),
     status_id: rawUser.status_id ?? 0,
     is_verified: rawUser.is_verified ?? false,
     roles: Array.isArray(rawUser.roles)
