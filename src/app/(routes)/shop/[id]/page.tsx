@@ -314,7 +314,6 @@ export default function BusinessDetailPage() {
         </DialogContent>
       </Dialog>
 
-      <SupportChatWidget />
       
       {/* Diálogo de Dirección Obligatoria */}
       <AddressRequiredDialog 
