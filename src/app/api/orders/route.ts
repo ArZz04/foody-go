@@ -36,6 +36,12 @@ type AddressRow = RowDataPacket & {
   user_id: number;
 };
 
+type BusinessRow = RowDataPacket & {
+  id: number;
+  status_id: number | null;
+  is_open: number | boolean | null;
+};
+
 type ColumnRow = RowDataPacket & {
   Field: string;
 };
@@ -684,13 +690,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const [businessRows] = await conn.query<
-      Array<{
-        id: number;
-        status_id: number | null;
-        is_open: number | boolean | null;
-      }>
-    >(
+    const [businessRows] = await conn.query<BusinessRow[]>(
       `
         SELECT id, status_id, is_open
         FROM business
