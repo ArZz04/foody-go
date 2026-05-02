@@ -193,7 +193,7 @@ async function getOrCreateCatalogIdByName(
   return result.insertId;
 }
 
-async function getOrderById(orderId: number) {
+async function getOrderById(orderId: number): Promise<any | null> {
   await ensureOrdersColumns();
   await ensureAdminMessagesTable();
   const avatarColumns = await getUserAvatarColumns();
