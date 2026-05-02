@@ -35,27 +35,69 @@ const CART_STORAGE_KEY = "gogi:cart";
 export default function CarritoPage() {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
+<<<<<<< Updated upstream
   const [customerLocation, setCustomerLocation] =
     useState<CustomerLocation | null>(null);
+=======
+  const [customerLocation, setCustomerLocation] = useState<{ lat: number; lng: number } | null>(null);
+>>>>>>> Stashed changes
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const [cartId, setCartId] = useState<number | null>(null);
+
+  // Mover useMemo al principio, antes de cualquier return condicional
+  const deliveryFee = useMemo(() => {
+    if (!customerLocation) {
+      return DEFAULT_DELIVERY_FEE;
+    }
+    return DEFAULT_DELIVERY_FEE;
+  }, [customerLocation]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(CART_STORAGE_KEY);
-    if (stored) {
+    if (!user) return;
+
+    async function loadCart() {
+      if (!user) return;
       try {
-        const parsed = JSON.parse(stored) as StoredCartItem[];
+        const uid = user.id;
+        const res = await fetch(`/api/cart?user_id=${uid}`);
+        const data = await res.json();
+
+        if (!data.cart) {
+          // Si no existe carrito, crear uno
+          const createRes = await fetch("/api/cart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: uid })
+          });
+
+          const newCart = await createRes.json();
+          setCartId(newCart.cart_id);
+          setCartItems([]);
+          return;
+        }
+
+        // carrito encontrado
+        setCartId(data.cart.id);
         setCartItems(
-          parsed.map((item) => {
-            return item;
-          }),
+          data.products.map((p: any) => ({
+            id: p.product_id.toString(),
+            nombre: p.name,
+            image: p.thumbnail_url,
+            negocio: "Negocio",
+            quantity: p.quantity,
+            unitPrice: p.price,
+            price: p.total,
+            extras: [],
+          }))
         );
-      } catch (error) {
-        console.error("No se pudo cargar el carrito", error);
+      } catch (err) {
+        console.error("Error cargando carrito", err);
       }
     }
-  }, []);
+
+    loadCart();
+  }, [user]);
 
   const persistCart = (items: StoredCartItem[]) => {
     setCartItems(items);
@@ -64,20 +106,50 @@ export default function CarritoPage() {
     }
   };
 
-  const handleQuantityChange = (id: string, delta: number) => {
-    persistCart(
-      cartItems
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-            : item,
-        )
-        .filter((item) => item.quantity > 0),
+  const handleQuantityChange = async (id: string, delta: number) => {
+    if (!cartId) return;
+
+    const item = cartItems.find((i) => i.id === id);
+    if (!item) return;
+
+    const newQty = Math.max(0, item.quantity + delta);
+
+    // Si llega a 0 → eliminar
+    if (newQty === 0) {
+      return handleRemove(id);
+    }
+
+    await fetch("/api/cart/add-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cart_id: cartId,
+        product_id: item.id,
+        quantity: newQty,
+        discount: 0
+      })
+    });
+
+    setCartItems(
+      cartItems.map((i) =>
+        i.id === id ? { ...i, quantity: newQty } : i
+      )
     );
   };
 
-  const handleRemove = (id: string) => {
-    persistCart(cartItems.filter((item) => item.id !== id));
+  const handleRemove = async (id: string) => {
+    if (!cartId) return;
+
+    await fetch("/api/cart/remove-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cart_id: cartId,
+        product_id: id
+      })
+    });
+
+    setCartItems(cartItems.filter((i) => i.id !== id));
   };
 
   if (!user) {
@@ -147,6 +219,7 @@ export default function CarritoPage() {
     0,
   );
 
+<<<<<<< Updated upstream
   const deliveryFee = useMemo(() => {
     if (!customerLocation) {
       return DEFAULT_DELIVERY_FEE;
@@ -156,6 +229,10 @@ export default function CarritoPage() {
   }, [cartItems, customerLocation]);
 
   const total = subtotal + SERVICE_FEE + deliveryFee;
+=======
+  // Nota: deliveryFee ya está definido arriba con useMemo
+  const total = subtotal + SERVICE_FEE + deliveryFee; // Agregar deliveryFee al total
+>>>>>>> Stashed changes
 
   const handleDetectLocation = () => {
     if (!window?.navigator?.geolocation) {
@@ -167,8 +244,13 @@ export default function CarritoPage() {
     window.navigator.geolocation.getCurrentPosition(
       (pos) => {
         setCustomerLocation({
+<<<<<<< Updated upstream
           latitude: pos.coords.latitude,
           longitude: pos.coords.longitude,
+=======
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+>>>>>>> Stashed changes
         });
         setLocating(false);
       },
@@ -275,9 +357,15 @@ export default function CarritoPage() {
             <h2 className="text-lg font-semibold text-orange-900">
               Instrucciones para el repartidor
             </h2>
+<<<<<<< Updated upstream
             <p className="mt-2 text-sm text-orange-900/70">
               Agrega cualquier indicación adicional (por ejemplo: “dejar en
               recepción” o “tocar el timbre 2”).
+=======
+            <p className="mt-2 text-sm text-emerald-900/70">
+              Agrega cualquier indicación adicional (por ejemplo: "dejar en
+              recepción" o "tocar el timbre 2").
+>>>>>>> Stashed changes
             </p>
             <textarea
               placeholder="Escribe tus instrucciones..."

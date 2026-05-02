@@ -72,6 +72,8 @@ export default function BusinessDetailPage() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmed, setConfirmed] = useState<Record<number, boolean>>({});
+  const [cartId, setCartId] = useState<number | null>(null);
+
 
 
   const addToCart = (productId: number) => {
@@ -97,12 +99,78 @@ export default function BusinessDetailPage() {
     }));
   };
 
-  const confirmQuantity = (productId: number) => {
+  const confirmQuantity = async (productId: number) => {
+  const qty = quantities[productId] ?? 1;
+
+  await sendToCart(productId, qty);
+
   setConfirmed(prev => ({ ...prev, [productId]: true }));
-  // Aquí después puedes disparar:
-  //  enviar al carrito real
-  //  abrir modal
-  //  llamar API
+
+  // Reinicia después de 1.5s
+  setTimeout(() => {
+    setConfirmed(prev => ({ ...prev, [productId]: false }));
+  }, 1500);
+};
+
+useEffect(() => {
+  if (!user) return;
+
+  async function loadCart() {
+    try {
+      if (!user) return;
+
+      const uid = user.id;
+      // Obtener carrito existente
+      const res = await fetch(`/api/cart?user_id=${uid}`);
+      const data = await res.json();
+
+      if (data.cart) {
+        setCartId(data.cart.id);
+      } else {
+        // Crear carrito si no existe
+        const createRes = await fetch("/api/cart", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: uid })
+        });
+
+        const newCart = await createRes.json();
+        setCartId(newCart.cart_id);
+      }
+    } catch (err) {
+      console.error("Error cargando carrito:", err);
+    }
+  }
+
+  loadCart();
+}, [user]);
+
+const sendToCart = async (productId: number, quantity: number) => {
+  if (!user || !cartId) {
+    alert("Inicia sesión para agregar productos al carrito.");
+    return;
+  }
+
+  const product = products.find((p) => p.id === productId);
+  if (!product) return;
+
+  const priceToUse = product.discount_price ?? product.price;
+
+  try {
+    await fetch("/api/cart/add-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        cart_id: cartId,
+        product_id: productId,
+        quantity,
+        discount: 0, // lo puedes cambiar después
+      }),
+    });
+
+  } catch (err) {
+    console.error("Error agregando al carrito:", err);
+  }
 };
 
 
@@ -418,6 +486,84 @@ export default function BusinessDetailPage() {
                                 </div>
                               )}
                             </div>
+<<<<<<< Updated upstream
+=======
+                            
+                            {/* Stock */}
+<div
+  className={`text-xs font-medium ${
+    product.is_stock_available
+      ? product.stock_average > product.stock_danger
+        ? "text-emerald-600"
+        : "text-amber-600"
+      : "text-red-600"
+  }`}
+>
+  {product.is_stock_available
+    ? `Disponible: ${product.stock_average} unidades`
+    : "Agotado"}
+</div>
+
+{/* Botón + selector */}
+<div className="mt-3 flex justify-center">
+  {quantities[product.id] ? (
+    /* Selector + botón confirmar */
+    <div className="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3 py-1">
+
+      {/* Botón menos */}
+      <button
+        type="button"
+        onClick={() => decrement(product.id)}
+        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+      >
+        -
+      </button>
+
+      {/* Cantidad */}
+      <span className="w-6 text-center text-sm font-semibold">
+        {quantities[product.id]}
+      </span>
+
+      {/* Botón más */}
+      <button
+        type="button"
+        onClick={() => increment(product.id)}
+        className="rounded-full bg-slate-200 px-2 py-1 text-sm font-semibold hover:bg-slate-300"
+      >
+        +
+      </button>
+
+      {/* Botón confirmar */}
+      <button
+        type="button"
+        onClick={() => confirmQuantity(product.id)}
+        className={`
+          ml-1 flex items-center justify-center rounded-full px-2 py-1 text-white text-xs font-bold shadow
+          ${confirmed[product.id] ? "bg-emerald-600" : "bg-emerald-500 hover:bg-emerald-600"}
+        `}
+      >
+        ✓
+      </button>
+
+    </div>
+  ) : (
+    /* Botón agregar */
+    <button
+  type="button"
+  onClick={() => {
+    addToCart(product.id);     // muestra selector
+    sendToCart(product.id, 1); // agrega 1 a la BD
+  }}
+  className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-emerald-600"
+>
+  Agregar al carrito
+</button>
+
+  )}
+</div>
+
+
+>>>>>>> Stashed changes
                           </div>
 
                           <div className="flex w-full flex-col gap-1.5 text-center">
