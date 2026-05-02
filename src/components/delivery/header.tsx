@@ -6,17 +6,21 @@ import {
   LogOut,
   MessageCircle,
   PauseCircle,
+  Settings,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface DeliveryHeaderProps {
   driverName?: string;
   serviceArea?: string;
+  isAvailable?: boolean;
   pendingOrders?: number;
+  completedToday?: number;
   lastSync?: string;
   onLogout?: () => void;
+  onOpenSettings?: () => void;
   onReportIncident?: (payload: { type: string; notes: string }) => void;
   onChatMessage?: (message: string) => void;
 }
@@ -24,9 +28,12 @@ interface DeliveryHeaderProps {
 export function DeliveryHeader({
   driverName = "Repartidor",
   serviceArea = "Zona Norte",
+  isAvailable = true,
   pendingOrders = 0,
+  completedToday = 0,
   lastSync = "Hace 2 min",
   onLogout,
+  onOpenSettings,
   onReportIncident,
   onChatMessage,
 }: DeliveryHeaderProps) {
@@ -43,6 +50,11 @@ export function DeliveryHeader({
     () => (isActive ? "Activo" : "Inactivo"),
     [isActive],
   );
+
+  useEffect(() => {
+    setIsActive(isAvailable);
+    setIsPaused(!isAvailable);
+  }, [isAvailable]);
 
   const handlePauseToggle = () => {
     setIsPaused((prev) => !prev);
@@ -79,9 +91,17 @@ export function DeliveryHeader({
   };
 
   return (
-    <header className="relative overflow-hidden rounded-[24px] bg-[#006b3f] p-5 text-white shadow-2xl shadow-emerald-950/20 sm:p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(25,190,104,0.5)_0%,rgba(0,107,63,0.82)_42%,rgba(0,75,45,1)_100%)]" />
-      <div className="relative grid gap-5 lg:grid-cols-[1.25fr,1fr]">
+    <header className="relative isolate overflow-hidden rounded-[24px] bg-[#006b3f] p-5 text-white shadow-2xl shadow-emerald-950/20 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_left,rgba(25,190,104,0.5)_0%,rgba(0,107,63,0.82)_42%,rgba(0,75,45,1)_100%)]" />
+      <button
+        type="button"
+        onClick={onOpenSettings}
+        className="absolute right-4 top-4 z-20 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-white shadow-lg backdrop-blur transition hover:bg-white/20"
+        aria-label="Abrir configuración del repartidor"
+      >
+        <Settings className="h-5 w-5" />
+      </button>
+      <div className="relative z-10 grid gap-5 lg:grid-cols-[1.25fr,1fr]">
         <div className="space-y-4">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-100/75">
             Repartidor autorizado
@@ -99,9 +119,12 @@ export function DeliveryHeader({
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
               <p className="text-xs font-semibold text-emerald-100/70">
-                Entregas
+                Entregas actuales
               </p>
               <p className="mt-2 text-3xl font-extrabold">{pendingOrders}</p>
+              <p className="mt-2 text-xs font-semibold text-emerald-100/70">
+                Completadas hoy: {completedToday}
+              </p>
             </div>
             <div className="rounded-2xl bg-white/12 p-4 backdrop-blur">
               <p className="text-xs font-semibold text-emerald-100/70">Zona</p>
@@ -190,13 +213,13 @@ export function DeliveryHeader({
       </div>
 
       {actionMessage ? (
-        <p className="mt-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-xs text-white/90">
+        <p className="relative z-20 mt-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-xs text-white/90">
           {actionMessage}
         </p>
       ) : null}
 
       {chatOpen ? (
-        <div className="mt-4 rounded-2xl border border-orange-200/60 bg-white/80 p-4 text-sm text-orange-900 shadow-inner">
+        <div className="relative z-20 mt-4 rounded-2xl border border-orange-200/60 bg-white p-4 text-sm text-orange-900 shadow-2xl">
           <p className="font-semibold">Chat con soporte</p>
           <p className="text-xs text-orange-800/70">
             Soporte Gogi Eats responde en menos de 3 minutos.
@@ -225,7 +248,7 @@ export function DeliveryHeader({
       {reportOpen ? (
         <form
           onSubmit={handleReportSubmit}
-          className="mt-4 space-y-3 rounded-2xl border border-rose-200/60 bg-white/80 p-4 text-sm text-rose-900 shadow-inner"
+          className="relative z-20 mt-4 space-y-3 rounded-2xl border border-rose-200/60 bg-white p-4 text-sm text-rose-900 shadow-2xl"
         >
           <p className="font-semibold">Reportar incidencia</p>
           <div className="grid gap-2 sm:grid-cols-2">

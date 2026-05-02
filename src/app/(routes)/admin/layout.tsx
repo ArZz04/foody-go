@@ -1,13 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
-import { SidebarLink } from "./components/SidebarLink";
 import { MobileNav } from "./components/MobileNav";
+import { SidebarLink } from "./components/SidebarLink";
 
 const NAV_LINKS = [
   { href: "/admin", label: "Resumen", icon: "📊" },
   { href: "/admin/users", label: "Usuarios", icon: "👥" },
   { href: "/admin/business", label: "Negocios", icon: "🏪" },
+  { href: "/admin/orders", label: "Pedidos", icon: "📦" },
+  { href: "/admin/support", label: "Soporte", icon: "💬" },
   { href: "/admin/deliveries", label: "Repartos", icon: "🛵" },
   { href: "/admin/settings", label: "Ajustes", icon: "⚙️" },
 ];
@@ -19,7 +21,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[url('/fondo-bosque.jpg')] bg-cover bg-center bg-fixed" />
         <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px] dark:bg-zinc-950/85" />
-        
+
         <div className="absolute -left-40 top-[-18rem] h-[32rem] w-[32rem] rounded-full bg-gradient-to-br from-orange-200/60 via-orange-200/50 to-orange-300/10 blur-3xl sm:-left-20 sm:top-[-22rem] md:-left-32 lg:-left-40" />
         <div className="absolute inset-x-8 top-16 h-40 rounded-3xl bg-gradient-to-r from-orange-100/50 via-transparent to-orange-100/40 blur-2xl sm:inset-x-16 sm:top-24 md:inset-x-24 md:top-32 md:h-52" />
         <div className="absolute -right-20 bottom-[-14rem] h-[28rem] w-[28rem] rounded-full bg-gradient-to-br from-orange-200/50 via-orange-300/30 to-transparent blur-3xl md:-right-32 lg:-right-40" />
@@ -42,7 +44,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               </div>
             </Link>
           </div>
-          
+
           <nav className="mt-3 grid gap-1.5 md:mt-4">
             {NAV_LINKS.map((link) => (
               <SidebarLink key={link.href} {...link} />
@@ -75,6 +77,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   </h1>
                 </div>
               </div>
+              <Link
+                href="/"
+                className="inline-flex items-center rounded-full border border-zinc-200 bg-white/80 px-3 py-2 text-xs font-semibold text-zinc-600 shadow-sm transition hover:bg-white hover:text-zinc-900 dark:border-white/15 dark:bg-white/10 dark:text-zinc-200 dark:hover:bg-white/15"
+              >
+                ← Ir al inicio
+              </Link>
             </div>
           </header>
 

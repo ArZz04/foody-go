@@ -16,13 +16,18 @@ export default function RegisterForm() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [role, setRole] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [errorMessage, setErrorMessage] = useState(""); // 👈 estado para errores
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
+
+    if (!acceptTerms) {
+      setErrorMessage("Debes aceptar los términos para continuar");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setErrorMessage("Las contraseñas no coinciden");
@@ -36,12 +41,10 @@ export default function RegisterForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          phone: phoneNumber,
+          name: `${firstName.trim()} ${lastName.trim()}`.trim(),
           email,
+          phone: phoneNumber.trim(),
           password,
-          role: role || undefined,
         }),
       });
 

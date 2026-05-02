@@ -1,13 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
-import Link from "next/link";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -35,8 +35,13 @@ export default function LoginForm() {
       const data = await res.json();
 
       if (res.ok) {
+        localStorage.setItem("token", data.token);
         login(
-          { id: data.user.id, name: data.user.name, roles: data.user.role },
+          {
+            id: data.user.id,
+            name: data.user.name,
+            roles: data.user.roles ?? [],
+          },
           data.token,
         );
         document.cookie = `authToken=${data.token}; path=/; max-age=32400; secure; samesite=lax`;

@@ -1,6 +1,8 @@
-import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
+
 import pool from "@/lib/db";
+import { mapDbRoleToPublicRole } from "@/lib/role-utils";
 
 export async function GET(req: Request) {
   try {
@@ -13,14 +15,14 @@ export async function GET(req: Request) {
     }
 
     const token = auth.split(" ")[1];
-    const secret = process.env.JWT_SECRET as string;
+    const secret = process.env.JWT_SECRET || "gogi-dev-secret";
 
     const decoded = jwt.verify(token, secret) as { id: number };
 
     // Buscar roles del usuario
     const [rows] = await pool.query(
       `
-      SELECT r.id, r.name, r.code
+      SELECT r.id, r.name
       FROM user_roles ur
       JOIN roles r ON ur.role_id = r.id
       WHERE ur.user_id = ?
@@ -29,7 +31,17 @@ export async function GET(req: Request) {
     );
 
     return NextResponse.json({
-      roles: rows,
+      roles: Array.isArray(rows)
+        ? rows.map((row) => {
+            const roleRow = row as { id?: number; name?: string };
+            return {
+              id: roleRow.id,
+              name:
+                mapDbRoleToPublicRole(String(roleRow.name ?? "")) ??
+                String(roleRow.name ?? ""),
+            };
+          })
+        : [],
     });
   } catch (error) {
     console.error(error);

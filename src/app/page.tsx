@@ -43,16 +43,6 @@ export default function Home() {
 
               <HeroActions />
 
-              <div className="mt-12 flex flex-col gap-2 text-slate-700">
-                <div className="flex gap-1 text-2xl text-orange-500">
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                  <span>★</span>
-                </div>
-                <p className="text-lg font-semibold">4.9/5 de 10k+ usuarios</p>
-              </div>
             </div>
 
             <div className="relative">

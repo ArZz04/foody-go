@@ -1,202 +1,291 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Users, UserCheck, AlertCircle, Edit } from "lucide-react";
-import SummaryCard from "./components/SummaryCard";
-import StatusBadge from "./components/StatusBadge";
-import LoadingRow from "./components/LoadingRow";
+import { AlertCircle, Edit, UserCheck, Users } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import ResponsiveModal from "@/app/components/Modal";
 import type { DBUser } from "@/types/db/users";
+
+import LoadingRow from "./components/LoadingRow";
+import StatusBadge from "./components/StatusBadge";
+import SummaryCard from "./components/SummaryCard";
+
+type UserRoleOption = {
+  value:
+    | "admin_general"
+    | "cliente"
+    | "repartidor"
+    | "business_admin"
+    | "business_staff";
+  label: string;
+};
+
+type RawRole = {
+  id?: number;
+  name?: string;
+};
+
+type RawUser = {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  status_id?: number;
+  is_verified?: boolean;
+  roles?: RawRole[];
+};
+
+const ROLE_OPTIONS: UserRoleOption[] = [
+  { value: "admin_general", label: "ADMIN_GENERAL" },
+  { value: "cliente", label: "CLIENTE" },
+  { value: "repartidor", label: "REPARTIDOR" },
+  { value: "business_admin", label: "DUENO_TIENDA / ADMIN_NEGOCIO" },
+  { value: "business_staff", label: "VENDEDOR" },
+];
+
+const ROLE_LABELS: Record<string, string> = {
+  admin_general: "ADMIN_GENERAL",
+  cliente: "CLIENTE",
+  repartidor: "REPARTIDOR",
+  business_admin: "DUENO_TIENDA / ADMIN_NEGOCIO",
+  business_staff: "VENDEDOR",
+};
+
+function normalizeUser(rawUser: RawUser): DBUser {
+  return {
+    id: rawUser.id,
+    first_name: rawUser.first_name ?? "",
+    last_name: rawUser.last_name ?? "",
+    email: rawUser.email ?? "",
+    phone: rawUser.phone ?? "",
+    created_at: rawUser.created_at ?? "",
+    updated_at: rawUser.updated_at ?? "",
+    status_id: rawUser.status_id ?? 0,
+    is_verified: rawUser.is_verified ?? false,
+    roles: Array.isArray(rawUser.roles)
+      ? rawUser.roles
+          .map((role) => role?.name)
+          .filter((role: string | undefined): role is string => Boolean(role))
+      : [],
+  };
+}
+
+function getRoleLabel(roles: string[] | undefined) {
+  if (!Array.isArray(roles) || roles.length === 0) {
+    return "Sin rol";
+  }
+
+  return roles.map((role) => ROLE_LABELS[role] ?? role).join(", ");
+}
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<DBUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedUser, setSelectedUser] = useState<DBUser | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<UserRoleOption["value"][]>(
+    [],
+  );
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
 
-  // Estados controlados dentro del modal
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [statusId, setStatusId] = useState(0);
-
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isDelivery, setIsDelivery] = useState(false);
-
-  async function refreshUsers() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-
-  const response = await fetch("/api/users", {
-    cache: "no-store",
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  const json = await response.json();
-
-  setUsers(
-    (json.users || []).map((u: any): DBUser => ({
-      id: u.id,
-      first_name: u.first_name ?? "",
-      last_name: u.last_name ?? "",
-      email: u.email ?? "",
-      phone: u.phone ?? "",
-      created_at: u.created_at ?? "",
-      updated_at: u.updated_at ?? "",
-      status_id: u.status_id ?? 0,
-      is_verified: u.is_verified ?? false,
-      roles: Array.isArray(u.roles)
-        ? u.roles.map((r: any) => r.name)
-        : []
-    }))
-  );
-}
-
-
-
-  // =========== FETCH USERS ===========
   useEffect(() => {
-    const controller = new AbortController();
-
-    async function fetchUsers() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return console.warn("Token no encontrado");
-
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch("/api/users", {
-          cache: "no-store",
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal,
-        });
-
-        if (!response.ok) throw new Error(`Error ${response.status}`);
-
-        const json = await response.json();
-        console.log("🟢 FETCH USERS:", json.users);
-        setUsers(
-        (json.users || []).map(
-          (u: any): DBUser => ({
-            id: u.id,
-            first_name: u.first_name ?? "",
-            last_name: u.last_name ?? "",
-            email: u.email ?? "",
-            phone: u.phone ?? "",
-            created_at: u.created_at ?? "",
-            updated_at: u.updated_at ?? "",
-            status_id: u.status_id ?? 0,
-            is_verified: u.is_verified ?? false,
-
-            roles: Array.isArray(u.roles) ? u.roles.map((r: any) => r.name) : []
-          })
-        )
+    try {
+      const rawUser = localStorage.getItem("user");
+      const parsedUser = rawUser
+        ? (JSON.parse(rawUser) as { id?: number })
+        : null;
+      setCurrentUserId(
+        Number.isFinite(Number(parsedUser?.id)) ? Number(parsedUser?.id) : null,
       );
-      } catch (err) {
-        if ((err as Error).name === "AbortError") return;
-        console.error("Error al cargar usuarios:", err);
-        setError("No se pudieron cargar los usuarios.");
-        setUsers([]);
-      } finally {
-        setLoading(false);
-      }
+    } catch (parseError) {
+      console.error("No se pudo leer el usuario actual:", parseError);
+      setCurrentUserId(null);
     }
-
-    fetchUsers();
-    return () => controller.abort();
   }, []);
 
-  // =========== CALL API TO UPDATE USER ===========
-  async function updateUser(updatedData: Partial<DBUser>, userId: number) {
+  const refreshUsers = useCallback(async () => {
     const token = localStorage.getItem("token");
-    if (!token) return console.warn("Token no encontrado");
 
-    const res = await fetch(`/api/users/edit/${userId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(updatedData),
-    });
+    if (!token) {
+      setError("Debes iniciar sesión como ADMIN_GENERAL.");
+      setUsers([]);
+      setLoading(false);
+      return;
+    }
 
-    return await res.json();
-  }
+    try {
+      setLoading(true);
+      setError(null);
 
-  // =========== OPEN MODAL AND SET FORM DATA ===========
-const handleEdit = (user: DBUser) => {
-  setSelectedUser(user);
-  setFirstName(user.first_name);
-  setLastName(user.last_name);
-  setPhone(user.phone ?? "");
-  setEmail(user.email);
-  setStatusId(user.status_id);
+      const response = await fetch("/api/users", {
+        cache: "no-store",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-  const roles = Array.isArray(user.roles) ? user.roles : [];
+      const data = await response.json();
 
-  setIsAdmin(roles.includes("ADMIN"));
-  setIsDelivery(roles.includes("DELIVERY"));
+      if (!response.ok || !data.success) {
+        throw new Error(data?.error || "No se pudieron cargar los usuarios.");
+      }
 
-  setOpen(true);
-};
+      setUsers(
+        Array.isArray(data.users)
+          ? data.users.map((user: RawUser) => normalizeUser(user))
+          : [],
+      );
+    } catch (fetchError) {
+      console.error("Error cargando usuarios:", fetchError);
+      setError("No se pudieron cargar los usuarios.");
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    refreshUsers();
+  }, [refreshUsers]);
 
-  // =========== SAVE CHANGES ===========
-const handleSave = async () => {
-  if (!selectedUser) return;
-
-  const payload = {
-    first_name: firstName,
-    last_name: lastName,
-    phone,
-    email,
-    status_id: statusId,
-    roles: [
-      ...(isAdmin ? ["ADMIN"] : []),
-      ...(isDelivery ? ["DELIVERY"] : []),
-    ],
+  const handleEdit = (user: DBUser) => {
+    setSelectedUser(user);
+    const currentRoles = Array.isArray(user.roles)
+      ? user.roles.filter((role): role is UserRoleOption["value"] =>
+          ROLE_OPTIONS.some((option) => option.value === role),
+        )
+      : [];
+    setSelectedRoles(
+      currentRoles.length
+        ? currentRoles
+        : (["cliente"] as UserRoleOption["value"][]),
+    );
+    setOpen(true);
   };
 
-  const res = await updateUser(payload, selectedUser.id);
+  const handleSave = async () => {
+    if (!selectedUser) return;
 
-  // refrescar siempre después de guardar
-  await refreshUsers();
+    const token = localStorage.getItem("token");
 
-  setOpen(false);
-};
+    if (!token) {
+      setError("Debes iniciar sesión como ADMIN_GENERAL.");
+      return;
+    }
 
+    try {
+      setSaving(true);
 
+      const response = await fetch(`/api/admin/users/${selectedUser.id}/role`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          roles: selectedRoles,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data?.error || "No se pudo actualizar el rol.");
+      }
+
+      await refreshUsers();
+      setOpen(false);
+    } catch (saveError) {
+      console.error("Error guardando rol:", saveError);
+      setError("No se pudo actualizar el rol del usuario.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleRole = (role: UserRoleOption["value"]) => {
+    setSelectedRoles((current) =>
+      current.includes(role)
+        ? current.filter((item) => item !== role)
+        : [...current, role],
+    );
+  };
 
   const stats = useMemo(() => {
     const total = users.length;
-    const activos = users.filter((u) => u.status_id === 1).length;
-    return { total, activos };
+    const activos = users.filter((user) => user.status_id === 1).length;
+    const repartidores = users.filter((user) =>
+      user.roles?.includes("repartidor"),
+    ).length;
+
+    return { total, activos, repartidores };
   }, [users]);
+
+  const filteredUsers = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return users;
+    }
+
+    return users.filter((user) => {
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const email = String(user.email ?? "").toLowerCase();
+
+      return (
+        fullName.includes(normalizedQuery) || email.includes(normalizedQuery)
+      );
+    });
+  }, [searchQuery, users]);
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-4 px-3 py-6 sm:space-y-6 sm:px-6 sm:py-10 lg:space-y-8">
       <header className="flex items-center gap-2 sm:gap-3">
         <Users className="h-6 w-6 text-red-600 dark:text-red-400 sm:h-7 sm:w-7" />
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white sm:text-3xl">Usuarios</h1>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white sm:text-3xl">
+          Usuarios
+        </h1>
       </header>
 
       <section className="space-y-4 rounded-2xl bg-white/90 p-4 shadow-md ring-1 ring-red-200/60 dark:bg-white/10 dark:ring-white/10 sm:space-y-5 sm:p-6 lg:space-y-6">
         <header className="space-y-1">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-red-700 dark:text-red-400 sm:text-xl">
             <UserCheck className="h-4 w-4 sm:h-5 sm:w-5" />
-            Lista de Usuarios
+            Administración de roles
           </h2>
           <p className="text-xs text-zinc-500 dark:text-zinc-300 sm:text-sm">
-            Consulta y ajusta los roles y estatus de los usuarios registrados.
+            Solo el ADMIN_GENERAL puede asignar roles desde este panel.
           </p>
         </header>
 
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
           <SummaryCard label="Usuarios Totales" value={stats.total} />
-          <SummaryCard label="Usuarios Activos" value={stats.activos} accent="orange" />
+          <SummaryCard
+            label="Usuarios Activos"
+            value={stats.activos}
+            accent="orange"
+          />
+          <SummaryCard
+            label="Repartidores"
+            value={stats.repartidores}
+            accent="red"
+          />
+        </div>
+
+        <div className="max-w-md">
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Buscar por nombre o correo..."
+            className="w-full rounded-xl border border-red-200/60 bg-white px-4 py-2.5 text-sm text-zinc-700 shadow-sm outline-none transition focus:border-red-300 focus:ring-4 focus:ring-red-100 dark:border-white/10 dark:bg-white/5 dark:text-zinc-100 dark:focus:border-red-400 dark:focus:ring-red-500/10"
+          />
         </div>
 
         <div className="overflow-x-auto rounded-2xl border border-red-200/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -205,11 +294,14 @@ const handleSave = async () => {
               <tr>
                 <th className="px-3 py-2.5 sm:px-4 sm:py-3">Usuario</th>
                 <th className="px-3 py-2.5 sm:px-4 sm:py-3">Contacto</th>
-                <th className="hidden sm:table-cell px-3 py-2.5 sm:px-4 sm:py-3">Estado</th>
-                <th className="hidden md:table-cell px-3 py-2.5 sm:px-4 sm:py-3">Registro</th>
+                <th className="hidden sm:table-cell px-3 py-2.5 sm:px-4 sm:py-3">
+                  Estado
+                </th>
+                <th className="hidden md:table-cell px-3 py-2.5 sm:px-4 sm:py-3">
+                  Rol
+                </th>
                 <th className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                  <span className="hidden sm:inline">Acciones</span>
-                  <span className="sm:hidden">✎</span>
+                  Acciones
                 </th>
               </tr>
             </thead>
@@ -219,54 +311,74 @@ const handleSave = async () => {
                 <LoadingRow />
               ) : error ? (
                 <tr>
-                  <td colSpan={5} className="px-3 py-6 text-center text-red-500 sm:px-4 sm:py-8">
+                  <td
+                    colSpan={5}
+                    className="px-3 py-6 text-center text-red-500 sm:px-4 sm:py-8"
+                  >
                     <AlertCircle className="mx-auto mb-2 h-4 w-4 sm:h-5 sm:w-5" />
                     {error}
                   </td>
                 </tr>
               ) : users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-3 py-6 text-center text-zinc-400 sm:px-4 sm:py-8">
+                  <td
+                    colSpan={5}
+                    className="px-3 py-6 text-center text-zinc-400 sm:px-4 sm:py-8"
+                  >
                     No hay usuarios registrados.
                   </td>
                 </tr>
+              ) : filteredUsers.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-3 py-6 text-center text-zinc-400 sm:px-4 sm:py-8"
+                  >
+                    No se encontraron usuarios
+                  </td>
+                </tr>
               ) : (
-                users.map((user) => (
-                  <tr key={user.id} className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
+                filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
+                  >
                     <td className="px-3 py-2.5 font-medium sm:px-4 sm:py-3">
-                      <div className="line-clamp-2">{user.first_name} {user.last_name}</div>
+                      <div className="line-clamp-2">
+                        {user.first_name} {user.last_name}
+                      </div>
                     </td>
-                    
                     <td className="px-3 py-2.5 sm:px-4 sm:py-3">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs sm:text-sm">{user.email}</span>
-                        <span className="text-xs text-zinc-400">{user.phone || "—"}</span>
+                        <span className="text-xs text-zinc-400">
+                          {user.phone || "—"}
+                        </span>
                       </div>
                     </td>
-                    
                     <td className="hidden sm:table-cell px-3 py-2.5 sm:px-4 sm:py-3">
                       <StatusBadge status={user.status_id} />
                     </td>
-                    
-                    <td className="hidden md:table-cell px-3 py-2.5 text-xs text-zinc-400 sm:px-4 sm:py-3">
-                      {user.created_at
-                        ? new Date(user.created_at).toLocaleDateString("es-MX", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "—"}
+                    <td className="hidden md:table-cell px-3 py-2.5 sm:px-4 sm:py-3">
+                      <span className="rounded-full border border-red-200/60 px-3 py-1 text-xs font-semibold text-red-600 dark:border-white/20 dark:text-red-200">
+                        {getRoleLabel(user.roles)}
+                      </span>
                     </td>
-                    
                     <td className="px-3 py-2.5 text-center sm:px-4 sm:py-3">
-                      <button
-                        type="button"
-                        onClick={() => handleEdit(user)}
-                        className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-200/60 px-2 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10 sm:gap-1.5 sm:px-3 sm:py-2"
-                      >
-                        <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                        <span className="hidden sm:inline">Editar</span>
-                      </button>
+                      {currentUserId === user.id ? (
+                        <span className="text-xs font-semibold text-zinc-400">
+                          Protegido
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleEdit(user)}
+                          className="inline-flex items-center justify-center gap-1 rounded-lg border border-red-200/60 px-2 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10 sm:gap-1.5 sm:px-3 sm:py-2"
+                        >
+                          <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                          <span className="hidden sm:inline">Cambiar rol</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -274,161 +386,70 @@ const handleSave = async () => {
             </tbody>
           </table>
         </div>
-
-        <p className="text-xs text-zinc-400">Los cambios son locales. Integra este módulo con tu API para guardar roles y estatus.</p>
       </section>
 
-      {/* Modal de edición */}
       <ResponsiveModal
         open={open}
         onOpenChange={setOpen}
-        title="Editar usuario"
-        icon={<Edit className="h-4 w-4 sm:h-5 sm:w-5 text-red-400" />}
+        title="Cambiar roles de usuario"
+        icon={<Edit className="h-4 w-4 text-red-400 sm:h-5 sm:w-5" />}
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row-reverse sm:gap-3">
             <button
+              type="button"
               onClick={handleSave}
-              className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 sm:px-4 sm:py-2 sm:text-sm"
+              disabled={saving}
+              className="rounded-lg bg-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-60 sm:px-4 sm:py-2 sm:text-sm"
             >
-              Guardar Cambios
+              {saving ? "Guardando..." : "Guardar roles"}
             </button>
             <button
+              type="button"
               onClick={() => setOpen(false)}
               className="rounded-lg border border-white/20 px-3 py-2 text-xs text-zinc-300 transition hover:bg-white/10 sm:px-4 sm:py-2 sm:text-sm"
             >
-              Cerrar
+              Cancelar
             </button>
           </div>
         }
       >
         {selectedUser ? (
-          <form className="space-y-4 sm:space-y-5">
-            {/* Información Personal */}
-            <div className="space-y-2.5 sm:space-y-3">
-              <h3 className="text-sm font-semibold text-white">Información Personal</h3>
-
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-3">
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400 sm:mb-1.5">
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1.5 text-xs text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400 sm:mb-1.5">
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1.5 text-xs text-white transition focus:outline-none focus:ring-2 focus:ring-red-400 sm:px-3 sm:py-2 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400 sm:mb-1.5">
-                  Teléfono
-                </label>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1.5 text-xs text-white transition focus:outline-none focus:ring-2 focus:ring-red-400 sm:px-3 sm:py-2 sm:text-sm"
-                />
-              </div>
+          <div className="space-y-5">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-white">
+                {selectedUser.first_name} {selectedUser.last_name}
+              </p>
+              <p className="text-xs text-zinc-400">{selectedUser.email}</p>
             </div>
 
-            {/* Credenciales */}
-            <div className="space-y-2.5 border-t border-zinc-800 pt-4 sm:space-y-3 sm:pt-5">
-              <h3 className="text-sm font-semibold text-white">Credenciales</h3>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400 sm:mb-1.5">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800/80 px-2.5 py-1.5 text-xs text-white transition focus:outline-none focus:ring-2 focus:ring-red-400 sm:px-3 sm:py-2 sm:text-sm"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-zinc-400 sm:mb-1.5">
-                  Contraseña
-                </label>
-                <button
-                  type="button"
-                  className="w-full rounded-lg bg-red-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 sm:px-3 sm:py-2 sm:text-sm"
-                >
-                  Enviar nueva contraseña
-                </button>
+            <div className="space-y-3">
+              <p className="block text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                Roles
+              </p>
+              <div className="space-y-2">
+                {ROLE_OPTIONS.map((option) => (
+                  <label
+                    key={option.value}
+                    className="flex items-center gap-3 rounded-lg border border-zinc-700 bg-zinc-800/80 px-3 py-2 text-sm text-white"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedRoles.includes(option.value)}
+                      onChange={() => toggleRole(option.value)}
+                      className="h-4 w-4 rounded border-zinc-500 text-red-600 focus:ring-red-400"
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
               </div>
             </div>
-
-            {/* Roles y Permisos */}
-          <div className="space-y-2.5 border-t border-zinc-800 pt-4 sm:space-y-3 sm:pt-5">
-            <h3 className="text-sm font-semibold text-white">Roles y Permisos</h3>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={isAdmin}
-                onChange={() => setIsAdmin(!isAdmin)}
-                className="h-4 w-4 accent-red-500"
-              />
-              <span className="text-xs text-zinc-300 sm:text-sm">Administrador</span>
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={isDelivery}
-                onChange={() => setIsDelivery(!isDelivery)}
-                className="h-4 w-4 accent-red-500"
-              />
-              <span className="text-xs text-zinc-300 sm:text-sm">Repartidor</span>
-            </label>
           </div>
-
-
-            {/* Información del Sistema */}
-            <div className="space-y-1 border-t border-zinc-800 pt-4 text-xs text-zinc-400 sm:pt-5">
-              <p>
-                <span className="font-semibold text-zinc-300">Última modificación:</span>{" "}
-                {selectedUser.updated_at
-                  ? new Date(selectedUser.updated_at).toLocaleDateString("es-MX", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "—"}
-              </p>
-              <p>
-                <span className="font-semibold text-zinc-300">Fecha de registro:</span>{" "}
-                {selectedUser.created_at
-                  ? new Date(selectedUser.created_at).toLocaleDateString("es-MX", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })
-                  : "—"}
-              </p>
-            </div>
-          </form>
         ) : (
-          <p className="text-center text-xs text-zinc-400 sm:text-sm">No hay datos disponibles.</p>
+          <p className="text-center text-sm text-zinc-400">
+            No hay datos disponibles.
+          </p>
         )}
       </ResponsiveModal>
     </div>
-  )
+  );
 }

@@ -1,16 +1,21 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import {
-  useEffect,
-  useMemo,
-  useState,
   type ChangeEvent,
   type FormEvent,
   type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
-import Link from "next/link";
 
-export default function NewProductClient({ businessId }: { businessId: number }) {
+export default function NewProductClient({
+  businessId,
+}: {
+  businessId: number;
+}) {
   const businessIdNumber = Number(businessId);
 
   console.log("businessId:", businessIdNumber);
@@ -28,11 +33,10 @@ export default function NewProductClient({ businessId }: { businessId: number })
 
   // Categorías
   const [categories, setCategories] = useState<{ id: number; name: string }[]>(
-    []
+    [],
   );
 
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [subcategoryId, setSubcategoryId] = useState<number | null>(null);
 
   // Precios
   const [price, setPrice] = useState<number>(0);
@@ -59,15 +63,18 @@ export default function NewProductClient({ businessId }: { businessId: number })
   // Promociones
   const [promotionId, setPromotionId] = useState<number | null>(null);
 
-  // Imagen (deshabilitada)
+  // Imagen
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFileName, setImageFileName] = useState<string | null>(null);
+  const [imageError, setImageError] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Fechas
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   // Status
-  const [statusId, setStatusId] = useState<number>(1); // activo
+  const [statusId] = useState<number>(1); // activo
 
   // ============================
   // 📌 Clases de input
@@ -79,127 +86,206 @@ export default function NewProductClient({ businessId }: { businessId: number })
   // ============================
   // 📌 Cargar categorías dinámicas
   // ============================
-useEffect(() => {
-  async function loadCategories() {
-    try {
-      const token = typeof window !== "undefined" 
-        ? localStorage.getItem("token")
-        : null;
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const res = await fetch("/api/product-categories", {
+          cache: "no-store",
+        });
 
-      const res = await fetch("/api/categories/" + businessId, {
-        headers: {
-          "Authorization": token ? `Bearer ${token}` : "",
-        },
-      });
+        const data = await res.json();
 
-      const data = await res.json();
+        if (res.ok && Array.isArray(data.categories)) {
+          const nextCategories = data.categories as Array<{
+            id: number;
+            name: string;
+          }>;
 
-      if (data.categories) {
-        setCategories(data.categories);
+          setCategories(nextCategories);
 
-        if (data.categories.length > 0) {
-          setCategoryId(data.categories[0].id);
+          if (nextCategories.length > 0) {
+            setCategoryId(nextCategories[0].id);
+          }
         }
+      } catch (err) {
+        console.error("Error cargando categorías:", err);
       }
-    } catch (err) {
-      console.error("Error cargando categorías:", err);
     }
+
+    loadCategories();
+  }, []);
+
+  // ============================
+  // 📌 Manejo de imagen
+  // ============================
+
+  function clearSelectedImage() {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImageFile(null);
+    setImagePreview(null);
+    setImageFileName(null);
+    setImageError("");
   }
-
-  loadCategories();
-}, [businessId]);
-
-
-  // ============================
-  // 📌 Manejo de imagen (deshabilitada)
-  // ============================
 
   function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    return; // imagen deshabilitada por ahora
-  }
+    const file = event.target.files?.[0] ?? null;
 
-// ============================
-// 📌 Validación mínima para permitir submit
-// ============================
-
-const canSubmit = useMemo(() => {
-  return (
-    name.trim().length > 0 &&
-    categoryId !== null &&
-    price > 0
-  );
-}, [name, categoryId, price]);
-
-// ============================
-// 📌 Envío a API
-// ============================
-
-async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-
-  // Generar SKU automático más corto y legible
-  const skuValue = sku.trim() || `PROD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
-
-  try {
-    const payload = {
-      product: {
-        business_id: businessId,
-        sku: skuValue,
-        barcode: barcode || null,
-        name,
-        description_long: descriptionLong || null,
-        description_short: descriptionShort || null,
-        product_category_id: categoryId,
-        product_subcategory_id: subcategoryId || null,
-        price,
-        discount_price: discountPrice || null,
-        currency: currency || "MXN",
-        sale_format: saleFormat || "UNIDAD",
-        price_per_unit: pricePerUnit || null,
-        tax_included: taxIncluded ? 1 : 0,
-        tax_rate: taxRate || 0,
-        commission_rate: commissionRate || 0,
-        is_stock_available: isStockAvailable ? 1 : 0,
-        max_per_order: maxPerOrder || null,
-        min_per_order: minPerOrder || null,
-        promotion_id: promotionId || null,
-        thumbnail_url: null,
-        stock_average: stockAverage || 0,  // ← 0 en lugar de null
-        stock_danger: stockDanger || 0,    // ← 0 en lugar de null
-        created_at: new Date(),
-        updated_at: new Date(),
-        expires_at: expiresAt || null,
-        status_id: statusId
-      }
-    };
-
-    const token = typeof window !== "undefined" 
-      ? localStorage.getItem("token")
-      : null;
-
-    const res = await fetch("/api/business/products", {
-      method: "POST",
-      headers: {
-        "Authorization": token ? `Bearer ${token}` : "",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert("❌ Error al guardar: " + JSON.stringify(data));
+    if (!file) {
       return;
     }
 
-    alert("✅ Producto creado correctamente.");
-    // Opcional: redirigir al panel
-    // window.location.href = `/business`;
-    
-  } catch (err) {
-    console.error(err);
-    alert("❌ Error inesperado.");
+    const validMimeTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!validMimeTypes.includes(file.type)) {
+      setImageError("Solo se permiten imágenes JPG, JPEG, PNG o WEBP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setImageError("La imagen no debe superar 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    setImageFile(file);
+    setImageFileName(file.name);
+    setImagePreview(URL.createObjectURL(file));
+    setImageError("");
   }
-}
+
+  // ============================
+  // 📌 Validación mínima para permitir submit
+  // ============================
+
+  const canSubmit = useMemo(() => {
+    return name.trim().length > 0 && categoryId !== null && price > 0;
+  }, [name, categoryId, price]);
+
+  // ============================
+  // 📌 Envío a API
+  // ============================
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    // Generar SKU automático más corto y legible
+    const skuValue =
+      sku.trim() ||
+      `PROD-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+
+    try {
+      const payload = {
+        product: {
+          business_id: businessId,
+          sku: skuValue,
+          barcode: barcode || null,
+          name,
+          description_long: descriptionLong || null,
+          description_short: descriptionShort || null,
+          product_category_id: categoryId,
+          price,
+          discount_price: discountPrice || null,
+          currency: currency || "MXN",
+          sale_format: saleFormat || "UNIDAD",
+          price_per_unit: pricePerUnit || null,
+          tax_included: taxIncluded ? 1 : 0,
+          tax_rate: taxRate || 0,
+          commission_rate: commissionRate || 0,
+          is_stock_available: isStockAvailable ? 1 : 0,
+          max_per_order: maxPerOrder || null,
+          min_per_order: minPerOrder || null,
+          promotion_id: promotionId || null,
+          thumbnail_url: null,
+          stock_average: stockAverage || 0, // ← 0 en lugar de null
+          stock_danger: stockDanger || 0, // ← 0 en lugar de null
+          created_at: new Date(),
+          updated_at: new Date(),
+          expires_at: expiresAt || null,
+          status_id: statusId,
+        },
+      };
+
+      const token =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+      const res = await fetch("/api/business/products", {
+        method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(`❌ Error al guardar: ${JSON.stringify(data)}`);
+        return;
+      }
+
+      const productId = Number(data.product_id ?? 0);
+
+      if (imageFile && productId > 0) {
+        try {
+          setUploadingImage(true);
+          const formData = new FormData();
+          formData.append("product_id", String(productId));
+          formData.append("business_id", String(businessId));
+          formData.append("image", imageFile);
+
+          const uploadResponse = await fetch(
+            "/api/business/products/upload-image",
+            {
+              method: "POST",
+              headers: {
+                Authorization: token ? `Bearer ${token}` : "",
+              },
+              body: formData,
+            },
+          );
+          const uploadData = await uploadResponse.json();
+
+          if (!uploadResponse.ok || uploadData.success === false) {
+            alert(
+              `✅ Producto creado, pero la imagen no se pudo guardar: ${
+                uploadData.error || "Error desconocido"
+              }`,
+            );
+            return;
+          }
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
+      if (!imageFile) {
+        alert(
+          "✅ Producto creado correctamente. Advertencia: el producto quedó sin imagen.",
+        );
+        return;
+      }
+
+      alert("✅ Producto creado correctamente.");
+      // Opcional: redirigir al panel
+      // window.location.href = `/business`;
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error inesperado.");
+    }
+  }
 
   // ============================
   // 📌 Layout del formulario (empieza aquí)
@@ -212,7 +298,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
           {/* ============================
               🏆 Header Principal
               ============================ */}
-         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-3xl sm:p-6 md:p-8 lg:p-10">
+          <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1f3029] via-[#2f4638] to-[#3f5c45] p-4 text-white shadow-xl sm:rounded-3xl sm:p-6 md:p-8 lg:p-10">
             {/* Elementos de fondo decorativos - totalmente responsivos */}
             <div
               aria-hidden="true"
@@ -222,7 +308,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
               aria-hidden="true"
               className="absolute -right-8 -top-12 size-32 rounded-full bg-white/15 blur-xl sm:-right-12 sm:-top-16 sm:size-48 sm:blur-2xl md:-right-16 md:-top-20 md:size-56 lg:-right-24 lg:-top-24 lg:size-64 lg:blur-3xl"
             />
-            
+
             <div className="relative grid gap-6 md:gap-8 lg:grid-cols-[1.5fr,1fr] lg:items-center">
               {/* Columna izquierda: Contenido principal */}
               <div className="space-y-4 md:space-y-6 lg:order-1">
@@ -245,12 +331,13 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   <h1 className="text-2xl font-semibold sm:text-3xl md:text-4xl lg:text-5xl">
                     Agregar producto al catálogo
                   </h1>
-                  
+
                   <p className="text-sm text-white/90 sm:text-base md:text-lg lg:max-w-2xl">
-                    Completa la ficha del producto para publicarlo en el menú del negocio.
+                    Completa la ficha del producto para publicarlo en el menú
+                    del negocio.
                   </p>
                 </div>
-                
+
                 {/* Badge del sistema */}
                 <div className="grid gap-3 rounded-xl bg-white/15 p-3 text-xs uppercase tracking-[0.2em] sm:rounded-2xl sm:p-4">
                   <div className="flex items-center gap-3">
@@ -266,9 +353,8 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   </div>
                 </div>
               </div>
-              
+
               {/* Columna derecha: Espacio para contenido adicional */}
-              
             </div>
           </section>
 
@@ -295,7 +381,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Datos principales del producto
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <FieldCompact
                       label="Nombre del producto"
@@ -331,11 +417,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                     </FieldCompact>
 
                     <div className="grid gap-2 sm:grid-cols-2">
-                      <FieldCompact
-                        label="SKU"
-                        htmlFor="sku"
-                        required
-                      >
+                      <FieldCompact label="SKU" htmlFor="sku" required>
                         <input
                           id="sku"
                           type="text"
@@ -346,10 +428,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                         />
                       </FieldCompact>
 
-                      <FieldCompact
-                        label="Código de barras"
-                        htmlFor="barcode"
-                      >
+                      <FieldCompact label="Código de barras" htmlFor="barcode">
                         <input
                           id="barcode"
                           type="text"
@@ -361,10 +440,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       </FieldCompact>
                     </div>
 
-                    <FieldCompact
-                      label="Categoría"
-                      htmlFor="category"
-                    >
+                    <FieldCompact label="Categoría" htmlFor="category">
                       <select
                         id="category"
                         value={categoryId ?? ""}
@@ -395,7 +471,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Costo y cómo se vende
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <div className="grid gap-2 sm:grid-cols-2">
                       {/* Precio (MXN) */}
@@ -415,7 +491,9 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                             step="0.01"
                             required
                             value={price}
-                            onChange={(event) => setPrice(Number(event.target.value))}
+                            onChange={(event) =>
+                              setPrice(Number(event.target.value))
+                            }
                             className={`${inputClass} pl-8 sm:pl-8`}
                           />
                         </div>
@@ -458,7 +536,9 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                         <select
                           id="saleFormat"
                           value={saleFormat}
-                          onChange={(event) => setSaleFormat(event.target.value)}
+                          onChange={(event) =>
+                            setSaleFormat(event.target.value)
+                          }
                           className={inputClass}
                         >
                           <option value="pieza">Pieza</option>
@@ -496,10 +576,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       </FieldCompact>
                     </div>
 
-                    <FieldCompact
-                      label="Moneda"
-                      htmlFor="currency"
-                    >
+                    <FieldCompact label="Moneda" htmlFor="currency">
                       <select
                         id="currency"
                         value={currency}
@@ -525,7 +602,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Configuración fiscal
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <div className="flex items-center gap-2">
                       <input
@@ -535,7 +612,10 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                         onChange={(e) => setTaxIncluded(e.target.checked)}
                         className="size-3.5 rounded border-[#c1e3b2] text-[#3f6b45] sm:size-4"
                       />
-                      <label htmlFor="taxIncluded" className="text-xs font-medium text-[#3f6b45] sm:text-sm">
+                      <label
+                        htmlFor="taxIncluded"
+                        className="text-xs font-medium text-[#3f6b45] sm:text-sm"
+                      >
                         Precio incluye impuestos
                       </label>
                     </div>
@@ -591,10 +671,11 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Control de stock y disponibilidad
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <div className="flex items-center gap-2">
                       <input
+                        id="isStockAvailable"
                         type="checkbox"
                         checked={isStockAvailable}
                         onChange={(event) =>
@@ -602,7 +683,10 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                         }
                         className="size-3.5 rounded border-[#c1e3b2] text-[#3f6b45] sm:size-4"
                       />
-                      <label className="text-xs font-medium text-[#3f6b45] sm:text-sm">
+                      <label
+                        htmlFor="isStockAvailable"
+                        className="text-xs font-medium text-[#3f6b45] sm:text-sm"
+                      >
                         Mostrar como disponible
                       </label>
                     </div>
@@ -644,6 +728,99 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                 </section>
               </div>
 
+              <section className="rounded-lg bg-[#f7f6ef] p-3 shadow-lg ring-1 ring-[#d6e3d0] backdrop-blur sm:rounded-xl sm:p-4">
+                <header className="space-y-0.5 pb-2 sm:pb-3">
+                  <h2 className="text-sm font-semibold text-[#1b4332] sm:text-base">
+                    Imagen del producto
+                  </h2>
+                  <p className="text-[10px] text-[#5c6f5b] sm:text-xs">
+                    Foto visible para los clientes
+                  </p>
+                </header>
+
+                <div className="grid gap-4 lg:grid-cols-[0.95fr,1.05fr]">
+                  <div className="space-y-3">
+                    <label
+                      htmlFor="product-image"
+                      className="grid min-h-36 cursor-pointer place-content-center gap-2 rounded-xl border-2 border-dashed border-[#c1e3b2] bg-[#f4ffef] p-4 text-center text-sm font-semibold text-[#3f6b45] transition hover:border-[#4c956c] hover:bg-[#eefbe7]"
+                    >
+                      <span className="text-base font-semibold">
+                        Subir imagen
+                      </span>
+                      <span className="text-xs text-[#5c6f5b]">
+                        JPG, JPEG, PNG o WEBP · Máximo 5 MB
+                      </span>
+                      <input
+                        id="product-image"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <div className="flex flex-wrap gap-2">
+                      <label
+                        htmlFor="product-image"
+                        className="inline-flex cursor-pointer items-center rounded-lg border border-[#c1e3b2] bg-white px-3 py-2 text-xs font-semibold text-[#2f5238] shadow-sm transition hover:bg-[#f4ffef]"
+                      >
+                        {imageFile ? "Cambiar imagen" : "Seleccionar imagen"}
+                      </label>
+                      {imageFile ? (
+                        <button
+                          type="button"
+                          onClick={clearSelectedImage}
+                          className="inline-flex items-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100"
+                        >
+                          Eliminar
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {imageError ? (
+                      <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700">
+                        {imageError}
+                      </p>
+                    ) : null}
+
+                    {!imageFile ? (
+                      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">
+                        Producto sin imagen. Puedes guardarlo así, pero se verá
+                        mejor con foto.
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <div className="rounded-xl border border-[#d6e3d0] bg-white p-3 shadow-sm">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#5c6f5b]">
+                      Vista previa
+                    </p>
+
+                    {imagePreview ? (
+                      <div className="mt-3 overflow-hidden rounded-xl border border-[#d6e3d0]">
+                        <Image
+                          src={imagePreview}
+                          alt="Vista previa del producto"
+                          width={1200}
+                          height={900}
+                          className="h-64 w-full object-cover"
+                          unoptimized
+                        />
+                        {imageFileName ? (
+                          <p className="truncate border-t border-[#d6e3d0] px-3 py-2 text-xs font-medium text-[#5c6f5b]">
+                            {imageFileName}
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : (
+                      <div className="mt-3 grid min-h-64 place-content-center rounded-xl border border-dashed border-[#d6e3d0] bg-[#fbfbf6] px-4 text-center text-sm font-medium text-[#7a8673]">
+                        Aún no has seleccionado una imagen.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </section>
+
               {/* Grupo 3: Límites y descripción larga */}
               <div className="grid gap-4 sm:grid-cols-2 sm:gap-5">
                 {/* Columna izquierda: Límites y promoción */}
@@ -656,7 +833,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Restricciones por pedido
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <div className="grid gap-2 sm:grid-cols-2">
                       <FieldCompact
@@ -692,10 +869,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       </FieldCompact>
                     </div>
 
-                    <FieldCompact
-                      label="ID Promoción"
-                      htmlFor="promotionId"
-                    >
+                    <FieldCompact label="ID Promoción" htmlFor="promotionId">
                       <input
                         id="promotionId"
                         type="number"
@@ -742,7 +916,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                       Información complementaria
                     </p>
                   </header>
-                  
+
                   <div className="grid gap-3">
                     <FieldCompact
                       label="Descripción larga"
@@ -757,27 +931,6 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                         }
                         placeholder="Describe ingredientes, tamaño, notas especiales, preparación..."
                         className={`${inputClass} min-h-[80px] resize-y`}
-                      />
-                    </FieldCompact>
-
-                    <FieldCompact
-                      label="Subcategoría (ID)"
-                      htmlFor="subcategory"
-                    >
-                      <input
-                        id="subcategory"
-                        type="number"
-                        min={0}
-                        value={subcategoryId ?? ""}
-                        onChange={(event) =>
-                          setSubcategoryId(
-                            event.target.value
-                              ? Number(event.target.value)
-                              : null,
-                          )
-                        }
-                        placeholder="Opcional"
-                        className={inputClass}
                       />
                     </FieldCompact>
                   </div>
@@ -814,12 +967,18 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   <li className="flex items-center justify-between rounded-lg bg-[#ecfadc] px-3 py-2 sm:rounded-xl">
                     <span className="font-medium text-[#2f5238]">SKU</span>
                     <span className="text-right font-mono text-xs">
-                      {sku || <span className="text-amber-600 italic">(auto-generado)</span>}
+                      {sku || (
+                        <span className="text-amber-600 italic">
+                          (auto-generado)
+                        </span>
+                      )}
                     </span>
                   </li>
 
                   <li className="flex items-center justify-between rounded-lg bg-[#ecfadc] px-3 py-2 sm:rounded-xl">
-                    <span className="font-medium text-[#2f5238]">IVA incluido</span>
+                    <span className="font-medium text-[#2f5238]">
+                      IVA incluido
+                    </span>
                     <span>{taxIncluded ? "Sí" : "No"}</span>
                   </li>
 
@@ -831,7 +990,9 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   </li>
 
                   <li className="flex items-center justify-between rounded-lg bg-[#ecfadc] px-3 py-2 sm:rounded-xl">
-                    <span className="font-medium text-[#2f5238]">Categoría</span>
+                    <span className="font-medium text-[#2f5238]">
+                      Categoría
+                    </span>
                     <span className="text-right">
                       {categories.find((c) => c.id === categoryId)?.name ??
                         "Sin categoría"}
@@ -847,58 +1008,26 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                   >
                     Guardar producto
                   </button>
-                  
+
                   {!canSubmit && (
                     <p className="mt-2 text-center text-[10px] text-[#dc2626]">
                       Completa los campos requeridos
                     </p>
                   )}
+                  {uploadingImage ? (
+                    <p className="mt-2 text-center text-[10px] text-[#4c956c]">
+                      Subiendo imagen del producto...
+                    </p>
+                  ) : null}
                 </div>
 
                 <div className="mt-3 border-t border-[#dfe9d8] pt-3">
                   <p className="text-[9px] text-[#5c6f5b] sm:text-[10px]">
-                    <span className="font-semibold">Nota:</span> La subida de imágenes está deshabilitada temporalmente.
+                    <span className="font-semibold">Nota:</span>{" "}
+                    {imageFile
+                      ? "La imagen se guardará después de crear el producto."
+                      : "Puedes guardar el producto sin imagen y agregarla después."}
                   </p>
-                </div>
-              </section>
-
-              {/* Sección de Imagen (más compacta) */}
-              <section className="rounded-lg bg-[#f6f5ec] p-3 shadow-lg ring-1 ring-[#d6e3d0] sm:rounded-xl sm:p-4">
-                <header className="space-y-0.5 pb-2 sm:pb-3">
-                  <p className="text-sm font-semibold text-[#2f5238]">
-                    Imagen
-                  </p>
-                  <p className="text-[10px] text-[#5c6f5b] sm:text-xs">
-                    Vista previa del producto
-                  </p>
-                </header>
-                
-                <div className="space-y-3">
-                  <label className="grid min-h-24 place-content-center gap-1.5 rounded-lg border-2 border-dashed border-[#c1e3b2] bg-[#f4ffef] p-3 text-center text-xs font-medium text-[#3f6b45] opacity-60 cursor-not-allowed sm:min-h-28 sm:rounded-xl">
-                    <span className="text-[10px] sm:text-xs">Cargar imagen (próximamente)</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      disabled
-                      onChange={() => {}}
-                      className="hidden"
-                    />
-                  </label>
-
-                  {imagePreview && (
-                    <div className="overflow-hidden rounded-lg border border-[#d6e3d0] shadow-sm opacity-60 sm:rounded-xl">
-                      <img
-                        src={imagePreview}
-                        alt="Vista previa"
-                        className="w-full object-cover"
-                      />
-                      {imageFileName && (
-                        <p className="truncate px-2 py-1.5 text-[10px] text-[#5c6f5b]">
-                          {imageFileName}
-                        </p>
-                      )}
-                    </div>
-                  )}
                 </div>
               </section>
 
@@ -912,7 +1041,7 @@ async function handleSubmit(event: FormEvent<HTMLFormElement>) {
                     ID: {businessId}
                   </p>
                 </header>
-                
+
                 <div className="space-y-2 text-xs text-[#5c6f5b]">
                   <p className="flex items-center gap-1.5">
                     <span className="text-[#3f6b45]">✓</span>
@@ -956,9 +1085,7 @@ function FieldCompact({
         <span className="text-xs font-medium text-[#1b4332] sm:text-sm">
           {label}
         </span>
-        {required && (
-          <span className="text-[10px] text-[#dc2626]">*</span>
-        )}
+        {required && <span className="text-[10px] text-[#dc2626]">*</span>}
       </div>
       {children}
     </label>

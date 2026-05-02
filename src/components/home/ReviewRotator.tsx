@@ -9,6 +9,19 @@ type Business = {
   category?: string;
 };
 
+type ApiStore = {
+  id: number | string;
+  name?: string;
+  nombre?: string;
+  city?: string;
+  ciudad?: string;
+  category?: string;
+  category_name?: string;
+  giro?: string;
+  business_category_name?: string;
+  categories?: string[];
+};
+
 type Ally = {
   name: string;
   category: string;
@@ -25,16 +38,17 @@ export function ReviewRotator() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const res = await fetch("/api/shop/business");
+        const res = await fetch("/api/stores");
         const data = await res.json();
 
-        const parsed: Business[] = (data.negocios ?? []).map((n: any) => ({
+        const parsed: Business[] = (data.stores ?? []).map((n: ApiStore) => ({
           id: n.id,
           name: n.name ?? n.nombre,
           city: n.city ?? n.ciudad,
           category:
             n.category ??
             n.category_name ??
+            (Array.isArray(n.categories) ? n.categories[0] : undefined) ??
             n.giro ??
             n.business_category_name,
         }));
@@ -102,9 +116,9 @@ export function ReviewRotator() {
       </p>
 
       <div className="mt-4 flex items-center justify-center gap-1">
-        {allies.map((_, index) => (
+        {allies.map((item, index) => (
           <span
-            key={index}
+            key={`${item.name}-${item.category}-${item.city}`}
             className={`h-1.5 w-6 rounded-full transition-all ${
               index === active ? "bg-[#6D8B74]" : "bg-[#E2D9D0]"
             }`}

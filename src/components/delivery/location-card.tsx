@@ -30,7 +30,12 @@ export function LocationCard({ order }: LocationCardProps) {
     "address" | "references" | null
   >(null);
 
-  const locationText = `${order.address.street}, ${order.address.neighborhood}, ${order.address.city}`;
+  const locationText =
+    order.fullAddress ||
+    order.address.fullAddress ||
+    [order.address.street, order.address.neighborhood, order.address.city]
+      .filter(Boolean)
+      .join(", ");
   const referencesText = order.address.references;
   const phoneSanitized = order.contact.phone.replace(/\s+/g, "");
 
@@ -47,8 +52,13 @@ export function LocationCard({ order }: LocationCardProps) {
     [],
   );
 
+  const googleMapsQuery =
+    order.address.latitude != null && order.address.longitude != null
+      ? `${order.address.latitude},${order.address.longitude}`
+      : locationText;
+
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${order.address.street}, ${order.address.city}`,
+    googleMapsQuery,
   )}`;
 
   return (
@@ -78,7 +88,9 @@ export function LocationCard({ order }: LocationCardProps) {
             {order.address.street}
           </p>
           <p className="mt-1 text-sm text-white/80">
-            {order.address.neighborhood}, {order.address.city}
+            {[order.address.neighborhood, order.address.city]
+              .filter(Boolean)
+              .join(", ")}
           </p>
         </div>
 
@@ -88,7 +100,7 @@ export function LocationCard({ order }: LocationCardProps) {
             Referencias
           </div>
           <p className="text-sm leading-relaxed text-white/85">
-            {order.address.references}
+            {order.address.references || "Sin referencias adicionales."}
           </p>
         </div>
 

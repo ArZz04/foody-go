@@ -16,21 +16,22 @@ export async function GET(
 
     // ⬇️ FIX IMPORTANTE — params ahora es Promise
     const { id } = await context.params;
-    const businessId = id;
-
     const [rows] = await pool.query(
       `
       SELECT 
-        id,
-        name,
-        business_id,
-        created_at,
-        updated_at
-      FROM product_categories
-      WHERE business_id = ?
+        pc.id,
+        pc.name,
+        pc.created_at,
+        pc.updated_at,
+        COUNT(pcm.product_id) AS products_count
+      FROM product_categories pc
+      LEFT JOIN product_category_map pcm ON pcm.category_id = pc.id
+      LEFT JOIN products p ON p.id = pcm.product_id AND p.business_id = ?
+      WHERE pcm.product_id IS NULL OR p.business_id = ?
+      GROUP BY pc.id
       ORDER BY name ASC
       `,
-      [businessId]
+      [id, id]
     );
 
     return NextResponse.json({ categories: rows }, { status: 200 });

@@ -1,88 +1,85 @@
+import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 import pool from "@/lib/db";
-import jwt from "jsonwebtoken";
 
-// ============================
-// 📌 GET — Obtener negocios
-// ============================
+function validateBearer(req: Request) {
+  const auth = req.headers.get("authorization");
+  if (!auth?.startsWith("Bearer ")) return false;
+
+  try {
+    jwt.verify(auth.split(" ")[1], process.env.JWT_SECRET || "gogi-dev-secret");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function GET(req: Request) {
   try {
-    const auth = req.headers.get("authorization");
-    if (!auth?.startsWith("Bearer ")) {
+    if (!validateBearer(req)) {
       return NextResponse.json(
-        { error: "Token no proporcionado" },
-        { status: 401 }
+        { error: "Token no proporcionado o inválido" },
+        { status: 401 },
       );
     }
 
-    const token = auth.split(" ")[1];
-    jwt.verify(token, process.env.JWT_SECRET as string);
-
-    // Query principal
     const [rows] = await pool.query(`
-      SELECT 
+      SELECT
         b.id,
         b.name,
-        b.business_category_id,
+        bcm.category_id AS business_category_id,
+        bc.name AS category_name,
         b.city,
         b.district,
         b.address,
         b.legal_name,
         b.tax_id,
         b.address_notes,
+        b.phone,
+        b.email,
+        b.logo_url,
+        b.cover_image_url,
+        b.min_order_amount,
+        b.estimated_delivery_minutes,
+        b.rating_average,
+        b.is_open AS is_open_now,
         b.status_id,
         b.created_at,
         b.updated_at,
         bo.user_id AS owner_id
       FROM business b
-      LEFT JOIN business_owners bo 
-        ON bo.business_id = b.id 
-        AND bo.status_id = 1
-      LEFT JOIN business_categories bc
-        ON bc.id = b.business_category_id
+      LEFT JOIN business_category_map bcm ON bcm.business_id = b.id
+      LEFT JOIN business_categories bc ON bc.id = bcm.category_id
+      LEFT JOIN business_owners bo ON bo.business_id = b.id
       ORDER BY b.id DESC
     `);
 
-
-    const negocios = (rows as any[]).map(b => ({
-      ...b,
-      business_owner: { user_id: b.owner_id ?? null }
+    const negocios = (rows as any[]).map((business) => ({
+      ...business,
+      business_owner: { user_id: business.owner_id ?? null },
     }));
 
-
-    if (!negocios || negocios.length === 0) {
-      return NextResponse.json(
-        { message: "No hay negocios registrados", negocios: [] },
-        { status: 200 }
-      );
-    }
-
-    return NextResponse.json(
-      { message: "OK", negocios },
-      { status: 200 }
-    );
-
+    return NextResponse.json({ message: "OK", negocios }, { status: 200 });
   } catch (error) {
-    console.error("❌ Error al obtener negocios:", error);
+    console.error("Error al obtener negocios:", error);
     return NextResponse.json(
       { error: "Error interno", details: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function POST(req: Request) {
+  const connection = await pool.getConnection();
+
   try {
-    // 1️⃣ Validar token
-    const auth = req.headers.get("authorization");
-    if (!auth?.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Token no proporcionado" }, { status: 401 });
+    if (!validateBearer(req)) {
+      return NextResponse.json(
+        { error: "Token no proporcionado o inválido" },
+        { status: 401 },
+      );
     }
 
-    const token = auth.split(" ")[1];
-    jwt.verify(token, process.env.JWT_SECRET as string);
-
-    // 2️⃣ Extraer body
     const body = await req.json();
     const {
       owner_id,
@@ -94,74 +91,113 @@ export async function POST(req: Request) {
       legal_name,
       tax_id,
       address_notes,
+      phone,
+      email,
       status_id = 1,
     } = body;
 
-    // 3️⃣ Validaciones mínimas
-    if (!owner_id || !name || !business_category_id) {
+    if (!owner_id || !name || !business_category_id || !city || !address) {
       return NextResponse.json(
-        { error: "owner_id, name y business_category_id son requeridos" },
-        { status: 400 }
+        {
+          error:
+            "owner_id, name, business_category_id, city y address son requeridos",
+        },
+        { status: 400 },
       );
     }
 
-    // 4️⃣ Insert en business
-    const [businessResult] = await pool.query(
+    await connection.beginTransaction();
+
+    const [businessResult]: any = await connection.query(
       `
-      INSERT INTO business
-        (name, business_category_id, city, district, address, legal_name, tax_id, address_notes, status_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW());
+        INSERT INTO business (
+          name,
+          legal_name,
+          tax_id,
+          city,
+          district,
+          address,
+          address_notes,
+          phone,
+          email,
+          status_id,
+          created_at,
+          updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
       `,
       [
         name,
-        business_category_id,
-        city ?? null,
-        district ?? null,
-        address ?? null,
         legal_name ?? null,
         tax_id ?? null,
+        city,
+        district ?? null,
+        address,
         address_notes ?? null,
-        status_id
-      ]
+        phone ?? null,
+        email ?? null,
+        status_id,
+      ],
     );
 
-    const businessId = (businessResult as any).insertId;
+    const businessId = businessResult.insertId;
 
-    // 5️⃣ Registrar dueño del negocio
-    await pool.query(
+    await connection.query(
       `
-      INSERT INTO business_owners (business_id, user_id, invited_by, status_id, created_at, updated_at)
-      VALUES (?, ?, ?, ?, NOW(), NOW());
+        INSERT INTO business_category_map (business_id, category_id)
+        VALUES (?, ?)
       `,
-      [businessId, owner_id, owner_id, 1]
+      [businessId, business_category_id],
     );
 
-    // 6️⃣ Asignar rol OWNER (role_id = 2) al usuario (WITH UPSERT)
-    await pool.query(
+    await connection.query(
       `
-      INSERT INTO user_roles (user_id, role_id)
-      VALUES (?, 2)
-      ON DUPLICATE KEY UPDATE role_id = 2;
+        INSERT INTO business_owners (business_id, user_id)
+        VALUES (?, ?)
       `,
-      [owner_id]
+      [businessId, owner_id],
     );
 
-    // 7️⃣ Retornar negocio creado
-    const [data] = await pool.query(`SELECT * FROM business WHERE id = ?`, [businessId]);
+    await connection.query(
+      `
+        INSERT IGNORE INTO user_roles (user_id, role_id)
+        SELECT ?, id FROM roles WHERE name = 'business_admin'
+      `,
+      [owner_id],
+    );
+
+    const [data]: any = await connection.query(
+      `
+        SELECT
+          b.*,
+          bcm.category_id AS business_category_id,
+          bc.name AS category_name
+        FROM business b
+        LEFT JOIN business_category_map bcm ON bcm.business_id = b.id
+        LEFT JOIN business_categories bc ON bc.id = bcm.category_id
+        WHERE b.id = ?
+        LIMIT 1
+      `,
+      [businessId],
+    );
+
+    await connection.commit();
 
     return NextResponse.json(
       {
         message: "Negocio creado correctamente",
-        business: (data as any)[0],
+        business: data[0],
       },
-      { status: 201 }
+      { status: 201 },
     );
-
   } catch (error) {
-    console.error("❌ Error al crear negocio:", error);
+    await connection.rollback();
+    console.error("Error al crear negocio:", error);
     return NextResponse.json(
       { error: "Error interno", details: (error as Error).message },
-      { status: 500 }
+      { status: 500 },
     );
+  } finally {
+    connection.release();
   }
 }

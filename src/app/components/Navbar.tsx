@@ -8,13 +8,76 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
+const CART_STORAGE_KEY = "gogi:cart";
+const CART_UPDATED_EVENT = "gogi-cart-updated";
+
+function hasPanelAccess(roles: string[] | undefined) {
+  const normalizedRoles = Array.isArray(roles)
+    ? roles.map((role) => String(role))
+    : [];
+
+  return normalizedRoles.some((role) =>
+    [
+      "ADMIN_GENERAL",
+      "REPARTIDOR",
+      "ADMIN_NEGOCIO",
+      "VENDEDOR",
+      "ADMIN",
+      "DELIVERY",
+      "MANAGER",
+      "OWNER",
+      "admin_general",
+      "repartidor",
+      "business_admin",
+      "business_staff",
+    ].includes(role),
+  );
+}
+
+function getStoredCartCount() {
+  if (typeof window === "undefined") return 0;
+
+  try {
+    const rawCart = window.localStorage.getItem(CART_STORAGE_KEY);
+    if (!rawCart) return 0;
+
+    const parsedCart = JSON.parse(rawCart) as Array<{ quantity?: number }>;
+
+    return parsedCart.reduce(
+      (total, item) => total + Math.max(0, Number(item.quantity) || 0),
+      0,
+    );
+  } catch (error) {
+    console.error("No se pudo leer el contador del carrito", error);
+    return 0;
+  }
+}
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const syncCartCount = () => {
+      setCartCount(getStoredCartCount());
+    };
+
+    syncCartCount();
+    window.addEventListener("storage", syncCartCount);
+    window.addEventListener(CART_UPDATED_EVENT, syncCartCount);
+
+    return () => {
+      window.removeEventListener("storage", syncCartCount);
+      window.removeEventListener(CART_UPDATED_EVENT, syncCartCount);
+    };
   }, []);
 
   const toggleMobileMenu = () => {
@@ -73,7 +136,15 @@ export default function Navbar() {
             >
               Inicio
             </Link>
-            {user && user.roles?.length > 1 && (
+            {user && (
+              <Link
+                href="/pedidos"
+                className="text-white/80 transition-colors hover:text-white"
+              >
+                Mis pedidos
+              </Link>
+            )}
+            {user && hasPanelAccess(user.roles) && (
               <Link
                 href="/pickdash"
                 className="text-white/80 transition-colors hover:text-white"
@@ -95,6 +166,11 @@ export default function Navbar() {
                   <Link href="/carrito" className="flex items-center gap-2">
                     <ShoppingCart className="h-4 w-4" />
                     <span>Carrito</span>
+                    {cartCount > 0 ? (
+                      <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-orange-500 px-2 py-0.5 text-xs font-bold text-white">
+                        {cartCount}
+                      </span>
+                    ) : null}
                   </Link>
                 </Button>
                 <span className="text-white/70 text-sm">Hola, {user.name}</span>
@@ -135,7 +211,14 @@ export default function Navbar() {
                 className="text-white hover:bg-white/10"
               >
                 <Link href="/carrito" aria-label="Carrito de compras">
-                  <ShoppingCart className="h-5 w-5" />
+                  <span className="relative block">
+                    <ShoppingCart className="h-5 w-5" />
+                    {cartCount > 0 ? (
+                      <span className="absolute -right-2 -top-2 inline-flex min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                        {cartCount}
+                      </span>
+                    ) : null}
+                  </span>
                 </Link>
               </Button>
             )}
@@ -170,7 +253,16 @@ export default function Navbar() {
               >
                 Inicio
               </Link>
-              {user && user.roles?.length > 1 && (
+              {user && (
+                <Link
+                  href="/pedidos"
+                  className="text-white/80 hover:text-white transition-colors px-2 py-2"
+                  onClick={closeMobileMenu}
+                >
+                  Mis pedidos
+                </Link>
+              )}
+              {user && hasPanelAccess(user.roles) && (
                 <Link
                   href="/pickdash"
                   className="text-white/80 hover:text-white transition-colors px-2 py-2"

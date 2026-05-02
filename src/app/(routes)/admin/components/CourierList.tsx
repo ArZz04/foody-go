@@ -1,19 +1,92 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import {
-  couriers,
-} from "../data/couriers";
-
-import { CourierRecord, CourierStatus } from "@/types/Couriers";
-
+type CourierStatus = "Activo" | "En descanso" | "Suspendido";
 type EstadoFiltro = "Todos" | CourierStatus;
 
+type Courier = {
+  id: number;
+  name: string;
+  profile_image_url: string | null;
+  phone: string;
+  email: string;
+  status: CourierStatus;
+  vehicle: string;
+  zone: string;
+  total_deliveries: number;
+  deliveries_today: number;
+  deliveries_week: number;
+  deliveries_month: number;
+  earnings: number;
+};
+
+type CourierResponse = {
+  success: boolean;
+  couriers: Courier[];
+  summary: {
+    total: number;
+    activos: number;
+    descanso: number;
+    suspendidos: number;
+  };
+  error?: string;
+};
+
 export function CourierList() {
+  const [couriers, setCouriers] = useState<Courier[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [estadoFiltro, setEstadoFiltro] = useState<EstadoFiltro>("Todos");
+
+  useEffect(() => {
+    const loadCouriers = async () => {
+      const token = window.localStorage.getItem("token");
+
+      if (!token) {
+        setError("Debes iniciar sesión nuevamente");
+        setCouriers([]);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch("/api/admin/deliveries/repartidores", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const payload = (await response.json()) as CourierResponse;
+
+        if (!response.ok || !payload.success) {
+          console.error("Error real cargando repartidores:", {
+            status: response.status,
+            body: payload,
+          });
+          setError(payload.error || "No se pudieron cargar los repartidores.");
+          setCouriers([]);
+          return;
+        }
+
+        setCouriers(payload.couriers ?? []);
+      } catch (fetchError) {
+        console.error("Error cargando repartidores:", fetchError);
+        setError("No se pudieron cargar los repartidores.");
+        setCouriers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCouriers();
+  }, []);
 
   const filteredCouriers = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -21,28 +94,35 @@ export function CourierList() {
     return couriers.filter((courier) => {
       const matchesSearch =
         query.length === 0 ||
-        courier.nombre.toLowerCase().includes(query) ||
-        courier.telefono
-          .replace(/\s+/g, "")
-          .includes(query.replace(/\s+/g, "")) ||
-        courier.vehiculo.toLowerCase().includes(query);
+        courier.name.toLowerCase().includes(query) ||
+        courier.phone.replace(/\s+/g, "").includes(query.replace(/\s+/g, "")) ||
+        courier.vehicle.toLowerCase().includes(query) ||
+        courier.zone.toLowerCase().includes(query);
 
       const matchesStatus =
-        estadoFiltro === "Todos" || courier.estado === estadoFiltro;
+        estadoFiltro === "Todos" || courier.status === estadoFiltro;
 
       return matchesSearch && matchesStatus;
     });
-  }, [search, estadoFiltro]);
+  }, [couriers, search, estadoFiltro]);
 
   const summary = useMemo(() => {
     const total = couriers.length;
-    const activos = couriers.filter((c) => c.estado === "Activo").length;
-    const descanso = couriers.filter((c) => c.estado === "En descanso").length;
+    const activos = couriers.filter((courier) => courier.status === "Activo");
+    const descanso = couriers.filter(
+      (courier) => courier.status === "En descanso",
+    );
     const suspendidos = couriers.filter(
-      (c) => c.estado === "Suspendido",
-    ).length;
-    return { total, activos, descanso, suspendidos };
-  }, []);
+      (courier) => courier.status === "Suspendido",
+    );
+
+    return {
+      total,
+      activos: activos.length,
+      descanso: descanso.length,
+      suspendidos: suspendidos.length,
+    };
+  }, [couriers]);
 
   return (
     <section className="w-full rounded-3xl bg-white/95 px-6 py-8 shadow-lg ring-1 ring-red-200/60 backdrop-blur-sm dark:bg-white/10 dark:ring-white/10 lg:px-10 lg:py-10">
@@ -52,7 +132,8 @@ export function CourierList() {
             Repartidores activos
           </h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-300">
-            Administra la flota, revisa horarios y estados de disponibilidad.
+            Revisa disponibilidad, métricas y acceso al detalle operativo de
+            cada repartidor.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -60,7 +141,7 @@ export function CourierList() {
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por nombre, teléfono o vehículo"
+            placeholder="Buscar por nombre, teléfono, vehículo o zona"
             className="min-w-[240px] rounded-xl border border-red-200/60 bg-white px-3 py-2 text-sm shadow-sm transition focus:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-200 dark:border-white/20 dark:bg-white/5"
           />
           <select
@@ -77,6 +158,12 @@ export function CourierList() {
           </select>
         </div>
       </header>
+
+      {error ? (
+        <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-white/10 dark:bg-white/5 dark:text-red-200">
+          {error}
+        </div>
+      ) : null}
 
       <section className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard label="Repartidores totales" value={summary.total} />
@@ -102,12 +189,21 @@ export function CourierList() {
               <th className="px-6 py-3">Vehículo</th>
               <th className="px-6 py-3">Zona</th>
               <th className="px-6 py-3">Estado</th>
-              <th className="px-6 py-3">Ingreso</th>
+              <th className="px-6 py-3">Métrica rápida</th>
               <th className="px-6 py-3 text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-red-100/60 bg-white text-zinc-700 dark:bg-white/5 dark:text-zinc-200">
-            {filteredCouriers.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={7}
+                  className="px-6 py-8 text-center text-sm text-zinc-400"
+                >
+                  Cargando repartidores...
+                </td>
+              </tr>
+            ) : filteredCouriers.length === 0 ? (
               <tr>
                 <td
                   colSpan={7}
@@ -118,78 +214,61 @@ export function CourierList() {
               </tr>
             ) : (
               filteredCouriers.map((courier) => (
-                <CourierRow key={courier.id} courier={courier} />
+                <tr
+                  key={courier.id}
+                  className="transition hover:bg-red-50/40 dark:hover:bg-white/10"
+                >
+                  <td className="px-6 py-3">
+                    <div className="flex items-center gap-3">
+                      {courier.profile_image_url ? (
+                        <Image
+                          src={courier.profile_image_url}
+                          alt={courier.name}
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 rounded-full object-cover ring-2 ring-red-100"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-sm font-semibold text-red-600 ring-2 ring-red-100">
+                          {courier.name.slice(0, 1).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="font-medium">{courier.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span>{courier.phone || "Sin teléfono"}</span>
+                      <span className="text-xs text-zinc-400">
+                        {courier.email || "Sin correo"}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3">{courier.vehicle}</td>
+                  <td className="px-6 py-3">{courier.zone}</td>
+                  <td className="px-6 py-3">
+                    <CourierStatusBadge status={courier.status} />
+                  </td>
+                  <td className="px-6 py-3 text-xs text-zinc-500 dark:text-zinc-300">
+                    <p>Total: {courier.total_deliveries}</p>
+                    <p>Hoy: {courier.deliveries_today}</p>
+                    <p>Semana: {courier.deliveries_week}</p>
+                  </td>
+                  <td className="px-6 py-3 text-center">
+                    <Link
+                      href={`/admin/deliveries/${courier.id}`}
+                      className="rounded-lg border border-red-200/60 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10"
+                    >
+                      Revisar
+                    </Link>
+                  </td>
+                </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
-
-      <p className="mt-4 text-xs text-zinc-400">
-        Datos simulados para prototipo. Conecta tu API de repartidores cuando
-        esté disponible.
-      </p>
     </section>
-  );
-}
-
-function CourierRow({ courier }: { courier: CourierRecord }) {
-  const [status, setStatus] = useState<CourierStatus>(courier.estado);
-
-  return (
-    <tr className="transition hover:bg-red-50/40 dark:hover:bg-white/10">
-      <td className="px-6 py-3 font-medium">{courier.nombre}</td>
-      <td className="px-6 py-3">
-        <div className="flex flex-col gap-0.5">
-          <span>{courier.telefono}</span>
-          <span className="text-xs text-zinc-400">{courier.email}</span>
-        </div>
-      </td>
-      <td className="px-6 py-3">
-        <div className="flex flex-col gap-0.5">
-          <span>{courier.vehiculo}</span>
-          <span className="text-xs text-zinc-400">{courier.placas}</span>
-        </div>
-      </td>
-      <td className="px-6 py-3">
-        <div className="flex flex-col gap-0.5">
-          <span>{courier.horario.zona}</span>
-          <span className="text-xs text-zinc-400">
-            {courier.horario.turno} ({courier.horario.inicio} -{" "}
-            {courier.horario.fin})
-          </span>
-        </div>
-      </td>
-      <td className="px-6 py-3">
-        <CourierStatusBadge status={status} />
-      </td>
-      <td className="px-6 py-3 text-xs text-zinc-400">
-        {new Date(courier.inicioEnGogiEats).toLocaleDateString("es-MX", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        })}
-      </td>
-      <td className="px-6 py-3 text-center">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Link
-            href={`/admin/repartos/${courier.id}`}
-            className="rounded-lg border border-red-200/60 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50 dark:border-white/20 dark:text-red-200 dark:hover:bg-white/10"
-          >
-            Revisar
-          </Link>
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as CourierStatus)}
-            className="rounded-lg border border-red-200/60 bg-white px-3 py-1 text-xs font-semibold text-zinc-600 transition focus:border-red-400 focus:outline-none focus:ring-1 focus:ring-red-200 dark:border-white/20 dark:bg-white/5 dark:text-zinc-200"
-          >
-            <option value="Activo">Activo</option>
-            <option value="En descanso">En descanso</option>
-            <option value="Suspendido">Suspendido</option>
-          </select>
-        </div>
-      </td>
-    </tr>
   );
 }
 

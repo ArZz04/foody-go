@@ -46,19 +46,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 5. Evitar categorías duplicadas en el mismo negocio
+    // 5. Evitar categorías duplicadas globales
     const [dupCheck] = await pool.query(
       `
         SELECT id 
         FROM product_categories
-        WHERE business_id = ? AND name = ?
+        WHERE name = ?
       `,
-      [business_id, cleanName]
+      [cleanName]
     );
 
     if (Array.isArray(dupCheck) && dupCheck.length > 0) {
       return NextResponse.json(
-        { error: "Ya existe una categoría con ese nombre para este negocio" },
+        { error: "Ya existe una categoría con ese nombre" },
         { status: 409 }
       );
     }
@@ -66,10 +66,10 @@ export async function POST(req: NextRequest) {
     // 6. Insertar categoría
     await pool.query(
       `
-        INSERT INTO product_categories (business_id, name)
-        VALUES (?, ?)
+        INSERT INTO product_categories (name)
+        VALUES (?)
       `,
-      [business_id, cleanName]
+      [cleanName]
     );
 
     return NextResponse.json(

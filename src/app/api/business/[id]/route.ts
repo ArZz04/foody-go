@@ -1,52 +1,39 @@
-import { NextResponse, type NextRequest } from "next/server";
-import pool from "@/lib/db";
 import jwt from "jsonwebtoken";
+import { type NextRequest, NextResponse } from "next/server";
+import pool from "@/lib/db";
 
-// ============================
-// 🔐 Validación de token
-// ============================
 function validateAuth(req: NextRequest): boolean {
   const auth = req.headers.get("authorization");
-  if (!auth || !auth.startsWith("Bearer ")) return false;
-
-  const token = auth.split(" ")[1];
+  if (!auth?.startsWith("Bearer ")) return false;
 
   try {
-    jwt.verify(token, process.env.JWT_SECRET as string);
+    jwt.verify(auth.split(" ")[1], process.env.JWT_SECRET || "gogi-dev-secret");
     return true;
-  } catch (error) {
-    console.error("❌ Token inválido:", error);
+  } catch {
     return false;
   }
 }
 
-// ============================
-// 📌 GET — Obtener negocio por ID (+ horarios)
-// ============================
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!validateAuth(req)) {
       return NextResponse.json(
         { error: "Token inválido o faltante" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
-    const params = await context.params;
-    const id = params.id;
+    const { id } = await context.params;
 
-    // ============================
-    // 1️⃣ Obtener información del negocio
-    // ============================
     const [rows]: any = await pool.query(
       `
-        SELECT 
+        SELECT
           b.id,
           b.name,
-          b.business_category_id,
+          bcm.category_id AS business_category_id,
           bc.name AS category_name,
           b.city,
           b.district,
@@ -54,47 +41,57 @@ export async function GET(
           b.legal_name,
           b.tax_id,
           b.address_notes,
+          b.phone,
+          b.email,
+          b.logo_url,
+          b.cover_image_url,
+          b.min_order_amount,
+          b.estimated_delivery_minutes,
+          b.rating_average,
+          b.is_open AS is_open_now,
           b.created_at,
           b.updated_at,
           b.status_id,
-          bo.user_id AS owner_id
+          bo.user_id AS owner_id,
+          bd.description_long,
+          bd.slogan,
+          bd.specialties,
+          bd.service_notes,
+          bd.accepts_pickup,
+          bd.accepts_delivery,
+          bd.has_own_delivery,
+          bd.pet_friendly,
+          bd.instagram_url,
+          bd.facebook_url,
+          bd.whatsapp_phone,
+          bd.website_url
         FROM business b
-        LEFT JOIN business_owners bo 
-          ON bo.business_id = b.id AND bo.status_id = 1
-        LEFT JOIN business_categories bc 
-          ON bc.id = b.business_category_id
+        LEFT JOIN business_category_map bcm ON bcm.business_id = b.id
+        LEFT JOIN business_categories bc ON bc.id = bcm.category_id
+        LEFT JOIN business_owners bo ON bo.business_id = b.id
+        LEFT JOIN business_details bd ON bd.business_id = b.id
         WHERE b.id = ?
         LIMIT 1
       `,
-      [id]
+      [id],
     );
 
-    if (!rows?.length) {
+    if (!rows.length) {
       return NextResponse.json(
         { message: "Negocio no encontrado" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const business = rows[0];
-
-    // ============================
-    // 2️⃣ Obtener horarios del negocio
-    // ============================
     const [hours]: any = await pool.query(
       `
-        SELECT 
-          day_of_week,
-          open_time,
-          close_time,
-          is_closed
-        FROM business_hours 
+        SELECT day_of_week, open_time, close_time, is_closed
+        FROM business_hours
         WHERE business_id = ?
       `,
-      [id]
+      [id],
     );
 
-    // Formato de días (0 = Lunes, 6 = Domingo o según tu DB)
     const days = [
       "Lunes",
       "Martes",
@@ -105,64 +102,51 @@ export async function GET(
       "Domingo",
     ];
 
-    // ============================
-    // 3️⃣ Combinar horarios (7 días garantizados)
-    // ============================
     const formattedHours = days.map((day, index) => {
-      const found = hours.find((h: any) => h.day_of_week === index);
-
-      if (!found) {
-        return {
-          day_of_week: index,
-          day_name: day,
-          open_time: "undefined",
-          close_time: "undefined",
-          is_closed: true,
-        };
-      }
+      const found = hours.find((hour: any) => hour.day_of_week === index);
 
       return {
         day_of_week: index,
         day_name: day,
-        open_time: found.open_time ?? "undefined",
-        close_time: found.close_time ?? "undefined",
-        is_closed: !!found.is_closed,
+        open_time: found?.open_time ?? null,
+        close_time: found?.close_time ?? null,
+        is_closed: found ? Boolean(found.is_closed) : true,
       };
     });
 
-    // ============================
-    // 4️⃣ Respuesta final
-    // ============================
     return NextResponse.json(
       {
-        business,
+        business: {
+          ...rows[0],
+          is_open_now: Boolean(rows[0].is_open_now),
+          business_owner: { user_id: rows[0].owner_id ?? null },
+        },
         hours: formattedHours,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
-    console.error("❌ Error GET /business/:id:", error);
+    console.error("Error GET /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
 
-
-// ============================
-// 📌 PUT — Actualizar negocio
-// ============================
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
+  const connection = await pool.getConnection();
+
   try {
     if (!validateAuth(req)) {
-      return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Token inválido o faltante" },
+        { status: 401 },
+      );
     }
 
-    const params = await context.params;
-    const businessId = params.id;
+    const { id: businessId } = await context.params;
     const body = await req.json();
-
     const {
       owner_id,
       name,
@@ -173,131 +157,137 @@ export async function PUT(
       legal_name,
       tax_id,
       address_notes,
+      phone,
+      email,
       status_id = 1,
     } = body;
 
-    if (!owner_id || !name || !business_category_id) {
+    if (!owner_id || !name || !business_category_id || !city || !address) {
       return NextResponse.json(
-        { error: "owner_id, name y business_category_id son requeridos" },
-        { status: 400 }
+        {
+          error:
+            "owner_id, name, business_category_id, city y address son requeridos",
+        },
+        { status: 400 },
       );
     }
 
-    // 🔹 1. Obtener el owner ANTERIOR ANTES de actualizar
-    const [oldOwnerRows] = await pool.query<any[]>(
-      `SELECT user_id FROM business_owners WHERE business_id = ?`,
-      [businessId]
-    );
+    await connection.beginTransaction();
 
-    const oldOwnerId = oldOwnerRows.length > 0 ? oldOwnerRows[0].user_id : null;
-
-    // 🔹 2. Actualizar datos del negocio
-    await pool.query(
+    await connection.query(
       `
         UPDATE business SET
           name = ?,
-          business_category_id = ?,
+          legal_name = ?,
+          tax_id = ?,
           city = ?,
           district = ?,
           address = ?,
-          legal_name = ?,
-          tax_id = ?,
           address_notes = ?,
+          phone = ?,
+          email = ?,
           status_id = ?,
           updated_at = NOW()
-        WHERE id = ?;
+        WHERE id = ?
       `,
       [
         name,
-        business_category_id,
-        city ?? null,
-        district ?? null,
-        address ?? null,
         legal_name ?? null,
         tax_id ?? null,
+        city,
+        district ?? null,
+        address,
         address_notes ?? null,
+        phone ?? null,
+        email ?? null,
         status_id,
         businessId,
-      ]
+      ],
     );
 
-    // 🔹 3. Actualizar el owner actual
-    await pool.query(
+    await connection.query(
+      "DELETE FROM business_category_map WHERE business_id = ?",
+      [businessId],
+    );
+    await connection.query(
+      "INSERT INTO business_category_map (business_id, category_id) VALUES (?, ?)",
+      [businessId, business_category_id],
+    );
+
+    await connection.query(
+      "DELETE FROM business_owners WHERE business_id = ?",
+      [businessId],
+    );
+    await connection.query(
+      "INSERT INTO business_owners (business_id, user_id) VALUES (?, ?)",
+      [businessId, owner_id],
+    );
+
+    await connection.query(
       `
-        UPDATE business_owners
-        SET user_id = ?, updated_at = NOW()
-        WHERE business_id = ?;
+        INSERT IGNORE INTO user_roles (user_id, role_id)
+        SELECT ?, id FROM roles WHERE name = 'business_admin'
       `,
-      [owner_id, businessId]
+      [owner_id],
     );
 
-    // 🔹 4. Eliminar roles OWNER + MANAGER del dueño anterior (solo si cambió)
-    if (oldOwnerId && oldOwnerId !== owner_id) {
-      await pool.query(
-        `DELETE FROM user_roles WHERE user_id = ? AND role_id IN (2, 3);`,
-        [oldOwnerId]
-      );
-    }
-
-    // 🔹 5. Asignar rol OWNER al nuevo usuario
-    await pool.query(
+    const [updated]: any = await connection.query(
       `
-        INSERT INTO user_roles (user_id, role_id)
-        VALUES (?, 2)
-        ON DUPLICATE KEY UPDATE role_id = 2;
+        SELECT
+          b.*,
+          bcm.category_id AS business_category_id,
+          bc.name AS category_name
+        FROM business b
+        LEFT JOIN business_category_map bcm ON bcm.business_id = b.id
+        LEFT JOIN business_categories bc ON bc.id = bcm.category_id
+        WHERE b.id = ?
+        LIMIT 1
       `,
-      [owner_id]
+      [businessId],
     );
 
-        // 🔹 5b. Asignar rol MANAGER al nuevo usuario (si no tiene)
-    await pool.query(
-      `
-        INSERT INTO user_roles (user_id, role_id)
-        VALUES (?, 3)
-        ON DUPLICATE KEY UPDATE role_id = 3;
-      `,
-      [owner_id]
-    );
-
-    // 🔹 6. Obtener datos actualizados
-    const [updated]: any = await pool.query(
-      `SELECT * FROM business WHERE id = ?`,
-      [businessId]
-    );
+    await connection.commit();
 
     return NextResponse.json(
-      { message: "Negocio actualizado correctamente", business: updated[0] },
-      { status: 200 }
+      {
+        message: "Negocio actualizado correctamente",
+        business: updated[0],
+      },
+      { status: 200 },
     );
-
   } catch (error) {
-    console.error("❌ Error PUT /business/:id:", error);
+    await connection.rollback();
+    console.error("Error PUT /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
+  } finally {
+    connection.release();
   }
 }
 
-// ============================
-// 🗑 DELETE — Eliminar negocio
-// ============================
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     if (!validateAuth(req)) {
-      return NextResponse.json({ error: "Token inválido o faltante" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Token inválido o faltante" },
+        { status: 401 },
+      );
     }
 
-    const params = await context.params;
-    const id = params.id;
+    const { id } = await context.params;
 
-    await pool.query(`DELETE FROM business_owners WHERE business_id = ?`, [id]);
-    await pool.query(`DELETE FROM business WHERE id = ?`, [id]);
+    await pool.query(
+      "DELETE FROM business_category_map WHERE business_id = ?",
+      [id],
+    );
+    await pool.query("DELETE FROM business_owners WHERE business_id = ?", [id]);
+    await pool.query("DELETE FROM business WHERE id = ?", [id]);
 
     return NextResponse.json({ message: "Negocio eliminado" }, { status: 200 });
-
   } catch (error) {
-    console.error("❌ Error DELETE /business/:id:", error);
+    console.error("Error DELETE /business/:id:", error);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }

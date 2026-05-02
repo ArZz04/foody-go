@@ -48,11 +48,11 @@ const CardShell = ({
 };
 
 export default function BusinessCard({
-  id,
   name,
   city,
   category,
   rating = 4.5,
+  imagen,
   badge,
   etaMinutes,
   deliveryFee,
@@ -61,7 +61,11 @@ export default function BusinessCard({
   href,
   onClick,
 }: BusinessCardProps) {
-  const thumbnailPath = `/thumbnails/shop/${id}.png`;
+  const thumbnailPath = imagen
+    ? imagen.startsWith("/public/")
+      ? imagen.replace(/^\/public/, "")
+      : imagen
+    : "/default-business.png";
 
   function normalizeName(name: string) {
     let clean = name.toLowerCase();
@@ -89,6 +93,7 @@ export default function BusinessCard({
             src={thumbnailPath}
             alt={name}
             fill
+            unoptimized={Boolean(imagen)}
             className="object-cover transition duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
           />

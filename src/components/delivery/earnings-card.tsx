@@ -1,5 +1,6 @@
 import { PiggyBank, TrendingUp, Wallet } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,12 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 import type { DeliveryEarnings } from "./types";
 
 interface EarningsCardProps {
   earnings: DeliveryEarnings;
+  isHistoryLoading?: boolean;
+  onViewHistory?: () => void;
 }
 
 const formatterCache = new Map<string, Intl.NumberFormat>();
@@ -29,15 +31,35 @@ function formatCurrency(amount: number, currency: string) {
     );
   }
 
-  const formatter = formatterCache.get(currency)!;
+  const formatter =
+    formatterCache.get(currency) ??
+    new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    });
+
   return formatter.format(amount);
 }
 
-export function EarningsCard({ earnings }: EarningsCardProps) {
+export function EarningsCard({
+  earnings,
+  isHistoryLoading = false,
+  onViewHistory,
+}: EarningsCardProps) {
   const progress = Math.min(
     100,
-    Math.round((earnings.weekToDate / earnings.goal) * 100),
+    Math.round(
+      earnings.goal > 0
+        ? (earnings.weekToDate / earnings.goal) * 100
+        : (earnings.percentageToGoal ?? 0),
+    ),
   );
+  const comparisonToYesterday = Math.round(earnings.comparisonToYesterday ?? 0);
+  const comparisonLabel =
+    comparisonToYesterday >= 0
+      ? `+${comparisonToYesterday}% vs ayer`
+      : `${comparisonToYesterday}% vs ayer`;
 
   return (
     <Card className="overflow-hidden rounded-[26px] border border-white/20 bg-white/10 text-[#1f2d27] shadow-xl backdrop-blur-lg">
@@ -61,7 +83,7 @@ export function EarningsCard({ earnings }: EarningsCardProps) {
             </p>
             <p className="mt-1 flex items-center gap-2 text-xs text-orange-700">
               <TrendingUp className="h-3 w-3" />
-              +12% vs ayer
+              {comparisonLabel}
             </p>
           </div>
 
@@ -100,9 +122,11 @@ export function EarningsCard({ earnings }: EarningsCardProps) {
 
         <Button
           type="button"
+          onClick={onViewHistory}
+          disabled={isHistoryLoading}
           className="w-full rounded-full border border-orange-500/60 bg-orange-500/80 text-sm font-semibold text-white shadow-lg backdrop-blur hover:bg-orange-500"
         >
-          Ver historial
+          {isHistoryLoading ? "Cargando historial..." : "Ver historial"}
         </Button>
       </CardContent>
     </Card>

@@ -1,10 +1,23 @@
-import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 import pool from "@/lib/db";
+
+const roleAliases: Record<string, string> = {
+  ADMIN: "admin_general",
+  OWNER: "business_admin",
+  MANAGER: "business_staff",
+  DELIVERY: "repartidor",
+  CUSTOMER: "cliente",
+};
+
+function normalizeRole(role: unknown) {
+  const roleName = String(role);
+  return roleAliases[roleName] ?? roleName;
+}
 
 export async function PUT(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
   const userId = Number(id);
@@ -16,26 +29,28 @@ export async function PUT(
   const connection = await pool.getConnection();
 
   try {
-    console.log("➡️ Actualizando usuario:", userId);
-
-    // Validar token
     const auth = req.headers.get("authorization");
     if (!auth?.startsWith("Bearer ")) {
-      return NextResponse.json({ error: "Token no proporcionado" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Token no proporcionado" },
+        { status: 401 },
+      );
     }
 
-    const secret = process.env.JWT_SECRET as string;
-    const token = auth.split(" ")[1];
-    jwt.verify(token, secret);
+    jwt.verify(auth.split(" ")[1], process.env.JWT_SECRET as string);
 
-    // Leer body
     const body = await req.json();
     const { roles, ...fields } = body;
 
     await connection.beginTransaction();
 
-    // Actualizar datos básicos
-    const allowedFields = ["first_name", "last_name", "email", "phone", "status_id"];
+    const allowedFields = [
+      "first_name",
+      "last_name",
+      "email",
+      "phone",
+      "status_id",
+    ];
     const updates: string[] = [];
     const values: any[] = [];
 
@@ -50,123 +65,73 @@ export async function PUT(
       values.push(userId);
       await connection.query(
         `UPDATE users SET ${updates.join(", ")}, updated_at = NOW() WHERE id = ?`,
-        values
+        values,
       );
     }
 
-    // ========= ROLES ==========
     if (Array.isArray(roles)) {
-  const [oldRolesData] = await connection.query(
-    `SELECT r.code 
-     FROM roles r 
-     JOIN user_roles ur ON ur.role_id = r.id 
-     WHERE ur.user_id = ?`,
-    [userId]
-  );
+      const roleNames = roles.map(normalizeRole).filter(Boolean);
 
-  const oldRoles = (oldRolesData as any[]).map(r => r.code);
+      await connection.query("DELETE FROM user_roles WHERE user_id = ?", [
+        userId,
+      ]);
 
-  const roleMap: Record<string, string> = {
-    ADMIN: "1",
-    OWNER: "2",
-    DELIVERY: "4",
-    CUSTOMER: "5",
-  };
+      if (roleNames.length > 0) {
+        const placeholders = roleNames.map(() => "?").join(",");
+        const [roleRows] = await connection.query<any[]>(
+          `SELECT id FROM roles WHERE name IN (${placeholders})`,
+          roleNames,
+        );
 
-  const roleCodes = roles.map(r => roleMap[r]).filter(Boolean);
-
-  const sameRoles =
-    oldRoles.length === roleCodes.length &&
-    oldRoles.every(r => roleCodes.includes(r));
-
-  if (!sameRoles) {
-    console.log("🔁 Roles cambiaron, aplicando cambios...");
-    console.log("📌 old:", oldRoles, "➡ new:", roleCodes);
-
-    // 1. Borrar roles actuales
-    await connection.query(`DELETE FROM user_roles WHERE user_id = ?`, [userId]);
-
-    // 2. Insertar roles nuevos
-    if (roleCodes.length > 0) {
-      const placeholders = roleCodes.map(() => "?").join(",");
-      const [roleRows] = await connection.query(
-        `SELECT id FROM roles WHERE code IN (${placeholders})`,
-        roleCodes
-      );
-
-      const roleIds = (roleRows as any[]).map(r => r.id);
-
-      const insertValues = roleIds.map(roleId => [userId, roleId]);
-      const insertPlaceholders = insertValues.map(() => "(?, ?)").join(",");
-
-      await connection.query(
-        `INSERT INTO user_roles (user_id, role_id) VALUES ${insertPlaceholders}`,
-        insertValues.flat()
-      );
+        if (roleRows.length > 0) {
+          const insertValues = roleRows.map((role) => [userId, role.id]);
+          await connection.query(
+            "INSERT INTO user_roles (user_id, role_id) VALUES ?",
+            [insertValues],
+          );
+        }
+      }
     }
-
-    // 3. ⬇️ NUEVA LÓGICA: activar o desactivar verificación según rol
-    const hadAdmin = oldRoles.includes("1");
-    const hasAdminNow = roleCodes.includes("1");
-
-    // Si ganó ADMIN → activar verificación
-    if (!hadAdmin && hasAdminNow) {
-      console.log("⚡ ADMIN añadido → activando is_verified");
-      await connection.query(
-        `UPDATE users SET is_verified = 1, updated_at = NOW() WHERE id = ?`,
-        [userId]
-      );
-    }
-
-    // Si perdió ADMIN → desactivar verificación
-    if (hadAdmin && !hasAdminNow) {
-      console.log("❌ ADMIN retirado → desactivando is_verified");
-      await connection.query(
-        `UPDATE users SET is_verified = 0, updated_at = NOW() WHERE id = ?`,
-        [userId]
-      );
-    }
-  }
-}
 
     await connection.commit();
 
     const [updatedUser] = await pool.query(
       `
-      SELECT 
-        u.id,
-        u.first_name,
-        u.last_name,
-        u.email,
-        u.phone,
-        u.status_id,
-        u.created_at,
-        u.updated_at,
-        JSON_ARRAYAGG(JSON_OBJECT('id', r.id, 'code', r.code, 'name', r.name)) AS roles
-      FROM users u
-      LEFT JOIN user_roles ur ON ur.user_id = u.id
-      LEFT JOIN roles r ON r.id = ur.role_id
-      WHERE u.id = ?
-      GROUP BY u.id
+        SELECT
+          u.id,
+          u.first_name,
+          u.last_name,
+          u.email,
+          u.phone,
+          u.status_id,
+          u.created_at,
+          u.updated_at,
+          JSON_ARRAYAGG(JSON_OBJECT('id', r.id, 'name', r.name)) AS roles
+        FROM users u
+        LEFT JOIN user_roles ur ON ur.user_id = u.id
+        LEFT JOIN roles r ON r.id = ur.role_id
+        WHERE u.id = ?
+        GROUP BY u.id
       `,
-      [userId]
+      [userId],
     );
-
-    connection.release();
 
     return NextResponse.json({
       success: true,
       message: "Usuario actualizado correctamente",
-      user: (updatedUser as any[])[0] ?? null
+      user: (updatedUser as any[])[0] ?? null,
     });
-
   } catch (error) {
-    console.error("❌ ERROR, HACIENDO ROLLBACK:", error);
     await connection.rollback();
-    connection.release();
+    console.error("Error al actualizar usuario:", error);
     return NextResponse.json(
-      { error: "Error al actualizar usuario", details: (error as Error).message },
-      { status: 500 }
+      {
+        error: "Error al actualizar usuario",
+        details: (error as Error).message,
+      },
+      { status: 500 },
     );
+  } finally {
+    connection.release();
   }
 }
