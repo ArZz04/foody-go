@@ -344,7 +344,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const access = await resolveBusinessAccess(authUser.user.id, business_id);
+    const access = await resolveBusinessAccess(
+      Number(authUser.user.id),
+      Number(business_id),
+    );
 
     if (!access.businessId) {
       return NextResponse.json(
@@ -415,7 +418,7 @@ export async function POST(req: NextRequest) {
         stock_danger ?? 0,
         createdAt,
         updatedAt,
-        expires_at ? toMySQLDate(new Date(expires_at)) : null,
+        expires_at ? toMySQLDate(new Date(String(expires_at))) : null,
         status_id ?? 1,
       ],
     );
@@ -513,19 +516,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    await syncOfferPromotionForProduct(connection, {
-      id: result.insertId,
-      name: String(name),
-      price: Number(price),
-      discount_price:
-        discount_price === null || discount_price === undefined
-          ? null
-          : Number(discount_price),
-      promotion_id:
-        promotion_id === null || promotion_id === undefined
-          ? null
-          : Number(promotion_id),
-    });
+    await syncOfferPromotionForProduct(
+      connection,
+      ({
+        id: result.insertId,
+        name: String(name),
+        price: Number(price),
+        discount_price:
+          discount_price === null || discount_price === undefined
+            ? null
+            : Number(discount_price),
+        promotion_id:
+          promotion_id === null || promotion_id === undefined
+            ? null
+            : Number(promotion_id),
+      } as unknown) as ProductPromotionRow,
+    );
 
     await connection.commit();
 
