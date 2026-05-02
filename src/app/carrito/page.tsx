@@ -110,9 +110,11 @@ export default function CarritoPage() {
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
-  const [customerLocation, setCustomerLocation] = useState<{ lat: number; lng: number } | null>(null);
 >>>>>>> Stashed changes
+  const [customerLocation, setCustomerLocation] =
+    useState<CustomerLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
   const [cartId, setCartId] = useState<number | null>(null);
