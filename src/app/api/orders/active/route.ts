@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import type { RowDataPacket } from "mysql2/promise";
 
 import { GET as getOrders } from "@/app/api/orders/route";
 import { getAuthUser } from "@/lib/admin-security";
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const [userRows] = await pool.query<Array<{ email: string }>>(
+    const [userRows] = await pool.query<Array<RowDataPacket & { email: string }>>(
       `
         SELECT email
         FROM users
@@ -50,7 +51,7 @@ export async function GET(req: NextRequest) {
       [authUser.user.id],
     );
 
-    const [roleRows] = await pool.query<Array<{ role_name: string }>>(
+    const [roleRows] = await pool.query<Array<RowDataPacket & { role_name: string }>>(
       `
         SELECT r.name AS role_name
         FROM user_roles ur
