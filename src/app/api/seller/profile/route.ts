@@ -247,7 +247,7 @@ async function getSellerContext(userId: number) {
         business_id: Number(owner.business_id),
         business_name: owner.business_name,
         business_phone: owner.business_phone,
-      } satisfies SellerProfileRow,
+      } as SellerProfileRow,
       seller: {
         user_id: Number(owner.user_id),
         business_id: Number(owner.business_id),
@@ -275,7 +275,7 @@ async function getSellerContext(userId: number) {
         business_id: 0,
         business_name: "Sin negocio asignado",
         business_phone: null,
-      } satisfies SellerProfileRow,
+      } as SellerProfileRow,
       seller: {
         user_id: Number(user.user_id),
         business_id: 0,
