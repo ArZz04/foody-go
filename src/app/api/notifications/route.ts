@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { RowDataPacket } from "mysql2";
 
 import { getAuthUser } from "@/lib/admin-security";
 import pool, { logDbUsage } from "@/lib/db";
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const [userInfoRows] = await pool.query<UserInfoRow[]>(
+    const [userInfoRows] = await pool.query<Array<UserInfoRow & RowDataPacket>>(
       `
         SELECT u.email, r.name AS role_name
         FROM users u
@@ -50,12 +51,16 @@ export async function GET(req: NextRequest) {
     );
     console.log(
       "GET /api/notifications role:",
-      userInfoRows.map((row) => row.role_name).filter(Boolean),
+      userInfoRows
+        .map((row) => row.role_name)
+        .filter((role): role is string => Boolean(role)),
     );
     logDbUsage("/api/notifications", {
       userId: authUser.user.id,
       email: userInfoRows[0]?.email ?? null,
-      role: userInfoRows.map((row) => row.role_name).filter(Boolean),
+      role: userInfoRows
+        .map((row) => row.role_name)
+        .filter((role): role is string => Boolean(role)),
     });
 
     await ensureNotificationsTable();
