@@ -108,11 +108,6 @@ export default function CarritoPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState<StoredCartItem[]>([]);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
   const [customerLocation, setCustomerLocation] =
     useState<CustomerLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -126,7 +121,6 @@ export default function CarritoPage() {
     }
     return DEFAULT_DELIVERY_FEE;
   }, [customerLocation]);
-=======
   const [savedAddress, setSavedAddress] = useState<SavedAddress | null>(
     user?.address ?? null,
   );
@@ -626,7 +620,6 @@ export default function CarritoPage() {
     );
   }
 
-<<<<<<< Updated upstream
   const getItemPrice = (item: StoredCartItem) =>
     item.unitPrice ?? item.price ?? 0;
 
@@ -670,8 +663,6 @@ export default function CarritoPage() {
     );
   };
 
-=======
->>>>>>> Stashed changes
   return (
     <div className="min-h-screen bg-white/80 text-orange-950">
       <div className="container mx-auto grid gap-8 px-4 py-12 lg:grid-cols-[2fr_1fr]">
