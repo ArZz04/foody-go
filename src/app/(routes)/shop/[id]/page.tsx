@@ -4,7 +4,12 @@ import { ArrowLeft, MapPin, Search, ChevronLeft, ChevronRight } from "lucide-rea
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+<<<<<<< Updated upstream
 import { useEffect, useState, useMemo, useCallback } from "react";
+=======
+import { useEffect, useState, useMemo } from "react";
+import { useAuth } from "@/context/AuthContext";
+>>>>>>> Stashed changes
 
 type Business = {
   id: number | string;
@@ -60,6 +65,8 @@ const NAV_TABS = [
 const ITEMS_PER_PAGE = 12;
 
 export default function BusinessDetailPage() {
+  const { user } = useAuth();
+
   const params = useParams<{ id: string }>();
   const businessId = Number(params?.id ?? NaN);
   const [business, setBusiness] = useState<Business | null>(null);
